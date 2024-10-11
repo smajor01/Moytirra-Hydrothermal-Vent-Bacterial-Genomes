@@ -21,6 +21,7 @@ Read trimming and ASV calling was performed with the DADA2 v1.30 R package, remo
 
 ### DNA Extraction and Whole Genome Sequencing of 12 Isolates:
 Frozen 20 µL aliquots of each of the 12 isolates was thawed at room temperature and extracted using a modified CTAB protocol.
+
 **Illumina Short Read Sequencing**: 1 µg of DNA was sheared to 500 bp, size selected, end-repaired, A-tailed, ligated with Illumina indexes, size selected, then sent to the University of Connectericut Center for Genomic Innovation for paired-end sequencing on an Illumina NovaSeq.
 
 **Oxford Nanopore Long Read Sequencing**: DNA was size selected for fragments >1.5 kbp and 1 µg of high molecular weight was preparred following the Oxford Nanopore protocol for Native Barcoding Genomic DNA with the Ligation Sequencing kit (SQK-LSK109) and Native Barcoding Expansion kit (EXP-NBD104). Libraries were sequenced on a MinION R9.4.1 flow cell, basecalling was performed with Guppy v6.4.8 using the fast basecalling algorithm (community.nanoportech.com/download). The resulting sequences were quality filtered using the NanoPack programs’ nanofilt (25), retaining sequences greater than 150 bp with a FAST5 q score of 10.
