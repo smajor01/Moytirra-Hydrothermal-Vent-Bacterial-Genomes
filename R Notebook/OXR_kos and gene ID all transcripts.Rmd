@@ -1,0 +1,1380 @@
+---
+title: "OXR_KO and gene id"
+output: pdf_document
+date: "2023-10-25"
+---
+
+OXR-9
+```{r}
+# OXR-9
+library(dplyr)
+library(data.table)
+
+annos <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-9/trycycler/eggNOG_annotations/OXR-9_annos_w-DESeq.txt", sep = "\t",  header = T)
+
+#####
+# KEGG_ko
+
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,37)]
+
+ko[is.na(ko)] <- "-"
+
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+
+test <- splitstackshape::cSplit(ko, "KEGG_ko", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20), variable.name = "KEGG_ko")
+
+test2$KEGG_ko <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-9/trycycler/eggNOG_annotations/OXR-9_ko.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Pathway
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,38)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Pathway", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Pathway")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Pathway")
+
+test2$KEGG_Pathway <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-9/trycycler/eggNOG_annotations/OXR-9_pathway_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Module
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,39)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Module", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Module")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Module")
+
+test2$KEGG_Module <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-9/trycycler/eggNOG_annotations/OXR-9_module_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Reaction
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,40)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Reaction", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Reaction") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_Reaction <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-9/trycycler/eggNOG_annotations/OXR-9_reaction_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_rclass
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,41)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_rclass", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "KEGG_rclass") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_rclass <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-9/trycycler/eggNOG_annotations/OXR-9_rclass_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_BRITE
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,42)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "BRITE", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "BRITE") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$BRITE <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-9/trycycler/eggNOG_annotations/OXR-9_BRITE_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-11
+```{r}
+# OXR-11
+library(dplyr)
+library(data.table)
+
+annos <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-11/trycycler/eggNOG_annotations/OXR-11_annos_w-DESeq.txt", sep = "\t",  header = T)
+
+#####
+# KEGG_ko
+
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,37)]
+
+ko[is.na(ko)] <- "-"
+
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+
+test <- splitstackshape::cSplit(ko, "KEGG_ko", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20), variable.name = "KEGG_ko")
+
+test2$KEGG_ko <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-11/trycycler/eggNOG_annotations/OXR-11_ko.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Pathway
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,38)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Pathway", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Pathway")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Pathway")
+
+test2$KEGG_Pathway <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-11/trycycler/eggNOG_annotations/OXR-11_pathway_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Module
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,39)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Module", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Module")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Module")
+
+test2$KEGG_Module <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-11/trycycler/eggNOG_annotations/OXR-11_module_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Reaction
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,40)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Reaction", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Reaction") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_Reaction <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-11/trycycler/eggNOG_annotations/OXR-11_reaction_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_rclass
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,41)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_rclass", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "KEGG_rclass") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_rclass <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-11/trycycler/eggNOG_annotations/OXR-11_rclass_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_BRITE
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,42)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "BRITE", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "BRITE") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$BRITE <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-11/trycycler/eggNOG_annotations/OXR-11_BRITE_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-85
+```{r}
+# OXR-85
+library(dplyr)
+library(data.table)
+
+annos <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-85/trycycler/eggNOG_annotations/OXR-85_annos_w-DESeq.txt", sep = "\t",  header = T)
+
+#####
+# KEGG_ko
+
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,37)]
+
+ko[is.na(ko)] <- "-"
+
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+
+test <- splitstackshape::cSplit(ko, "KEGG_ko", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20), variable.name = "KEGG_ko")
+
+test2$KEGG_ko <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-85/trycycler/eggNOG_annotations/OXR-85_ko.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Pathway
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,38)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Pathway", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Pathway")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Pathway")
+
+test2$KEGG_Pathway <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-85/trycycler/eggNOG_annotations/OXR-85_pathway_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Module
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,39)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Module", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Module")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Module")
+
+test2$KEGG_Module <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-85/trycycler/eggNOG_annotations/OXR-85_module_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Reaction
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,40)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Reaction", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Reaction") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_Reaction <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-85/trycycler/eggNOG_annotations/OXR-85_reaction_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_rclass
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,41)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_rclass", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "KEGG_rclass") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_rclass <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-85/trycycler/eggNOG_annotations/OXR-85_rclass_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_BRITE
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,42)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "BRITE", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "BRITE") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$BRITE <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-85/trycycler/eggNOG_annotations/OXR-85_BRITE_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-96
+```{r}
+# OXR-96
+library(dplyr)
+library(data.table)
+
+annos <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-96/trycycler/eggNOG_annotations/OXR-96_annos_w-DESeq.txt", sep = "\t",  header = T)
+
+#####
+# KEGG_ko
+
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,37)]
+
+ko[is.na(ko)] <- "-"
+
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+
+test <- splitstackshape::cSplit(ko, "KEGG_ko", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20), variable.name = "KEGG_ko")
+
+test2$KEGG_ko <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-96/trycycler/eggNOG_annotations/OXR-96_ko.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Pathway
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,38)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Pathway", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Pathway")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Pathway")
+
+test2$KEGG_Pathway <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-96/trycycler/eggNOG_annotations/OXR-96_pathway_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Module
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,39)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Module", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Module")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Module")
+
+test2$KEGG_Module <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-96/trycycler/eggNOG_annotations/OXR-96_module_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Reaction
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,40)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Reaction", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Reaction") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_Reaction <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-96/trycycler/eggNOG_annotations/OXR-96_reaction_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_rclass
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,41)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_rclass", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "KEGG_rclass") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_rclass <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-96/trycycler/eggNOG_annotations/OXR-96_rclass_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_BRITE
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,42)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "BRITE", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "BRITE") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$BRITE <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-96/trycycler/eggNOG_annotations/OXR-96_BRITE_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-134
+```{r}
+# OXR-134
+library(dplyr)
+library(data.table)
+
+annos <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-134/trycycler/eggNOG_annotations/OXR-134_annos_w-DESeq.txt", sep = "\t",  header = T)
+
+#####
+# KEGG_ko
+
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,37)]
+
+ko[is.na(ko)] <- "-"
+
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+
+test <- splitstackshape::cSplit(ko, "KEGG_ko", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20), variable.name = "KEGG_ko")
+
+test2$KEGG_ko <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-134/trycycler/eggNOG_annotations/OXR-134_ko.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Pathway
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,38)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Pathway", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Pathway")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Pathway")
+
+test2$KEGG_Pathway <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-134/trycycler/eggNOG_annotations/OXR-134_pathway_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Module
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,39)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Module", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Module")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Module")
+
+test2$KEGG_Module <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-134/trycycler/eggNOG_annotations/OXR-134_module_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Reaction
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,40)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Reaction", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Reaction") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_Reaction <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-134/trycycler/eggNOG_annotations/OXR-134_reaction_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_rclass
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,41)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_rclass", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "KEGG_rclass") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_rclass <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-134/trycycler/eggNOG_annotations/OXR-134_rclass_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_BRITE
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,42)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "BRITE", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "BRITE") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$BRITE <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-134/trycycler/eggNOG_annotations/OXR-134_BRITE_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-137
+```{r}
+# OXR-137
+library(dplyr)
+library(data.table)
+
+annos <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/eggNOG_annotations/OXR-137_annos_w-DESeq.txt", sep = "\t",  header = T)
+
+#####
+# KEGG_ko
+
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,37)]
+
+ko[is.na(ko)] <- "-"
+
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+
+test <- splitstackshape::cSplit(ko, "KEGG_ko", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20), variable.name = "KEGG_ko")
+
+test2$KEGG_ko <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/eggNOG_annotations/OXR-137_ko.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Pathway
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,38)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Pathway", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Pathway")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Pathway")
+
+test2$KEGG_Pathway <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/eggNOG_annotations/OXR-137_pathway_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Module
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,39)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Module", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Module")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Module")
+
+test2$KEGG_Module <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/eggNOG_annotations/OXR-137_module_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Reaction
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,40)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Reaction", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Reaction") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_Reaction <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/eggNOG_annotations/OXR-137_reaction_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_rclass
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,41)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_rclass", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "KEGG_rclass") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_rclass <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/eggNOG_annotations/OXR-137_rclass_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_BRITE
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,42)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "BRITE", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "BRITE") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$BRITE <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/eggNOG_annotations/OXR-137_BRITE_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-159
+```{r}
+# OXR-159
+library(dplyr)
+library(data.table)
+
+annos <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-159/trycycler/eggNOG_annotations/OXR-159_annos_w-DESeq.txt", sep = "\t",  header = T)
+
+#####
+# KEGG_ko
+
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,37)]
+
+ko[is.na(ko)] <- "-"
+
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+
+test <- splitstackshape::cSplit(ko, "KEGG_ko", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20), variable.name = "KEGG_ko")
+
+test2$KEGG_ko <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-159/trycycler/eggNOG_annotations/OXR-159_ko.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Pathway
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,38)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Pathway", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Pathway")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Pathway")
+
+test2$KEGG_Pathway <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-159/trycycler/eggNOG_annotations/OXR-159_pathway_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Module
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,39)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Module", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Module")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Module")
+
+test2$KEGG_Module <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-159/trycycler/eggNOG_annotations/OXR-159_module_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Reaction
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,40)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Reaction", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Reaction") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_Reaction <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-159/trycycler/eggNOG_annotations/OXR-159_reaction_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_rclass
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,41)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_rclass", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "KEGG_rclass") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_rclass <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-159/trycycler/eggNOG_annotations/OXR-159_rclass_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_BRITE
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,42)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "BRITE", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "BRITE") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$BRITE <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-159/trycycler/eggNOG_annotations/OXR-159_BRITE_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-189
+```{r}
+# OXR-189
+library(dplyr)
+library(data.table)
+
+annos <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-189/trycycler/eggNOG_annotations/OXR-189_annos_w-DESeq.txt", sep = "\t",  header = T)
+
+#####
+# KEGG_ko
+
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,37)]
+
+ko[is.na(ko)] <- "-"
+
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+
+test <- splitstackshape::cSplit(ko, "KEGG_ko", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20), variable.name = "KEGG_ko")
+
+test2$KEGG_ko <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-189/trycycler/eggNOG_annotations/OXR-189_ko.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Pathway
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,38)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Pathway", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Pathway")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Pathway")
+
+test2$KEGG_Pathway <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-189/trycycler/eggNOG_annotations/OXR-189_pathway_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Module
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,39)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Module", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Module")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Module")
+
+test2$KEGG_Module <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-189/trycycler/eggNOG_annotations/OXR-189_module_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Reaction
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,40)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Reaction", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Reaction") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_Reaction <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-189/trycycler/eggNOG_annotations/OXR-189_reaction_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_rclass
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,41)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_rclass", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "KEGG_rclass") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_rclass <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-189/trycycler/eggNOG_annotations/OXR-189_rclass_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_BRITE
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,42)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "BRITE", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "BRITE") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$BRITE <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-189/trycycler/eggNOG_annotations/OXR-189_BRITE_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-199
+```{r}
+# OXR-199
+library(dplyr)
+library(data.table)
+
+annos <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-199/trycycler/eggNOG_annotations/OXR-199_annos_w-DESeq.txt", sep = "\t",  header = T)
+
+#####
+# KEGG_ko
+
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,37)]
+
+ko[is.na(ko)] <- "-"
+
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+
+test <- splitstackshape::cSplit(ko, "KEGG_ko", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20), variable.name = "KEGG_ko")
+
+test2$KEGG_ko <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-199/trycycler/eggNOG_annotations/OXR-199_ko.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Pathway
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,38)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Pathway", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Pathway")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Pathway")
+
+test2$KEGG_Pathway <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-199/trycycler/eggNOG_annotations/OXR-199_pathway_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Module
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,39)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Module", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Module")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Module")
+
+test2$KEGG_Module <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-199/trycycler/eggNOG_annotations/OXR-199_module_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Reaction
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,40)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Reaction", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Reaction") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_Reaction <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-199/trycycler/eggNOG_annotations/OXR-199_reaction_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_rclass
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,41)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_rclass", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "KEGG_rclass") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_rclass <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-199/trycycler/eggNOG_annotations/OXR-199_rclass_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_BRITE
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,42)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "BRITE", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "BRITE") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$BRITE <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-199/trycycler/eggNOG_annotations/OXR-199_BRITE_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-203
+```{r}
+# OXR-203
+library(dplyr)
+library(data.table)
+
+annos <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/trycycler/eggNOG_annotations/OXR-203_annos_w-DESeq.txt", sep = "\t",  header = T)
+
+#####
+# KEGG_ko
+
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,37)]
+
+ko[is.na(ko)] <- "-"
+
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+
+test <- splitstackshape::cSplit(ko, "KEGG_ko", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20), variable.name = "KEGG_ko")
+
+test2$KEGG_ko <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/trycycler/eggNOG_annotations/OXR-203_ko.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Pathway
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,38)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Pathway", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Pathway")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Pathway")
+
+test2$KEGG_Pathway <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/trycycler/eggNOG_annotations/OXR-203_pathway_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Module
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,39)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Module", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Module")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Module")
+
+test2$KEGG_Module <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/trycycler/eggNOG_annotations/OXR-203_module_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Reaction
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,40)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Reaction", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Reaction") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_Reaction <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/trycycler/eggNOG_annotations/OXR-203_reaction_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_rclass
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,41)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_rclass", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "KEGG_rclass") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_rclass <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/trycycler/eggNOG_annotations/OXR-203_rclass_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_BRITE
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,42)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "BRITE", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "BRITE") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$BRITE <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/trycycler/eggNOG_annotations/OXR-203_BRITE_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-209
+```{r}
+# OXR-209
+library(dplyr)
+library(data.table)
+
+annos <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-209/trycycler/eggNOG_annotations/OXR-209_annos_w-DESeq.txt", sep = "\t",  header = T)
+
+#####
+# KEGG_ko
+
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,37)]
+
+ko[is.na(ko)] <- "-"
+
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+
+test <- splitstackshape::cSplit(ko, "KEGG_ko", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20), variable.name = "KEGG_ko")
+
+test2$KEGG_ko <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-209/trycycler/eggNOG_annotations/OXR-209_ko.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Pathway
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,38)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Pathway", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Pathway")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Pathway")
+
+test2$KEGG_Pathway <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-209/trycycler/eggNOG_annotations/OXR-209_pathway_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Module
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,39)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Module", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Module")
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Module")
+
+test2$KEGG_Module <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-209/trycycler/eggNOG_annotations/OXR-209_module_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_Reaction
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,40)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_Reaction", sep=",")
+
+test2 <- melt(setDT(test), id.vars = c(1:20),variable.name = "KEGG_Reaction") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_Reaction <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-209/trycycler/eggNOG_annotations/OXR-209_reaction_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_rclass
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,41)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "KEGG_rclass", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "KEGG_rclass") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$KEGG_rclass <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-209/trycycler/eggNOG_annotations/OXR-209_rclass_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+#####
+# KEGG_BRITE
+ko <- annos[,c(1,2,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,42)]
+
+ko[is.na(ko)] <- "-"
+
+test <- splitstackshape::cSplit(ko, "BRITE", sep=",")
+
+test2 <- melt(setDT(test), id.vars =c(1:20),variable.name = "BRITE") 
+# c("eggNOG_name","eggNOG_alt_name","TPM.C1B11F1","TPM.C1B11F2","TPM.C1B11F3","COUNT.C1B11F1","COUNT.C1B11F2","COUNT.C1B11F3"), variable.name = "KEGG_Reaction")
+
+test2$BRITE <- NULL
+
+test3 <- na.omit(test2)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-209/trycycler/eggNOG_annotations/OXR-209_BRITE_DE.txt", "wb")
+write.table(test3, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```

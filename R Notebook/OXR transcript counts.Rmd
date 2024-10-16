@@ -1,0 +1,1140 @@
+---
+title: "OXR Transcript counts"
+output: pdf_document
+date: "2023-09-20"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+### OXR-9 ###
+library(ggplot2)
+###-------- load data process data --------###
+dta <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-9/OXR-9_expt.ct.txt", sep = "\t",
+                header=TRUE, row.names = "gene_id")
+
+# remove rows with all zeros
+dta <- dta[rowSums(dta[])>0,]
+sort(colSums(dta))
+sum(colSums(dta))
+
+### Make data integers
+dta2 <- as.data.frame(lapply(dta, as.integer))
+rownames(dta2) <- rownames(dta)
+
+OXR9 <- as.data.frame(colSums(dta2))
+OXR9 <- as.data.frame(t(OXR9))
+
+C1B1 <- (OXR9$C1B1F1 + OXR9$C1B1F2 + OXR9$C1B1F3)/3
+C1B1sd <- sd(c(OXR9$C1B1F1, OXR9$C1B1F2, OXR9$C1B1F3))
+
+C1B2 <- (OXR9$C1B2F1 + OXR9$C1B2F2 + OXR9$C1B2F3)/3
+C1B2sd <- sd(c(OXR9$C1B2F1,OXR9$C1B2F2, OXR9$C1B2F3))
+
+C1B3 <- (OXR9$C1B3F1 + OXR9$C1B3F2 + OXR9$C1B3F3)/3
+C1B3sd <- sd(c(OXR9$C1B3F1, OXR9$C1B3F2, OXR9$C1B3F3))
+
+C1B4 <- (OXR9$C1B4F1 + OXR9$C1B4F2 + OXR9$C1B4F3)/3
+C1B4sd <- sd(c(OXR9$C1B4F1, OXR9$C1B4F2, OXR9$C1B4F3))
+
+C1B5 <- (OXR9$C1B5F1 + OXR9$C1B5F2 + OXR9$C1B5F3)/3
+C1B5sd <- sd(c(OXR9$C1B5F1, OXR9$C1B5F2, OXR9$C1B5F3))
+
+C1B6 <- (OXR9$C1B6F1 + OXR9$C1B6F2 + OXR9$C1B6F3)/3
+C1B6sd <- sd(c(OXR9$C1B6F1, OXR9$C1B6F2, OXR9$C1B6F3))
+
+C1B7 <- (OXR9$C1B7F1 + OXR9$C1B7F2 + OXR9$C1B7F3)/3
+C1B7sd <- sd(c(OXR9$C1B7F1, OXR9$C1B7F2, OXR9$C1B7F3))
+
+C1B8 <- (OXR9$C1B8F1 + OXR9$C1B8F2 + OXR9$C1B8F3)/3
+C1B8sd <- sd(c(OXR9$C1B8F1, OXR9$C1B8F2, OXR9$C1B8F3))
+
+C1B9 <- (OXR9$C1B9F1 + OXR9$C1B9F2 + OXR9$C1B9F3)/3
+C1B9sd <- sd(c(OXR9$C1B9F1, OXR9$C1B9F2, OXR9$C1B9F3))
+
+C1B10 <- (OXR9$C1B10F1 + OXR9$C1B10F2 + OXR9$C1B10F3)/3
+C1B10sd <- sd(c(OXR9$C1B10F1, OXR9$C1B10F2, OXR9$C1B10F3))
+
+C1B11 <- (OXR9$C1B11F1 + OXR9$C1B11F2 + OXR9$C1B11F3)/3
+C1B11sd <- sd(c(OXR9$C1B11F1, OXR9$C1B11F2, OXR9$C1B11F3))
+
+C2B2 <- (OXR9$C2B2F1 + OXR9$C2B2F2 + OXR9$C2B2F3)/3
+C2B2sd <- sd(c(OXR9$C2B2F1, OXR9$C2B2F2, OXR9$C2B2F3))
+
+C2B3 <- (OXR9$C2B3F1 + OXR9$C2B3F2 + OXR9$C2B3F3)/3
+C2B3sd <- sd(c(OXR9$C2B3F1, OXR9$C2B3F2, OXR9$C2B3F3))
+
+C2B4 <- (OXR9$C2B4F1 + OXR9$C2B4F2 + OXR9$C2B4F3)/3
+C2B4sd <- sd(c(OXR9$C2B4F1, OXR9$C2B4F2, OXR9$C2B4F3))
+
+C2B5 <- (OXR9$C2B5F1 + OXR9$C2B5F2 + OXR9$C2B5F3)/3
+C2B5sd <- sd(c(OXR9$C2B5F1, OXR9$C2B5F2, OXR9$C2B5F3))
+
+C1B12 <- (OXR9$C1B12F1 + OXR9$C1B12F2 + OXR9$C1B12F3)/3
+C1B12sd <- sd(c(OXR9$C1B12F1, OXR9$C1B12F2, OXR9$C1B12F3))
+
+C2B1 <- (OXR9$C2B1F1 + OXR9$C2B1F2 + OXR9$C2B1F3)/3
+C2B1sd <- sd(c(OXR9$C2B1F1, OXR9$C2B1F2, OXR9$C2B1F3))
+
+OXR9 <- cbind(C1B1,C1B2,C1B3,C1B4,C1B5,C1B6,C1B7,C1B8,C1B9,C1B10,C1B11,C2B2,C2B3,C2B4,C2B5,C1B12,C2B1)
+sd <- cbind(C1B1sd,C1B2sd,C1B3sd,C1B4sd,C1B5sd,C1B6sd,C1B7sd,C1B8sd,C1B9sd,C1B10sd,C1B11sd,C2B2sd,C2B3sd,C2B4sd,C2B5sd,C1B12sd,C2B1sd)
+
+ 
+OXR9.t <- as.data.frame(t(OXR9))
+OXR9.t$sample <- row.names(OXR9.t)
+OXR9.t$sd <- as.numeric(t(sd))
+colnames(OXR9.t) <- c("count","sample","sd")
+OXR9.t$sample <- factor(OXR9.t$sample, levels=c("C1B1","C1B2","C1B3","C1B4","C1B5","C1B6","C1B7","C1B8","C1B9","C1B10","C1B11","C2B2","C2B3","C2B4","C2B5","C1B12","C2B1"))
+
+oxr.9 <- ggplot(OXR9.t, aes(x = sample, y = count))+
+  geom_bar(stat="identity") +
+ geom_errorbar(aes(ymin=count-sd, ymax= count+sd),width = 0.4) +
+  geom_vline(xintercept = 15.5, col = "red", lwd = 1)+
+  ggtitle(expression(italic("Sulfitobacter faviae") ~ "OXR-9"))+
+  theme_bw()+
+  labs(x = "Plume Sample", y = "Transcipt Count") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+  theme(axis.text = element_text(size = 11)) +
+  theme(axis.title = element_text(size = 12))
+
+oxr.9
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+```{r}
+### OXR-11 ###
+library(ggplot2)
+###-------- load data process data --------###
+dta <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-11/OXR-11_expt.ct.txt", sep = "\t",
+                header=TRUE, row.names = "gene_id")
+
+# remove rows with all zeros
+dta <- dta[rowSums(dta[])>0,]
+sort(colSums(dta))
+sum(colSums(dta))
+
+### Make data integers
+dta2 <- as.data.frame(lapply(dta, as.integer))
+rownames(dta2) <- rownames(dta)
+
+OXR11 <- as.data.frame(colSums(dta2))
+OXR11 <- as.data.frame(t(OXR11))
+C1B1 <- (OXR11$C1B1F1 + OXR11$C1B1F2 + OXR11$C1B1F3)/3
+C1B1sd <- sd(c(OXR11$C1B1F1, OXR11$C1B1F2, OXR11$C1B1F3))
+
+C1B2 <- (OXR11$C1B2F1 + OXR11$C1B2F2 + OXR11$C1B2F3)/3
+C1B2sd <- sd(c(OXR11$C1B2F1,OXR11$C1B2F2, OXR11$C1B2F3))
+
+C1B3 <- (OXR11$C1B3F1 + OXR11$C1B3F2 + OXR11$C1B3F3)/3
+C1B3sd <- sd(c(OXR11$C1B3F1, OXR11$C1B3F2, OXR11$C1B3F3))
+
+C1B4 <- (OXR11$C1B4F1 + OXR11$C1B4F2 + OXR11$C1B4F3)/3
+C1B4sd <- sd(c(OXR11$C1B4F1, OXR11$C1B4F2, OXR11$C1B4F3))
+
+C1B5 <- (OXR11$C1B5F1 + OXR11$C1B5F2 + OXR11$C1B5F3)/3
+C1B5sd <- sd(c(OXR11$C1B5F1, OXR11$C1B5F2, OXR11$C1B5F3))
+
+C1B6 <- (OXR11$C1B6F1 + OXR11$C1B6F2 + OXR11$C1B6F3)/3
+C1B6sd <- sd(c(OXR11$C1B6F1, OXR11$C1B6F2, OXR11$C1B6F3))
+
+C1B7 <- (OXR11$C1B7F1 + OXR11$C1B7F2 + OXR11$C1B7F3)/3
+C1B7sd <- sd(c(OXR11$C1B7F1, OXR11$C1B7F2, OXR11$C1B7F3))
+
+C1B8 <- (OXR11$C1B8F1 + OXR11$C1B8F2 + OXR11$C1B8F3)/3
+C1B8sd <- sd(c(OXR11$C1B8F1, OXR11$C1B8F2, OXR11$C1B8F3))
+
+C1B9 <- (OXR11$C1B9F1 + OXR11$C1B9F2 + OXR11$C1B9F3)/3
+C1B9sd <- sd(c(OXR11$C1B9F1, OXR11$C1B9F2, OXR11$C1B9F3))
+
+C1B10 <- (OXR11$C1B10F1 + OXR11$C1B10F2 + OXR11$C1B10F3)/3
+C1B10sd <- sd(c(OXR11$C1B10F1, OXR11$C1B10F2, OXR11$C1B10F3))
+
+C1B11 <- (OXR11$C1B11F1 + OXR11$C1B11F2 + OXR11$C1B11F3)/3
+C1B11sd <- sd(c(OXR11$C1B11F1, OXR11$C1B11F2, OXR11$C1B11F3))
+
+C2B2 <- (OXR11$C2B2F1 + OXR11$C2B2F2 + OXR11$C2B2F3)/3
+C2B2sd <- sd(c(OXR11$C2B2F1, OXR11$C2B2F2, OXR11$C2B2F3))
+
+C2B3 <- (OXR11$C2B3F1 + OXR11$C2B3F2 + OXR11$C2B3F3)/3
+C2B3sd <- sd(c(OXR11$C2B3F1, OXR11$C2B3F2, OXR11$C2B3F3))
+
+C2B4 <- (OXR11$C2B4F1 + OXR11$C2B4F2 + OXR11$C2B4F3)/3
+C2B4sd <- sd(c(OXR11$C2B4F1, OXR11$C2B4F2, OXR11$C2B4F3))
+
+C2B5 <- (OXR11$C2B5F1 + OXR11$C2B5F2 + OXR11$C2B5F3)/3
+C2B5sd <- sd(c(OXR11$C2B5F1, OXR11$C2B5F2, OXR11$C2B5F3))
+
+C1B12 <- (OXR11$C1B12F1 + OXR11$C1B12F2 + OXR11$C1B12F3)/3
+C1B12sd <- sd(c(OXR11$C1B12F1, OXR11$C1B12F2, OXR11$C1B12F3))
+
+C2B1 <- (OXR11$C2B1F1 + OXR11$C2B1F2 + OXR11$C2B1F3)/3
+C2B1sd <- sd(c(OXR11$C2B1F1, OXR11$C2B1F2, OXR11$C2B1F3))
+
+OXR11 <- cbind(C1B1,C1B2,C1B3,C1B4,C1B5,C1B6,C1B7,C1B8,C1B9,C1B10,C1B11,C2B2,C2B3,C2B4,C2B5,C1B12,C2B1)
+sd <- cbind(C1B1sd,C1B2sd,C1B3sd,C1B4sd,C1B5sd,C1B6sd,C1B7sd,C1B8sd,C1B9sd,C1B10sd,C1B11sd,C2B2sd,C2B3sd,C2B4sd,C2B5sd,C1B12sd,C2B1sd)
+
+
+OXR11.t <- as.data.frame(t(OXR11))
+OXR11.t$sample <- row.names(OXR11.t)
+OXR11.t$sd <- as.numeric(t(sd))
+colnames(OXR11.t) <- c("count","sample","sd")
+OXR11.t$sample <- factor(OXR11.t$sample, levels=c("C1B1","C1B2","C1B3","C1B4","C1B5","C1B6","C1B7","C1B8","C1B9","C1B10","C1B11","C2B2","C2B3","C2B4","C2B5","C1B12","C2B1"))
+
+oxr.11 <- ggplot(OXR11.t, aes(x = sample, y = count))+
+  geom_bar(stat="identity") +
+  geom_errorbar(aes(ymin=count-sd, ymax= count+sd),width = 0.4) +
+  geom_vline(xintercept = 15.5, col = "red", lwd = 1)+
+  ggtitle(expression(italic("Roseivirga spongicola")~"OXR-11"))+
+  theme_bw()+
+  labs(x = "Plume Sample", y = "Transcipt Count") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+  theme(axis.text = element_text(size = 11)) +
+  theme(axis.title = element_text(size = 12))
+
+oxr.11
+```
+```{r}
+### OXR-76 ###
+library(ggplot2)
+###-------- load data process data --------###
+dta <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-76/OXR-76_expt.ct.txt", sep = "\t",
+                header=TRUE, row.names = "gene_id")
+
+# remove rows with all zeros
+dta <- dta[rowSums(dta[])>0,]
+sort(colSums(dta))
+sum(colSums(dta))
+
+### Make data integers
+dta2 <- as.data.frame(lapply(dta, as.integer))
+rownames(dta2) <- rownames(dta)
+
+OXR76 <- as.data.frame(colSums(dta2))
+OXR76 <- as.data.frame(t(OXR76))
+C1B1 <- (OXR76$C1B1F1 + OXR76$C1B1F2 + OXR76$C1B1F3)/3
+C1B1sd <- sd(c(OXR76$C1B1F1, OXR76$C1B1F2, OXR76$C1B1F3))
+
+C1B2 <- (OXR76$C1B2F1 + OXR76$C1B2F2 + OXR76$C1B2F3)/3
+C1B2sd <- sd(c(OXR76$C1B2F1,OXR76$C1B2F2, OXR76$C1B2F3))
+
+C1B3 <- (OXR76$C1B3F1 + OXR76$C1B3F2 + OXR76$C1B3F3)/3
+C1B3sd <- sd(c(OXR76$C1B3F1, OXR76$C1B3F2, OXR76$C1B3F3))
+
+C1B4 <- (OXR76$C1B4F1 + OXR76$C1B4F2 + OXR76$C1B4F3)/3
+C1B4sd <- sd(c(OXR76$C1B4F1, OXR76$C1B4F2, OXR76$C1B4F3))
+
+C1B5 <- (OXR76$C1B5F1 + OXR76$C1B5F2 + OXR76$C1B5F3)/3
+C1B5sd <- sd(c(OXR76$C1B5F1, OXR76$C1B5F2, OXR76$C1B5F3))
+
+C1B6 <- (OXR76$C1B6F1 + OXR76$C1B6F2 + OXR76$C1B6F3)/3
+C1B6sd <- sd(c(OXR76$C1B6F1, OXR76$C1B6F2, OXR76$C1B6F3))
+
+C1B7 <- (OXR76$C1B7F1 + OXR76$C1B7F2 + OXR76$C1B7F3)/3
+C1B7sd <- sd(c(OXR76$C1B7F1, OXR76$C1B7F2, OXR76$C1B7F3))
+
+C1B8 <- (OXR76$C1B8F1 + OXR76$C1B8F2 + OXR76$C1B8F3)/3
+C1B8sd <- sd(c(OXR76$C1B8F1, OXR76$C1B8F2, OXR76$C1B8F3))
+
+C1B9 <- (OXR76$C1B9F1 + OXR76$C1B9F2 + OXR76$C1B9F3)/3
+C1B9sd <- sd(c(OXR76$C1B9F1, OXR76$C1B9F2, OXR76$C1B9F3))
+
+C1B10 <- (OXR76$C1B10F1 + OXR76$C1B10F2 + OXR76$C1B10F3)/3
+C1B10sd <- sd(c(OXR76$C1B10F1, OXR76$C1B10F2, OXR76$C1B10F3))
+
+C1B11 <- (OXR76$C1B11F1 + OXR76$C1B11F2 + OXR76$C1B11F3)/3
+C1B11sd <- sd(c(OXR76$C1B11F1, OXR76$C1B11F2, OXR76$C1B11F3))
+
+C2B2 <- (OXR76$C2B2F1 + OXR76$C2B2F2 + OXR76$C2B2F3)/3
+C2B2sd <- sd(c(OXR76$C2B2F1, OXR76$C2B2F2, OXR76$C2B2F3))
+
+C2B3 <- (OXR76$C2B3F1 + OXR76$C2B3F2 + OXR76$C2B3F3)/3
+C2B3sd <- sd(c(OXR76$C2B3F1, OXR76$C2B3F2, OXR76$C2B3F3))
+
+C2B4 <- (OXR76$C2B4F1 + OXR76$C2B4F2 + OXR76$C2B4F3)/3
+C2B4sd <- sd(c(OXR76$C2B4F1, OXR76$C2B4F2, OXR76$C2B4F3))
+
+C2B5 <- (OXR76$C2B5F1 + OXR76$C2B5F2 + OXR76$C2B5F3)/3
+C2B5sd <- sd(c(OXR76$C2B5F1, OXR76$C2B5F2, OXR76$C2B5F3))
+
+C1B12 <- (OXR76$C1B12F1 + OXR76$C1B12F2 + OXR76$C1B12F3)/3
+C1B12sd <- sd(c(OXR76$C1B12F1, OXR76$C1B12F2, OXR76$C1B12F3))
+
+C2B1 <- (OXR76$C2B1F1 + OXR76$C2B1F2 + OXR76$C2B1F3)/3
+C2B1sd <- sd(c(OXR76$C2B1F1, OXR76$C2B1F2, OXR76$C2B1F3))
+
+OXR76 <- cbind(C1B1,C1B2,C1B3,C1B4,C1B5,C1B6,C1B7,C1B8,C1B9,C1B10,C1B11,C2B2,C2B3,C2B4,C2B5,C1B12,C2B1)
+sd <- cbind(C1B1sd,C1B2sd,C1B3sd,C1B4sd,C1B5sd,C1B6sd,C1B7sd,C1B8sd,C1B9sd,C1B10sd,C1B11sd,C2B2sd,C2B3sd,C2B4sd,C2B5sd,C1B12sd,C2B1sd)
+
+
+OXR76.t <- as.data.frame(t(OXR76))
+OXR76.t$sample <- row.names(OXR76.t)
+OXR76.t$sd <- as.numeric(t(sd))
+colnames(OXR76.t) <- c("count","sample","sd")
+OXR76.t$sample <- factor(OXR76.t$sample, levels=c("C1B1","C1B2","C1B3","C1B4","C1B5","C1B6","C1B7","C1B8","C1B9","C1B10","C1B11","C2B2","C2B3","C2B4","C2B5","C1B12","C2B1"))
+
+oxr.76 <- ggplot(OXR76.t, aes(x = sample, y = count))+
+  geom_bar(stat="identity") +
+  geom_vline(xintercept = 15.5, col = "red", lwd = 1)+
+  geom_errorbar(aes(ymin=count-sd, ymax= count+sd),width = 0.4) +
+  ggtitle(expression(italic("Geobacillus subterraneus")~"OXR-76"))+
+  theme_bw()+
+    labs(x = "Plume Sample", y = "Transcipt Count") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+  theme(axis.text = element_text(size = 11)) +
+  theme(axis.title = element_text(size = 12))
+
+oxr.76
+```
+```{r}
+### OXR-85 ###
+library(ggplot2)
+###-------- load data process data --------###
+dta <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-85/OXR-85_expt.ct.txt", sep = "\t",
+                header=TRUE, row.names = "gene_id")
+
+# remove rows with all zeros
+dta <- dta[rowSums(dta[])>0,]
+sort(colSums(dta))
+sum(colSums(dta))
+
+### Make data integers
+dta2 <- as.data.frame(lapply(dta, as.integer))
+rownames(dta2) <- rownames(dta)
+
+OXR85 <- as.data.frame(colSums(dta2))
+OXR85 <- as.data.frame(t(OXR85))
+C1B1 <- (OXR85$C1B1F1 + OXR85$C1B1F2 + OXR85$C1B1F3)/3
+C1B1sd <- sd(c(OXR85$C1B1F1, OXR85$C1B1F2, OXR85$C1B1F3))
+
+C1B2 <- (OXR85$C1B2F1 + OXR85$C1B2F2 + OXR85$C1B2F3)/3
+C1B2sd <- sd(c(OXR85$C1B2F1,OXR85$C1B2F2, OXR85$C1B2F3))
+
+C1B3 <- (OXR85$C1B3F1 + OXR85$C1B3F2 + OXR85$C1B3F3)/3
+C1B3sd <- sd(c(OXR85$C1B3F1, OXR85$C1B3F2, OXR85$C1B3F3))
+
+C1B4 <- (OXR85$C1B4F1 + OXR85$C1B4F2 + OXR85$C1B4F3)/3
+C1B4sd <- sd(c(OXR85$C1B4F1, OXR85$C1B4F2, OXR85$C1B4F3))
+
+C1B5 <- (OXR85$C1B5F1 + OXR85$C1B5F2 + OXR85$C1B5F3)/3
+C1B5sd <- sd(c(OXR85$C1B5F1, OXR85$C1B5F2, OXR85$C1B5F3))
+
+C1B6 <- (OXR85$C1B6F1 + OXR85$C1B6F2 + OXR85$C1B6F3)/3
+C1B6sd <- sd(c(OXR85$C1B6F1, OXR85$C1B6F2, OXR85$C1B6F3))
+
+C1B7 <- (OXR85$C1B7F1 + OXR85$C1B7F2 + OXR85$C1B7F3)/3
+C1B7sd <- sd(c(OXR85$C1B7F1, OXR85$C1B7F2, OXR85$C1B7F3))
+
+C1B8 <- (OXR85$C1B8F1 + OXR85$C1B8F2 + OXR85$C1B8F3)/3
+C1B8sd <- sd(c(OXR85$C1B8F1, OXR85$C1B8F2, OXR85$C1B8F3))
+
+C1B9 <- (OXR85$C1B9F1 + OXR85$C1B9F2 + OXR85$C1B9F3)/3
+C1B9sd <- sd(c(OXR85$C1B9F1, OXR85$C1B9F2, OXR85$C1B9F3))
+
+C1B10 <- (OXR85$C1B10F1 + OXR85$C1B10F2 + OXR85$C1B10F3)/3
+C1B10sd <- sd(c(OXR85$C1B10F1, OXR85$C1B10F2, OXR85$C1B10F3))
+
+C1B11 <- (OXR85$C1B11F1 + OXR85$C1B11F2 + OXR85$C1B11F3)/3
+C1B11sd <- sd(c(OXR85$C1B11F1, OXR85$C1B11F2, OXR85$C1B11F3))
+
+C2B2 <- (OXR85$C2B2F1 + OXR85$C2B2F2 + OXR85$C2B2F3)/3
+C2B2sd <- sd(c(OXR85$C2B2F1, OXR85$C2B2F2, OXR85$C2B2F3))
+
+C2B3 <- (OXR85$C2B3F1 + OXR85$C2B3F2 + OXR85$C2B3F3)/3
+C2B3sd <- sd(c(OXR85$C2B3F1, OXR85$C2B3F2, OXR85$C2B3F3))
+
+C2B4 <- (OXR85$C2B4F1 + OXR85$C2B4F2 + OXR85$C2B4F3)/3
+C2B4sd <- sd(c(OXR85$C2B4F1, OXR85$C2B4F2, OXR85$C2B4F3))
+
+C2B5 <- (OXR85$C2B5F1 + OXR85$C2B5F2 + OXR85$C2B5F3)/3
+C2B5sd <- sd(c(OXR85$C2B5F1, OXR85$C2B5F2, OXR85$C2B5F3))
+
+C1B12 <- (OXR85$C1B12F1 + OXR85$C1B12F2 + OXR85$C1B12F3)/3
+C1B12sd <- sd(c(OXR85$C1B12F1, OXR85$C1B12F2, OXR85$C1B12F3))
+
+C2B1 <- (OXR85$C2B1F1 + OXR85$C2B1F2 + OXR85$C2B1F3)/3
+C2B1sd <- sd(c(OXR85$C2B1F1, OXR85$C2B1F2, OXR85$C2B1F3))
+
+OXR85 <- cbind(C1B1,C1B2,C1B3,C1B4,C1B5,C1B6,C1B7,C1B8,C1B9,C1B10,C1B11,C2B2,C2B3,C2B4,C2B5,C1B12,C2B1)
+sd <- cbind(C1B1sd,C1B2sd,C1B3sd,C1B4sd,C1B5sd,C1B6sd,C1B7sd,C1B8sd,C1B9sd,C1B10sd,C1B11sd,C2B2sd,C2B3sd,C2B4sd,C2B5sd,C1B12sd,C2B1sd)
+
+
+OXR85.t <- as.data.frame(t(OXR85))
+OXR85.t$sample <- row.names(OXR85.t)
+OXR85.t$sd <- as.numeric(t(sd))
+colnames(OXR85.t) <- c("count","sample","sd")
+OXR85.t$sample <- factor(OXR85.t$sample, levels=c("C1B1","C1B2","C1B3","C1B4","C1B5","C1B6","C1B7","C1B8","C1B9","C1B10","C1B11","C2B2","C2B3","C2B4","C2B5","C1B12","C2B1"))
+
+oxr.85 <- ggplot(OXR85.t, aes(x = sample, y = count))+
+  geom_bar(stat="identity") +
+  geom_vline(xintercept = 15.5, col = "red", lwd = 1)+
+  geom_errorbar(aes(ymin=count-sd, ymax= count+sd),width = 0.4) +
+  ggtitle(expression(italic("Nitratireductor rhodophyticola")~"OXR-85"))+
+  theme_bw()+
+    labs(x = "Plume Sample", y = "Transcipt Count") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+  theme(axis.text = element_text(size = 11)) +
+  theme(axis.title = element_text(size = 12))
+
+oxr.85
+```
+
+```{r}
+### OXR-96 ###
+library(ggplot2)
+###-------- load data process data --------###
+dta <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-96/OXR-96_expt.ct.txt", sep = "\t",
+                header=TRUE, row.names = "gene_id")
+
+# remove rows with all zeros
+dta <- dta[rowSums(dta[])>0,]
+sort(colSums(dta))
+sum(colSums(dta))
+
+### Make data integers
+dta2 <- as.data.frame(lapply(dta, as.integer))
+rownames(dta2) <- rownames(dta)
+
+OXR96 <- as.data.frame(colSums(dta2))
+OXR96 <- as.data.frame(t(OXR96))
+C1B1 <- (OXR96$C1B1F1 + OXR96$C1B1F2 + OXR96$C1B1F3)/3
+C1B1sd <- sd(c(OXR96$C1B1F1, OXR96$C1B1F2, OXR96$C1B1F3))
+
+C1B2 <- (OXR96$C1B2F1 + OXR96$C1B2F2 + OXR96$C1B2F3)/3
+C1B2sd <- sd(c(OXR96$C1B2F1,OXR96$C1B2F2, OXR96$C1B2F3))
+
+C1B3 <- (OXR96$C1B3F1 + OXR96$C1B3F2 + OXR96$C1B3F3)/3
+C1B3sd <- sd(c(OXR96$C1B3F1, OXR96$C1B3F2, OXR96$C1B3F3))
+
+C1B4 <- (OXR96$C1B4F1 + OXR96$C1B4F2 + OXR96$C1B4F3)/3
+C1B4sd <- sd(c(OXR96$C1B4F1, OXR96$C1B4F2, OXR96$C1B4F3))
+
+C1B5 <- (OXR96$C1B5F1 + OXR96$C1B5F2 + OXR96$C1B5F3)/3
+C1B5sd <- sd(c(OXR96$C1B5F1, OXR96$C1B5F2, OXR96$C1B5F3))
+
+C1B6 <- (OXR96$C1B6F1 + OXR96$C1B6F2 + OXR96$C1B6F3)/3
+C1B6sd <- sd(c(OXR96$C1B6F1, OXR96$C1B6F2, OXR96$C1B6F3))
+
+C1B7 <- (OXR96$C1B7F1 + OXR96$C1B7F2 + OXR96$C1B7F3)/3
+C1B7sd <- sd(c(OXR96$C1B7F1, OXR96$C1B7F2, OXR96$C1B7F3))
+
+C1B8 <- (OXR96$C1B8F1 + OXR96$C1B8F2 + OXR96$C1B8F3)/3
+C1B8sd <- sd(c(OXR96$C1B8F1, OXR96$C1B8F2, OXR96$C1B8F3))
+
+C1B9 <- (OXR96$C1B9F1 + OXR96$C1B9F2 + OXR96$C1B9F3)/3
+C1B9sd <- sd(c(OXR96$C1B9F1, OXR96$C1B9F2, OXR96$C1B9F3))
+
+C1B10 <- (OXR96$C1B10F1 + OXR96$C1B10F2 + OXR96$C1B10F3)/3
+C1B10sd <- sd(c(OXR96$C1B10F1, OXR96$C1B10F2, OXR96$C1B10F3))
+
+C1B11 <- (OXR96$C1B11F1 + OXR96$C1B11F2 + OXR96$C1B11F3)/3
+C1B11sd <- sd(c(OXR96$C1B11F1, OXR96$C1B11F2, OXR96$C1B11F3))
+
+C2B2 <- (OXR96$C2B2F1 + OXR96$C2B2F2 + OXR96$C2B2F3)/3
+C2B2sd <- sd(c(OXR96$C2B2F1, OXR96$C2B2F2, OXR96$C2B2F3))
+
+C2B3 <- (OXR96$C2B3F1 + OXR96$C2B3F2 + OXR96$C2B3F3)/3
+C2B3sd <- sd(c(OXR96$C2B3F1, OXR96$C2B3F2, OXR96$C2B3F3))
+
+C2B4 <- (OXR96$C2B4F1 + OXR96$C2B4F2 + OXR96$C2B4F3)/3
+C2B4sd <- sd(c(OXR96$C2B4F1, OXR96$C2B4F2, OXR96$C2B4F3))
+
+C2B5 <- (OXR96$C2B5F1 + OXR96$C2B5F2 + OXR96$C2B5F3)/3
+C2B5sd <- sd(c(OXR96$C2B5F1, OXR96$C2B5F2, OXR96$C2B5F3))
+
+C1B12 <- (OXR96$C1B12F1 + OXR96$C1B12F2 + OXR96$C1B12F3)/3
+C1B12sd <- sd(c(OXR96$C1B12F1, OXR96$C1B12F2, OXR96$C1B12F3))
+
+C2B1 <- (OXR96$C2B1F1 + OXR96$C2B1F2 + OXR96$C2B1F3)/3
+C2B1sd <- sd(c(OXR96$C2B1F1, OXR96$C2B1F2, OXR96$C2B1F3))
+
+OXR96 <- cbind(C1B1,C1B2,C1B3,C1B4,C1B5,C1B6,C1B7,C1B8,C1B9,C1B10,C1B11,C2B2,C2B3,C2B4,C2B5,C1B12,C2B1)
+sd <- cbind(C1B1sd,C1B2sd,C1B3sd,C1B4sd,C1B5sd,C1B6sd,C1B7sd,C1B8sd,C1B9sd,C1B10sd,C1B11sd,C2B2sd,C2B3sd,C2B4sd,C2B5sd,C1B12sd,C2B1sd)
+
+
+OXR96.t <- as.data.frame(t(OXR96))
+OXR96.t$sample <- row.names(OXR96.t)
+OXR96.t$sd <- as.numeric(t(sd))
+colnames(OXR96.t) <- c("count","sample","sd")
+OXR96.t$sample <- factor(OXR96.t$sample, levels=c("C1B1","C1B2","C1B3","C1B4","C1B5","C1B6","C1B7","C1B8","C1B9","C1B10","C1B11","C2B2","C2B3","C2B4","C2B5","C1B12","C2B1"))
+
+oxr.96 <- ggplot(OXR96.t, aes(x = sample, y = count))+
+  geom_bar(stat="identity") +
+  geom_vline(xintercept = 15.5, col = "red", lwd = 1)+
+  geom_errorbar(aes(ymin=count-sd, ymax= count+sd),width = 0.4) +
+  ggtitle(expression(italic("Pelagerythrobacter marinus")~"OXR-96"))+
+  theme_bw()+
+    labs(x = "Plume Sample", y = "Transcipt Count") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+  theme(axis.text = element_text(size = 11)) +
+  theme(axis.title = element_text(size = 12))
+oxr.96
+```
+
+```{r}
+### OXR-134 ###
+library(ggplot2)
+###-------- load data process data --------###
+dta <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-134/OXR-134_expt.ct.txt", sep = "\t",
+                header=TRUE, row.names = "gene_id")
+
+# remove rows with all zeros
+dta <- dta[rowSums(dta[])>0,]
+sort(colSums(dta))
+sum(colSums(dta))
+
+### Make data integers
+dta2 <- as.data.frame(lapply(dta, as.integer))
+rownames(dta2) <- rownames(dta)
+
+OXR134 <- as.data.frame(colSums(dta2))
+OXR134 <- as.data.frame(t(OXR134))
+C1B1 <- (OXR134$C1B1F1 + OXR134$C1B1F2 + OXR134$C1B1F3)/3
+C1B1sd <- sd(c(OXR134$C1B1F1, OXR134$C1B1F2, OXR134$C1B1F3))
+
+C1B2 <- (OXR134$C1B2F1 + OXR134$C1B2F2 + OXR134$C1B2F3)/3
+C1B2sd <- sd(c(OXR134$C1B2F1,OXR134$C1B2F2, OXR134$C1B2F3))
+
+C1B3 <- (OXR134$C1B3F1 + OXR134$C1B3F2 + OXR134$C1B3F3)/3
+C1B3sd <- sd(c(OXR134$C1B3F1, OXR134$C1B3F2, OXR134$C1B3F3))
+
+C1B4 <- (OXR134$C1B4F1 + OXR134$C1B4F2 + OXR134$C1B4F3)/3
+C1B4sd <- sd(c(OXR134$C1B4F1, OXR134$C1B4F2, OXR134$C1B4F3))
+
+C1B5 <- (OXR134$C1B5F1 + OXR134$C1B5F2 + OXR134$C1B5F3)/3
+C1B5sd <- sd(c(OXR134$C1B5F1, OXR134$C1B5F2, OXR134$C1B5F3))
+
+C1B6 <- (OXR134$C1B6F1 + OXR134$C1B6F2 + OXR134$C1B6F3)/3
+C1B6sd <- sd(c(OXR134$C1B6F1, OXR134$C1B6F2, OXR134$C1B6F3))
+
+C1B7 <- (OXR134$C1B7F1 + OXR134$C1B7F2 + OXR134$C1B7F3)/3
+C1B7sd <- sd(c(OXR134$C1B7F1, OXR134$C1B7F2, OXR134$C1B7F3))
+
+C1B8 <- (OXR134$C1B8F1 + OXR134$C1B8F2 + OXR134$C1B8F3)/3
+C1B8sd <- sd(c(OXR134$C1B8F1, OXR134$C1B8F2, OXR134$C1B8F3))
+
+C1B9 <- (OXR134$C1B9F1 + OXR134$C1B9F2 + OXR134$C1B9F3)/3
+C1B9sd <- sd(c(OXR134$C1B9F1, OXR134$C1B9F2, OXR134$C1B9F3))
+
+C1B10 <- (OXR134$C1B10F1 + OXR134$C1B10F2 + OXR134$C1B10F3)/3
+C1B10sd <- sd(c(OXR134$C1B10F1, OXR134$C1B10F2, OXR134$C1B10F3))
+
+C1B11 <- (OXR134$C1B11F1 + OXR134$C1B11F2 + OXR134$C1B11F3)/3
+C1B11sd <- sd(c(OXR134$C1B11F1, OXR134$C1B11F2, OXR134$C1B11F3))
+
+C2B2 <- (OXR134$C2B2F1 + OXR134$C2B2F2 + OXR134$C2B2F3)/3
+C2B2sd <- sd(c(OXR134$C2B2F1, OXR134$C2B2F2, OXR134$C2B2F3))
+
+C2B3 <- (OXR134$C2B3F1 + OXR134$C2B3F2 + OXR134$C2B3F3)/3
+C2B3sd <- sd(c(OXR134$C2B3F1, OXR134$C2B3F2, OXR134$C2B3F3))
+
+C2B4 <- (OXR134$C2B4F1 + OXR134$C2B4F2 + OXR134$C2B4F3)/3
+C2B4sd <- sd(c(OXR134$C2B4F1, OXR134$C2B4F2, OXR134$C2B4F3))
+
+C2B5 <- (OXR134$C2B5F1 + OXR134$C2B5F2 + OXR134$C2B5F3)/3
+C2B5sd <- sd(c(OXR134$C2B5F1, OXR134$C2B5F2, OXR134$C2B5F3))
+
+C1B12 <- (OXR134$C1B12F1 + OXR134$C1B12F2 + OXR134$C1B12F3)/3
+C1B12sd <- sd(c(OXR134$C1B12F1, OXR134$C1B12F2, OXR134$C1B12F3))
+
+C2B1 <- (OXR134$C2B1F1 + OXR134$C2B1F2 + OXR134$C2B1F3)/3
+C2B1sd <- sd(c(OXR134$C2B1F1, OXR134$C2B1F2, OXR134$C2B1F3))
+
+OXR134 <- cbind(C1B1,C1B2,C1B3,C1B4,C1B5,C1B6,C1B7,C1B8,C1B9,C1B10,C1B11,C2B2,C2B3,C2B4,C2B5,C1B12,C2B1)
+sd <- cbind(C1B1sd,C1B2sd,C1B3sd,C1B4sd,C1B5sd,C1B6sd,C1B7sd,C1B8sd,C1B9sd,C1B10sd,C1B11sd,C2B2sd,C2B3sd,C2B4sd,C2B5sd,C1B12sd,C2B1sd)
+
+
+OXR134.t <- as.data.frame(t(OXR134))
+OXR134.t$sample <- row.names(OXR134.t)
+OXR134.t$sd <- as.numeric(t(sd))
+colnames(OXR134.t) <- c("count","sample","sd")
+OXR134.t$sample <- factor(OXR134.t$sample, levels=c("C1B1","C1B2","C1B3","C1B4","C1B5","C1B6","C1B7","C1B8","C1B9","C1B10","C1B11","C2B2","C2B3","C2B4","C2B5","C1B12","C2B1"))
+
+oxr.134 <- ggplot(OXR134.t, aes(x = sample, y = count))+
+  geom_bar(stat="identity") +
+  geom_vline(xintercept = 15.5, col = "red", lwd = 1)+
+  geom_errorbar(aes(ymin=count-sd, ymax= count+sd),width = 0.4) +
+  ggtitle(expression(italic("Blastomonas marina")~"OXR-134"))+
+  theme_bw()+
+    labs(x = "Plume Sample", y = "Transcipt Count") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+  theme(axis.text = element_text(size = 11)) +
+  theme(axis.title = element_text(size = 12))
+oxr.134
+```
+
+```{r}
+### OXR-137 ###
+library(ggplot2)
+###-------- load data process data --------###
+dta <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/OXR-137_expt.ct.txt", sep = "\t",
+                header=TRUE, row.names = "gene_id")
+
+# remove rows with all zeros
+dta <- dta[rowSums(dta[])>0,]
+sort(colSums(dta))
+sum(colSums(dta))
+
+### Make data integers
+dta2 <- as.data.frame(lapply(dta, as.integer))
+rownames(dta2) <- rownames(dta)
+
+OXR137 <- as.data.frame(colSums(dta2))
+OXR137 <- as.data.frame(t(OXR137))
+C1B1 <- (OXR137$C1B1F1 + OXR137$C1B1F2 + OXR137$C1B1F3)/3
+C1B1sd <- sd(c(OXR137$C1B1F1, OXR137$C1B1F2, OXR137$C1B1F3))
+
+C1B2 <- (OXR137$C1B2F1 + OXR137$C1B2F2 + OXR137$C1B2F3)/3
+C1B2sd <- sd(c(OXR137$C1B2F1,OXR137$C1B2F2, OXR137$C1B2F3))
+
+C1B3 <- (OXR137$C1B3F1 + OXR137$C1B3F2 + OXR137$C1B3F3)/3
+C1B3sd <- sd(c(OXR137$C1B3F1, OXR137$C1B3F2, OXR137$C1B3F3))
+
+C1B4 <- (OXR137$C1B4F1 + OXR137$C1B4F2 + OXR137$C1B4F3)/3
+C1B4sd <- sd(c(OXR137$C1B4F1, OXR137$C1B4F2, OXR137$C1B4F3))
+
+C1B5 <- (OXR137$C1B5F1 + OXR137$C1B5F2 + OXR137$C1B5F3)/3
+C1B5sd <- sd(c(OXR137$C1B5F1, OXR137$C1B5F2, OXR137$C1B5F3))
+
+C1B6 <- (OXR137$C1B6F1 + OXR137$C1B6F2 + OXR137$C1B6F3)/3
+C1B6sd <- sd(c(OXR137$C1B6F1, OXR137$C1B6F2, OXR137$C1B6F3))
+
+C1B7 <- (OXR137$C1B7F1 + OXR137$C1B7F2 + OXR137$C1B7F3)/3
+C1B7sd <- sd(c(OXR137$C1B7F1, OXR137$C1B7F2, OXR137$C1B7F3))
+
+C1B8 <- (OXR137$C1B8F1 + OXR137$C1B8F2 + OXR137$C1B8F3)/3
+C1B8sd <- sd(c(OXR137$C1B8F1, OXR137$C1B8F2, OXR137$C1B8F3))
+
+C1B9 <- (OXR137$C1B9F1 + OXR137$C1B9F2 + OXR137$C1B9F3)/3
+C1B9sd <- sd(c(OXR137$C1B9F1, OXR137$C1B9F2, OXR137$C1B9F3))
+
+C1B10 <- (OXR137$C1B10F1 + OXR137$C1B10F2 + OXR137$C1B10F3)/3
+C1B10sd <- sd(c(OXR137$C1B10F1, OXR137$C1B10F2, OXR137$C1B10F3))
+
+C1B11 <- (OXR137$C1B11F1 + OXR137$C1B11F2 + OXR137$C1B11F3)/3
+C1B11sd <- sd(c(OXR137$C1B11F1, OXR137$C1B11F2, OXR137$C1B11F3))
+
+C2B2 <- (OXR137$C2B2F1 + OXR137$C2B2F2 + OXR137$C2B2F3)/3
+C2B2sd <- sd(c(OXR137$C2B2F1, OXR137$C2B2F2, OXR137$C2B2F3))
+
+C2B3 <- (OXR137$C2B3F1 + OXR137$C2B3F2 + OXR137$C2B3F3)/3
+C2B3sd <- sd(c(OXR137$C2B3F1, OXR137$C2B3F2, OXR137$C2B3F3))
+
+C2B4 <- (OXR137$C2B4F1 + OXR137$C2B4F2 + OXR137$C2B4F3)/3
+C2B4sd <- sd(c(OXR137$C2B4F1, OXR137$C2B4F2, OXR137$C2B4F3))
+
+C2B5 <- (OXR137$C2B5F1 + OXR137$C2B5F2 + OXR137$C2B5F3)/3
+C2B5sd <- sd(c(OXR137$C2B5F1, OXR137$C2B5F2, OXR137$C2B5F3))
+
+C1B12 <- (OXR137$C1B12F1 + OXR137$C1B12F2 + OXR137$C1B12F3)/3
+C1B12sd <- sd(c(OXR137$C1B12F1, OXR137$C1B12F2, OXR137$C1B12F3))
+
+C2B1 <- (OXR137$C2B1F1 + OXR137$C2B1F2 + OXR137$C2B1F3)/3
+C2B1sd <- sd(c(OXR137$C2B1F1, OXR137$C2B1F2, OXR137$C2B1F3))
+
+OXR137 <- cbind(C1B1,C1B2,C1B3,C1B4,C1B5,C1B6,C1B7,C1B8,C1B9,C1B10,C1B11,C2B2,C2B3,C2B4,C2B5,C1B12,C2B1)
+sd <- cbind(C1B1sd,C1B2sd,C1B3sd,C1B4sd,C1B5sd,C1B6sd,C1B7sd,C1B8sd,C1B9sd,C1B10sd,C1B11sd,C2B2sd,C2B3sd,C2B4sd,C2B5sd,C1B12sd,C2B1sd)
+
+
+OXR137.t <- as.data.frame(t(OXR137))
+OXR137.t$sample <- row.names(OXR137.t)
+OXR137.t$sd <- as.numeric(t(sd))
+colnames(OXR137.t) <- c("count","sample","sd")
+OXR137.t$sample <- factor(OXR137.t$sample, levels=c("C1B1","C1B2","C1B3","C1B4","C1B5","C1B6","C1B7","C1B8","C1B9","C1B10","C1B11","C2B2","C2B3","C2B4","C2B5","C1B12","C2B1"))
+
+oxr.137 <- ggplot(OXR137.t, aes(x = sample, y = count))+
+  geom_bar(stat="identity") +
+  geom_vline(xintercept = 15.5, col = "red", lwd = 1)+
+  geom_errorbar(aes(ymin=count-sd, ymax= count+sd),width = 0.4) +
+  ggtitle(expression(italic("Thalassobaculum")~"sp. OXR-137"))+
+  theme_bw()+
+    labs(x = "Plume Sample", y = "Transcipt Count") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+  theme(axis.text = element_text(size = 11)) +
+  theme(axis.title = element_text(size = 12))
+oxr.137
+```
+
+```{r}
+### OXR-159 ###
+library(ggplot2)
+###-------- load data process data --------###
+dta <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-159/OXR-159_expt.ct.txt", sep = "\t",
+                header=TRUE, row.names = "gene_id")
+
+# remove rows with all zeros
+dta <- dta[rowSums(dta[])>0,]
+sort(colSums(dta))
+sum(colSums(dta))
+
+### Make data integers
+dta2 <- as.data.frame(lapply(dta, as.integer))
+rownames(dta2) <- rownames(dta)
+
+OXR159 <- as.data.frame(colSums(dta2))
+OXR159 <- as.data.frame(t(OXR159))
+C1B1 <- (OXR159$C1B1F1 + OXR159$C1B1F2 + OXR159$C1B1F3)/3
+C1B1sd <- sd(c(OXR159$C1B1F1, OXR159$C1B1F2, OXR159$C1B1F3))
+
+C1B2 <- (OXR159$C1B2F1 + OXR159$C1B2F2 + OXR159$C1B2F3)/3
+C1B2sd <- sd(c(OXR159$C1B2F1,OXR159$C1B2F2, OXR159$C1B2F3))
+
+C1B3 <- (OXR159$C1B3F1 + OXR159$C1B3F2 + OXR159$C1B3F3)/3
+C1B3sd <- sd(c(OXR159$C1B3F1, OXR159$C1B3F2, OXR159$C1B3F3))
+
+C1B4 <- (OXR159$C1B4F1 + OXR159$C1B4F2 + OXR159$C1B4F3)/3
+C1B4sd <- sd(c(OXR159$C1B4F1, OXR159$C1B4F2, OXR159$C1B4F3))
+
+C1B5 <- (OXR159$C1B5F1 + OXR159$C1B5F2 + OXR159$C1B5F3)/3
+C1B5sd <- sd(c(OXR159$C1B5F1, OXR159$C1B5F2, OXR159$C1B5F3))
+
+C1B6 <- (OXR159$C1B6F1 + OXR159$C1B6F2 + OXR159$C1B6F3)/3
+C1B6sd <- sd(c(OXR159$C1B6F1, OXR159$C1B6F2, OXR159$C1B6F3))
+
+C1B7 <- (OXR159$C1B7F1 + OXR159$C1B7F2 + OXR159$C1B7F3)/3
+C1B7sd <- sd(c(OXR159$C1B7F1, OXR159$C1B7F2, OXR159$C1B7F3))
+
+C1B8 <- (OXR159$C1B8F1 + OXR159$C1B8F2 + OXR159$C1B8F3)/3
+C1B8sd <- sd(c(OXR159$C1B8F1, OXR159$C1B8F2, OXR159$C1B8F3))
+
+C1B9 <- (OXR159$C1B9F1 + OXR159$C1B9F2 + OXR159$C1B9F3)/3
+C1B9sd <- sd(c(OXR159$C1B9F1, OXR159$C1B9F2, OXR159$C1B9F3))
+
+C1B10 <- (OXR159$C1B10F1 + OXR159$C1B10F2 + OXR159$C1B10F3)/3
+C1B10sd <- sd(c(OXR159$C1B10F1, OXR159$C1B10F2, OXR159$C1B10F3))
+
+C1B11 <- (OXR159$C1B11F1 + OXR159$C1B11F2 + OXR159$C1B11F3)/3
+C1B11sd <- sd(c(OXR159$C1B11F1, OXR159$C1B11F2, OXR159$C1B11F3))
+
+C2B2 <- (OXR159$C2B2F1 + OXR159$C2B2F2 + OXR159$C2B2F3)/3
+C2B2sd <- sd(c(OXR159$C2B2F1, OXR159$C2B2F2, OXR159$C2B2F3))
+
+C2B3 <- (OXR159$C2B3F1 + OXR159$C2B3F2 + OXR159$C2B3F3)/3
+C2B3sd <- sd(c(OXR159$C2B3F1, OXR159$C2B3F2, OXR159$C2B3F3))
+
+C2B4 <- (OXR159$C2B4F1 + OXR159$C2B4F2 + OXR159$C2B4F3)/3
+C2B4sd <- sd(c(OXR159$C2B4F1, OXR159$C2B4F2, OXR159$C2B4F3))
+
+C2B5 <- (OXR159$C2B5F1 + OXR159$C2B5F2 + OXR159$C2B5F3)/3
+C2B5sd <- sd(c(OXR159$C2B5F1, OXR159$C2B5F2, OXR159$C2B5F3))
+
+C1B12 <- (OXR159$C1B12F1 + OXR159$C1B12F2 + OXR159$C1B12F3)/3
+C1B12sd <- sd(c(OXR159$C1B12F1, OXR159$C1B12F2, OXR159$C1B12F3))
+
+C2B1 <- (OXR159$C2B1F1 + OXR159$C2B1F2 + OXR159$C2B1F3)/3
+C2B1sd <- sd(c(OXR159$C2B1F1, OXR159$C2B1F2, OXR159$C2B1F3))
+
+OXR159 <- cbind(C1B1,C1B2,C1B3,C1B4,C1B5,C1B6,C1B7,C1B8,C1B9,C1B10,C1B11,C2B2,C2B3,C2B4,C2B5,C1B12,C2B1)
+sd <- cbind(C1B1sd,C1B2sd,C1B3sd,C1B4sd,C1B5sd,C1B6sd,C1B7sd,C1B8sd,C1B9sd,C1B10sd,C1B11sd,C2B2sd,C2B3sd,C2B4sd,C2B5sd,C1B12sd,C2B1sd)
+
+
+OXR159.t <- as.data.frame(t(OXR159))
+OXR159.t$sample <- row.names(OXR159.t)
+OXR159.t$sd <- as.numeric(t(sd))
+colnames(OXR159.t) <- c("count","sample","sd")
+OXR159.t$sample <- factor(OXR159.t$sample, levels=c("C1B1","C1B2","C1B3","C1B4","C1B5","C1B6","C1B7","C1B8","C1B9","C1B10","C1B11","C2B2","C2B3","C2B4","C2B5","C1B12","C2B1"))
+
+oxr.159 <- ggplot(OXR159.t, aes(x = sample, y = count))+
+  geom_bar(stat="identity") +
+  geom_vline(xintercept = 15.5, col = "red", lwd = 1)+
+  geom_errorbar(aes(ymin=count-sd, ymax= count+sd),width = 0.4) +
+  ggtitle(expression(italic("Sulfitobacter")~"sp. OXR-159"))+
+  theme_bw()+
+    labs(x = "Plume Sample", y = "Transcipt Count") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+  theme(axis.text = element_text(size = 11)) +
+  theme(axis.title = element_text(size = 12))
+
+oxr.159
+```
+
+```{r}
+### OXR-189 ###
+library(ggplot2)
+###-------- load data process data --------###
+dta <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-189/OXR-189_expt.ct.txt", sep = "\t",
+                header=TRUE, row.names = "gene_id")
+
+# remove rows with all zeros
+dta <- dta[rowSums(dta[])>0,]
+sort(colSums(dta))
+sum(colSums(dta))
+
+### Make data integers
+dta2 <- as.data.frame(lapply(dta, as.integer))
+rownames(dta2) <- rownames(dta)
+
+OXR189 <- as.data.frame(colSums(dta2))
+OXR189 <- as.data.frame(t(OXR189))
+C1B1 <- (OXR189$C1B1F1 + OXR189$C1B1F2 + OXR189$C1B1F3)/3
+C1B1sd <- sd(c(OXR189$C1B1F1, OXR189$C1B1F2, OXR189$C1B1F3))
+
+C1B2 <- (OXR189$C1B2F1 + OXR189$C1B2F2 + OXR189$C1B2F3)/3
+C1B2sd <- sd(c(OXR189$C1B2F1,OXR189$C1B2F2, OXR189$C1B2F3))
+
+C1B3 <- (OXR189$C1B3F1 + OXR189$C1B3F2 + OXR189$C1B3F3)/3
+C1B3sd <- sd(c(OXR189$C1B3F1, OXR189$C1B3F2, OXR189$C1B3F3))
+
+C1B4 <- (OXR189$C1B4F1 + OXR189$C1B4F2 + OXR189$C1B4F3)/3
+C1B4sd <- sd(c(OXR189$C1B4F1, OXR189$C1B4F2, OXR189$C1B4F3))
+
+C1B5 <- (OXR189$C1B5F1 + OXR189$C1B5F2 + OXR189$C1B5F3)/3
+C1B5sd <- sd(c(OXR189$C1B5F1, OXR189$C1B5F2, OXR189$C1B5F3))
+
+C1B6 <- (OXR189$C1B6F1 + OXR189$C1B6F2 + OXR189$C1B6F3)/3
+C1B6sd <- sd(c(OXR189$C1B6F1, OXR189$C1B6F2, OXR189$C1B6F3))
+
+C1B7 <- (OXR189$C1B7F1 + OXR189$C1B7F2 + OXR189$C1B7F3)/3
+C1B7sd <- sd(c(OXR189$C1B7F1, OXR189$C1B7F2, OXR189$C1B7F3))
+
+C1B8 <- (OXR189$C1B8F1 + OXR189$C1B8F2 + OXR189$C1B8F3)/3
+C1B8sd <- sd(c(OXR189$C1B8F1, OXR189$C1B8F2, OXR189$C1B8F3))
+
+C1B9 <- (OXR189$C1B9F1 + OXR189$C1B9F2 + OXR189$C1B9F3)/3
+C1B9sd <- sd(c(OXR189$C1B9F1, OXR189$C1B9F2, OXR189$C1B9F3))
+
+C1B10 <- (OXR189$C1B10F1 + OXR189$C1B10F2 + OXR189$C1B10F3)/3
+C1B10sd <- sd(c(OXR189$C1B10F1, OXR189$C1B10F2, OXR189$C1B10F3))
+
+C1B11 <- (OXR189$C1B11F1 + OXR189$C1B11F2 + OXR189$C1B11F3)/3
+C1B11sd <- sd(c(OXR189$C1B11F1, OXR189$C1B11F2, OXR189$C1B11F3))
+
+C2B2 <- (OXR189$C2B2F1 + OXR189$C2B2F2 + OXR189$C2B2F3)/3
+C2B2sd <- sd(c(OXR189$C2B2F1, OXR189$C2B2F2, OXR189$C2B2F3))
+
+C2B3 <- (OXR189$C2B3F1 + OXR189$C2B3F2 + OXR189$C2B3F3)/3
+C2B3sd <- sd(c(OXR189$C2B3F1, OXR189$C2B3F2, OXR189$C2B3F3))
+
+C2B4 <- (OXR189$C2B4F1 + OXR189$C2B4F2 + OXR189$C2B4F3)/3
+C2B4sd <- sd(c(OXR189$C2B4F1, OXR189$C2B4F2, OXR189$C2B4F3))
+
+C2B5 <- (OXR189$C2B5F1 + OXR189$C2B5F2 + OXR189$C2B5F3)/3
+C2B5sd <- sd(c(OXR189$C2B5F1, OXR189$C2B5F2, OXR189$C2B5F3))
+
+C1B12 <- (OXR189$C1B12F1 + OXR189$C1B12F2 + OXR189$C1B12F3)/3
+C1B12sd <- sd(c(OXR189$C1B12F1, OXR189$C1B12F2, OXR189$C1B12F3))
+
+C2B1 <- (OXR189$C2B1F1 + OXR189$C2B1F2 + OXR189$C2B1F3)/3
+C2B1sd <- sd(c(OXR189$C2B1F1, OXR189$C2B1F2, OXR189$C2B1F3))
+
+OXR189 <- cbind(C1B1,C1B2,C1B3,C1B4,C1B5,C1B6,C1B7,C1B8,C1B9,C1B10,C1B11,C2B2,C2B3,C2B4,C2B5,C1B12,C2B1)
+sd <- cbind(C1B1sd,C1B2sd,C1B3sd,C1B4sd,C1B5sd,C1B6sd,C1B7sd,C1B8sd,C1B9sd,C1B10sd,C1B11sd,C2B2sd,C2B3sd,C2B4sd,C2B5sd,C1B12sd,C2B1sd)
+
+
+OXR189.t <- as.data.frame(t(OXR189))
+OXR189.t$sample <- row.names(OXR189.t)
+OXR189.t$sd <- as.numeric(t(sd))
+colnames(OXR189.t) <- c("count","sample","sd")
+OXR189.t$sample <- factor(OXR189.t$sample, levels=c("C1B1","C1B2","C1B3","C1B4","C1B5","C1B6","C1B7","C1B8","C1B9","C1B10","C1B11","C2B2","C2B3","C2B4","C2B5","C1B12","C2B1"))
+
+oxr.189 <- ggplot(OXR189.t, aes(x = sample, y = count))+
+  geom_bar(stat="identity") +
+  geom_vline(xintercept = 15.5, col = "red", lwd = 1)+
+  geom_errorbar(aes(ymin=count-sd, ymax= count+sd),width = 0.4) +
+  ggtitle(expression(italic("Idiomarina")~"sp. OXR-189"))+
+  theme_bw()+
+    labs(x = "Plume Sample", y = "Transcipt Count") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+  theme(axis.text = element_text(size = 11)) +
+  theme(axis.title = element_text(size = 12))
+
+oxr.189
+```
+
+```{r}
+### OXR-199 ###
+library(ggplot2)
+###-------- load data process data --------###
+dta <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-199/OXR-199_expt.ct.txt", sep = "\t",
+                header=TRUE, row.names = "gene_id")
+
+# remove rows with all zeros
+dta <- dta[rowSums(dta[])>0,]
+sort(colSums(dta))
+sum(colSums(dta))
+
+### Make data integers
+dta2 <- as.data.frame(lapply(dta, as.integer))
+rownames(dta2) <- rownames(dta)
+
+OXR199 <- as.data.frame(colSums(dta2))
+OXR199 <- as.data.frame(t(OXR199))
+C1B1 <- (OXR199$C1B1F1 + OXR199$C1B1F2 + OXR199$C1B1F3)/3
+C1B1sd <- sd(c(OXR199$C1B1F1, OXR199$C1B1F2, OXR199$C1B1F3))
+
+C1B2 <- (OXR199$C1B2F1 + OXR199$C1B2F2 + OXR199$C1B2F3)/3
+C1B2sd <- sd(c(OXR199$C1B2F1,OXR199$C1B2F2, OXR199$C1B2F3))
+
+C1B3 <- (OXR199$C1B3F1 + OXR199$C1B3F2 + OXR199$C1B3F3)/3
+C1B3sd <- sd(c(OXR199$C1B3F1, OXR199$C1B3F2, OXR199$C1B3F3))
+
+C1B4 <- (OXR199$C1B4F1 + OXR199$C1B4F2 + OXR199$C1B4F3)/3
+C1B4sd <- sd(c(OXR199$C1B4F1, OXR199$C1B4F2, OXR199$C1B4F3))
+
+C1B5 <- (OXR199$C1B5F1 + OXR199$C1B5F2 + OXR199$C1B5F3)/3
+C1B5sd <- sd(c(OXR199$C1B5F1, OXR199$C1B5F2, OXR199$C1B5F3))
+
+C1B6 <- (OXR199$C1B6F1 + OXR199$C1B6F2 + OXR199$C1B6F3)/3
+C1B6sd <- sd(c(OXR199$C1B6F1, OXR199$C1B6F2, OXR199$C1B6F3))
+
+C1B7 <- (OXR199$C1B7F1 + OXR199$C1B7F2 + OXR199$C1B7F3)/3
+C1B7sd <- sd(c(OXR199$C1B7F1, OXR199$C1B7F2, OXR199$C1B7F3))
+
+C1B8 <- (OXR199$C1B8F1 + OXR199$C1B8F2 + OXR199$C1B8F3)/3
+C1B8sd <- sd(c(OXR199$C1B8F1, OXR199$C1B8F2, OXR199$C1B8F3))
+
+C1B9 <- (OXR199$C1B9F1 + OXR199$C1B9F2 + OXR199$C1B9F3)/3
+C1B9sd <- sd(c(OXR199$C1B9F1, OXR199$C1B9F2, OXR199$C1B9F3))
+
+C1B10 <- (OXR199$C1B10F1 + OXR199$C1B10F2 + OXR199$C1B10F3)/3
+C1B10sd <- sd(c(OXR199$C1B10F1, OXR199$C1B10F2, OXR199$C1B10F3))
+
+C1B11 <- (OXR199$C1B11F1 + OXR199$C1B11F2 + OXR199$C1B11F3)/3
+C1B11sd <- sd(c(OXR199$C1B11F1, OXR199$C1B11F2, OXR199$C1B11F3))
+
+C2B2 <- (OXR199$C2B2F1 + OXR199$C2B2F2 + OXR199$C2B2F3)/3
+C2B2sd <- sd(c(OXR199$C2B2F1, OXR199$C2B2F2, OXR199$C2B2F3))
+
+C2B3 <- (OXR199$C2B3F1 + OXR199$C2B3F2 + OXR199$C2B3F3)/3
+C2B3sd <- sd(c(OXR199$C2B3F1, OXR199$C2B3F2, OXR199$C2B3F3))
+
+C2B4 <- (OXR199$C2B4F1 + OXR199$C2B4F2 + OXR199$C2B4F3)/3
+C2B4sd <- sd(c(OXR199$C2B4F1, OXR199$C2B4F2, OXR199$C2B4F3))
+
+C2B5 <- (OXR199$C2B5F1 + OXR199$C2B5F2 + OXR199$C2B5F3)/3
+C2B5sd <- sd(c(OXR199$C2B5F1, OXR199$C2B5F2, OXR199$C2B5F3))
+
+C1B12 <- (OXR199$C1B12F1 + OXR199$C1B12F2 + OXR199$C1B12F3)/3
+C1B12sd <- sd(c(OXR199$C1B12F1, OXR199$C1B12F2, OXR199$C1B12F3))
+
+C2B1 <- (OXR199$C2B1F1 + OXR199$C2B1F2 + OXR199$C2B1F3)/3
+C2B1sd <- sd(c(OXR199$C2B1F1, OXR199$C2B1F2, OXR199$C2B1F3))
+
+OXR199 <- cbind(C1B1,C1B2,C1B3,C1B4,C1B5,C1B6,C1B7,C1B8,C1B9,C1B10,C1B11,C2B2,C2B3,C2B4,C2B5,C1B12,C2B1)
+sd <- cbind(C1B1sd,C1B2sd,C1B3sd,C1B4sd,C1B5sd,C1B6sd,C1B7sd,C1B8sd,C1B9sd,C1B10sd,C1B11sd,C2B2sd,C2B3sd,C2B4sd,C2B5sd,C1B12sd,C2B1sd)
+
+
+OXR199.t <- as.data.frame(t(OXR199))
+OXR199.t$sample <- row.names(OXR199.t)
+OXR199.t$sd <- as.numeric(t(sd))
+colnames(OXR199.t) <- c("count","sample","sd")
+OXR199.t$sample <- factor(OXR199.t$sample, levels=c("C1B1","C1B2","C1B3","C1B4","C1B5","C1B6","C1B7","C1B8","C1B9","C1B10","C1B11","C2B2","C2B3","C2B4","C2B5","C1B12","C2B1"))
+
+oxr.199 <- ggplot(OXR199.t, aes(x = sample, y = count))+
+  geom_bar(stat="identity") +
+  geom_vline(xintercept = 15.5, col = "red", lwd = 1)+
+  geom_errorbar(aes(ymin=count-sd, ymax= count+sd),width = 0.4) +
+  ggtitle(expression(italic("Sulfitobacter pontiacus")~"OXR-199"))+
+  theme_bw()+
+    labs(x = "Plume Sample", y = "Transcipt Count") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+  theme(axis.text = element_text(size = 11)) +
+  theme(axis.title = element_text(size = 12))
+
+oxr.199
+```
+
+```{r}
+### OXR-203 ###
+library(ggplot2)
+###-------- load data process data --------###
+dta <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/OXR-203_expt.ct.txt", sep = "\t",
+                header=TRUE, row.names = "gene_id")
+
+# remove rows with all zeros
+dta <- dta[rowSums(dta[])>0,]
+sort(colSums(dta))
+sum(colSums(dta))
+
+### Make data integers
+dta2 <- as.data.frame(lapply(dta, as.integer))
+rownames(dta2) <- rownames(dta)
+
+OXR203 <- as.data.frame(colSums(dta2))
+OXR203 <- as.data.frame(t(OXR203))
+C1B1 <- (OXR203$C1B1F1 + OXR203$C1B1F2 + OXR203$C1B1F3)/3
+C1B1sd <- sd(c(OXR203$C1B1F1, OXR203$C1B1F2, OXR203$C1B1F3))
+
+C1B2 <- (OXR203$C1B2F1 + OXR203$C1B2F2 + OXR203$C1B2F3)/3
+C1B2sd <- sd(c(OXR203$C1B2F1,OXR203$C1B2F2, OXR203$C1B2F3))
+
+C1B3 <- (OXR203$C1B3F1 + OXR203$C1B3F2 + OXR203$C1B3F3)/3
+C1B3sd <- sd(c(OXR203$C1B3F1, OXR203$C1B3F2, OXR203$C1B3F3))
+
+C1B4 <- (OXR203$C1B4F1 + OXR203$C1B4F2 + OXR203$C1B4F3)/3
+C1B4sd <- sd(c(OXR203$C1B4F1, OXR203$C1B4F2, OXR203$C1B4F3))
+
+C1B5 <- (OXR203$C1B5F1 + OXR203$C1B5F2 + OXR203$C1B5F3)/3
+C1B5sd <- sd(c(OXR203$C1B5F1, OXR203$C1B5F2, OXR203$C1B5F3))
+
+C1B6 <- (OXR203$C1B6F1 + OXR203$C1B6F2 + OXR203$C1B6F3)/3
+C1B6sd <- sd(c(OXR203$C1B6F1, OXR203$C1B6F2, OXR203$C1B6F3))
+
+C1B7 <- (OXR203$C1B7F1 + OXR203$C1B7F2 + OXR203$C1B7F3)/3
+C1B7sd <- sd(c(OXR203$C1B7F1, OXR203$C1B7F2, OXR203$C1B7F3))
+
+C1B8 <- (OXR203$C1B8F1 + OXR203$C1B8F2 + OXR203$C1B8F3)/3
+C1B8sd <- sd(c(OXR203$C1B8F1, OXR203$C1B8F2, OXR203$C1B8F3))
+
+C1B9 <- (OXR203$C1B9F1 + OXR203$C1B9F2 + OXR203$C1B9F3)/3
+C1B9sd <- sd(c(OXR203$C1B9F1, OXR203$C1B9F2, OXR203$C1B9F3))
+
+C1B10 <- (OXR203$C1B10F1 + OXR203$C1B10F2 + OXR203$C1B10F3)/3
+C1B10sd <- sd(c(OXR203$C1B10F1, OXR203$C1B10F2, OXR203$C1B10F3))
+
+C1B11 <- (OXR203$C1B11F1 + OXR203$C1B11F2 + OXR203$C1B11F3)/3
+C1B11sd <- sd(c(OXR203$C1B11F1, OXR203$C1B11F2, OXR203$C1B11F3))
+
+C2B2 <- (OXR203$C2B2F1 + OXR203$C2B2F2 + OXR203$C2B2F3)/3
+C2B2sd <- sd(c(OXR203$C2B2F1, OXR203$C2B2F2, OXR203$C2B2F3))
+
+C2B3 <- (OXR203$C2B3F1 + OXR203$C2B3F2 + OXR203$C2B3F3)/3
+C2B3sd <- sd(c(OXR203$C2B3F1, OXR203$C2B3F2, OXR203$C2B3F3))
+
+C2B4 <- (OXR203$C2B4F1 + OXR203$C2B4F2 + OXR203$C2B4F3)/3
+C2B4sd <- sd(c(OXR203$C2B4F1, OXR203$C2B4F2, OXR203$C2B4F3))
+
+C2B5 <- (OXR203$C2B5F1 + OXR203$C2B5F2 + OXR203$C2B5F3)/3
+C2B5sd <- sd(c(OXR203$C2B5F1, OXR203$C2B5F2, OXR203$C2B5F3))
+
+C1B12 <- (OXR203$C1B12F1 + OXR203$C1B12F2 + OXR203$C1B12F3)/3
+C1B12sd <- sd(c(OXR203$C1B12F1, OXR203$C1B12F2, OXR203$C1B12F3))
+
+C2B1 <- (OXR203$C2B1F1 + OXR203$C2B1F2 + OXR203$C2B1F3)/3
+C2B1sd <- sd(c(OXR203$C2B1F1, OXR203$C2B1F2, OXR203$C2B1F3))
+
+OXR203 <- cbind(C1B1,C1B2,C1B3,C1B4,C1B5,C1B6,C1B7,C1B8,C1B9,C1B10,C1B11,C2B2,C2B3,C2B4,C2B5,C1B12,C2B1)
+sd <- cbind(C1B1sd,C1B2sd,C1B3sd,C1B4sd,C1B5sd,C1B6sd,C1B7sd,C1B8sd,C1B9sd,C1B10sd,C1B11sd,C2B2sd,C2B3sd,C2B4sd,C2B5sd,C1B12sd,C2B1sd)
+
+
+OXR203.t <- as.data.frame(t(OXR203))
+OXR203.t$sample <- row.names(OXR203.t)
+OXR203.t$sd <- as.numeric(t(sd))
+colnames(OXR203.t) <- c("count","sample","sd")
+OXR203.t$sample <- factor(OXR203.t$sample, levels=c("C1B1","C1B2","C1B3","C1B4","C1B5","C1B6","C1B7","C1B8","C1B9","C1B10","C1B11","C2B2","C2B3","C2B4","C2B5","C1B12","C2B1"))
+
+oxr.203 <- ggplot(OXR203.t, aes(x = sample, y = count))+
+  geom_bar(stat="identity") +
+  geom_vline(xintercept = 15.5, col = "red", lwd = 1)+
+  geom_errorbar(aes(ymin=count-sd, ymax= count+sd),width = 0.4) +
+  ggtitle(expression(italic("Chrsitiangramia")~"sp. OXR-203"))+
+  theme_bw()+
+    labs(x = "Plume Sample", y = "Transcipt Count") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+  theme(axis.text = element_text(size = 11)) +
+  theme(axis.title = element_text(size = 12))
+
+oxr.203
+```
+
+```{r}
+### OXR-209 ###
+library(ggplot2)
+###-------- load data process data --------###
+dta <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-209/OXR-209_expt.ct.txt", sep = "\t",
+                header=TRUE, row.names = "gene_id")
+
+# remove rows with all zeros
+dta <- dta[rowSums(dta[])>0,]
+sort(colSums(dta))
+sum(colSums(dta))
+
+### Make data integers
+dta2 <- as.data.frame(lapply(dta, as.integer))
+rownames(dta2) <- rownames(dta)
+
+OXR209 <- as.data.frame(colSums(dta2))
+OXR209 <- as.data.frame(t(OXR209))
+C1B1 <- (OXR209$C1B1F1 + OXR209$C1B1F2 + OXR209$C1B1F3)/3
+C1B1sd <- sd(c(OXR209$C1B1F1, OXR209$C1B1F2, OXR209$C1B1F3))
+
+C1B2 <- (OXR209$C1B2F1 + OXR209$C1B2F2 + OXR209$C1B2F3)/3
+C1B2sd <- sd(c(OXR209$C1B2F1,OXR209$C1B2F2, OXR209$C1B2F3))
+
+C1B3 <- (OXR209$C1B3F1 + OXR209$C1B3F2 + OXR209$C1B3F3)/3
+C1B3sd <- sd(c(OXR209$C1B3F1, OXR209$C1B3F2, OXR209$C1B3F3))
+
+C1B4 <- (OXR209$C1B4F1 + OXR209$C1B4F2 + OXR209$C1B4F3)/3
+C1B4sd <- sd(c(OXR209$C1B4F1, OXR209$C1B4F2, OXR209$C1B4F3))
+
+C1B5 <- (OXR209$C1B5F1 + OXR209$C1B5F2 + OXR209$C1B5F3)/3
+C1B5sd <- sd(c(OXR209$C1B5F1, OXR209$C1B5F2, OXR209$C1B5F3))
+
+C1B6 <- (OXR209$C1B6F1 + OXR209$C1B6F2 + OXR209$C1B6F3)/3
+C1B6sd <- sd(c(OXR209$C1B6F1, OXR209$C1B6F2, OXR209$C1B6F3))
+
+C1B7 <- (OXR209$C1B7F1 + OXR209$C1B7F2 + OXR209$C1B7F3)/3
+C1B7sd <- sd(c(OXR209$C1B7F1, OXR209$C1B7F2, OXR209$C1B7F3))
+
+C1B8 <- (OXR209$C1B8F1 + OXR209$C1B8F2 + OXR209$C1B8F3)/3
+C1B8sd <- sd(c(OXR209$C1B8F1, OXR209$C1B8F2, OXR209$C1B8F3))
+
+C1B9 <- (OXR209$C1B9F1 + OXR209$C1B9F2 + OXR209$C1B9F3)/3
+C1B9sd <- sd(c(OXR209$C1B9F1, OXR209$C1B9F2, OXR209$C1B9F3))
+
+C1B10 <- (OXR209$C1B10F1 + OXR209$C1B10F2 + OXR209$C1B10F3)/3
+C1B10sd <- sd(c(OXR209$C1B10F1, OXR209$C1B10F2, OXR209$C1B10F3))
+
+C1B11 <- (OXR209$C1B11F1 + OXR209$C1B11F2 + OXR209$C1B11F3)/3
+C1B11sd <- sd(c(OXR209$C1B11F1, OXR209$C1B11F2, OXR209$C1B11F3))
+
+C2B2 <- (OXR209$C2B2F1 + OXR209$C2B2F2 + OXR209$C2B2F3)/3
+C2B2sd <- sd(c(OXR209$C2B2F1, OXR209$C2B2F2, OXR209$C2B2F3))
+
+C2B3 <- (OXR209$C2B3F1 + OXR209$C2B3F2 + OXR209$C2B3F3)/3
+C2B3sd <- sd(c(OXR209$C2B3F1, OXR209$C2B3F2, OXR209$C2B3F3))
+
+C2B4 <- (OXR209$C2B4F1 + OXR209$C2B4F2 + OXR209$C2B4F3)/3
+C2B4sd <- sd(c(OXR209$C2B4F1, OXR209$C2B4F2, OXR209$C2B4F3))
+
+C2B5 <- (OXR209$C2B5F1 + OXR209$C2B5F2 + OXR209$C2B5F3)/3
+C2B5sd <- sd(c(OXR209$C2B5F1, OXR209$C2B5F2, OXR209$C2B5F3))
+
+C1B12 <- (OXR209$C1B12F1 + OXR209$C1B12F2 + OXR209$C1B12F3)/3
+C1B12sd <- sd(c(OXR209$C1B12F1, OXR209$C1B12F2, OXR209$C1B12F3))
+
+C2B1 <- (OXR209$C2B1F1 + OXR209$C2B1F2 + OXR209$C2B1F3)/3
+C2B1sd <- sd(c(OXR209$C2B1F1, OXR209$C2B1F2, OXR209$C2B1F3))
+
+OXR209 <- cbind(C1B1,C1B2,C1B3,C1B4,C1B5,C1B6,C1B7,C1B8,C1B9,C1B10,C1B11,C2B2,C2B3,C2B4,C2B5,C1B12,C2B1)
+sd <- cbind(C1B1sd,C1B2sd,C1B3sd,C1B4sd,C1B5sd,C1B6sd,C1B7sd,C1B8sd,C1B9sd,C1B10sd,C1B11sd,C2B2sd,C2B3sd,C2B4sd,C2B5sd,C1B12sd,C2B1sd)
+
+
+OXR209.t <- as.data.frame(t(OXR209))
+OXR209.t$sample <- row.names(OXR209.t)
+OXR209.t$sd <- as.numeric(t(sd))
+colnames(OXR209.t) <- c("count","sample","sd")
+OXR209.t$sample <- factor(OXR209.t$sample, levels=c("C1B1","C1B2","C1B3","C1B4","C1B5","C1B6","C1B7","C1B8","C1B9","C1B10","C1B11","C2B2","C2B3","C2B4","C2B5","C1B12","C2B1"))
+
+oxr.209 <- ggplot(OXR209.t, aes(x = sample, y = count))+
+  geom_bar(stat="identity") +
+  geom_vline(xintercept = 15.5, col = "red", lwd = 1)+
+  geom_errorbar(aes(ymin=count-sd, ymax= count+sd),width = 0.4) +
+  ggtitle(expression(italic("Limimaricola variabilis")~"OXR-209"))+
+  theme_bw()+
+    labs(x = "Plume Sample", y = "Transcipt Count") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+  theme(axis.text = element_text(size = 11)) +
+  theme(axis.title = element_text(size = 12))
+
+oxr.209
+```
+```{r}
+library(patchwork)
+
+png(filename = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/RSEM_hits-3.png", height = 1000, width = 750)
+
+
+((oxr.9 | oxr.11) / (oxr.76 | oxr.85) / (oxr.96 | oxr.134) / (oxr.137 | oxr.159) / (oxr.189 | oxr.199) / (oxr.203 | oxr.209))
+
+while (!is.null(dev.list()))  dev.off()
+```

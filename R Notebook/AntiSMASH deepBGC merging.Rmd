@@ -1,0 +1,816 @@
+---
+title: "AntiSMASH deepBGC merging"
+output: pdf_document
+date: "2023-11-07"
+---
+
+This file will attempt to merge the deepBGC data file with the antiSMASH/deepBGC data generated from the antismash_converter.py command.
+
+OXR-9
+```{r}
+# OXR-9
+
+# read in the antismash data.
+antismash <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-9/deepBGC-antiSMASH_OXR-9_final_assembly/antismash_Conversion_files/all_BGC_info.csv", header = T, na.strings = c("","NA"))
+
+antismash$Region_Type <- NULL
+names(antismash) <- c("Genome","AS_classif","AS_new_classif","AS_From","AS_To","AS_Size.bp.","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","AS_Correct_name")
+
+# Read in deepBGC Data
+deep <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-9/trycycler/deepBGC/deepBGC.bgc.tsv", header = T, sep = "\t",na.strings = c("","NA"))
+
+# Narrow down the fields
+deep <- deep[c("sequence_id","nucl_start","nucl_end","nucl_length","num_proteins","num_domains","num_bio_domains","deepbgc_score","product_activity","product_class","bio_pfam_ids","pfam_ids")]
+# Give them DBGC name
+names(deep) <- c("DBGC_sequence_id","DBGC_nucl_start","DBGC_nucl_end","DBGC_nucl_length","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_deepbgc_score","DBGC_product_activity","DBGC_product_class","DBGC_bio_pfam_ids","DBGC_pfam_ids")
+
+# Merge by the end of the cluster, keeping all.
+deepSMASH <- merge(deep, antismash, by.x = "DBGC_nucl_end", by.y="AS_To", all = T)
+
+# Rearrange
+deepSMASH <- deepSMASH[c("Genome","AS_Correct_name","DBGC_sequence_id","AS_From","DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.","DBGC_nucl_length","AS_classif","AS_new_classif","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","DBGC_product_activity","DBGC_product_class","DBGC_deepbgc_score","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_bio_pfam_ids","DBGC_pfam_ids")]
+
+deepSMASH$Genome <- "OXR-9"
+
+library(dplyr)
+# Fill in NA/empty cells in the DBGC_nucl_start field with those from the AS_from field. This will maintain the longer length from the deep BGC analysis 
+deepSMASH <- deepSMASH %>% mutate(DBGC_nucl_start = coalesce(DBGC_nucl_start,AS_From))
+deepSMASH$AS_From <- NULL
+deepSMASH$AS_Size.bp. <- deepSMASH$DBGC_nucl_end - deepSMASH$DBGC_nucl_start
+names(deepSMASH)[names(deepSMASH) == c("DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.")] <- c("start","end","size.bp")
+deepSMASH$DBGC_nucl_length <- NULL
+
+# Make a new Column with DBGC_product_class data
+deepSMASH$classification <- deepSMASH$DBGC_product_class
+# Copy the data from the AS_new_classif field to the empty cells in the new classification field.
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_new_classif))
+# Make the AS_new_classif "Unclassified" into NA's
+deepSMASH$classification[deepSMASH$classification == "RiPPs"] <- "RiPP"
+deepSMASH$classification[deepSMASH$classification == "Others"] <- "Other"
+# Make other NA to fill in with coalesce and add in AS_Most_similar_classif, followed by AS_classif
+deepSMASH$classification[deepSMASH$classification == "Other"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+# Repeat with Unclassified and unknowns
+deepSMASH$classification[deepSMASH$classification == "Unclassified"] <- NA
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH$classification[is.na(deepSMASH$classification)] <- "Unclassified"
+
+# Add the missing DBGC_sequence_id
+deepSMASH <- deepSMASH %>% mutate(DBGC_sequence_id = coalesce(DBGC_sequence_id,AS_Correct_name))
+deepSMASH$DBGC_sequence_id <- gsub("*.region[0-9]+","", deepSMASH$DBGC_sequence_id)
+names(deepSMASH)[names(deepSMASH) == "DBGC_sequence_id"] <- "contig"
+
+deepSMASH.9 <- deepSMASH
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-9/trycycler/OXR-9_deepBGC_antismash.txt", "wb")
+write.table(deepSMASH, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-11
+```{r}
+# OXR-11
+
+# read in the antismash data.
+antismash <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-11/deepBGC-antiSMASH_OXR-11_final_assembly/antismash_Conversion_files/all_BGC_info.csv", header = T, na.strings = c("","NA"))
+
+antismash$Region_Type <- NULL
+names(antismash) <- c("Genome","AS_classif","AS_new_classif","AS_From","AS_To","AS_Size.bp.","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","AS_Correct_name")
+
+# Read in deepBGC Data
+deep <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-11/trycycler/deepBGC/deepBGC.bgc.tsv", header = T, sep = "\t",na.strings = c("","NA"))
+
+# Narrow down the fields
+deep <- deep[c("sequence_id","nucl_start","nucl_end","nucl_length","num_proteins","num_domains","num_bio_domains","deepbgc_score","product_activity","product_class","bio_pfam_ids","pfam_ids")]
+# Give them DBGC name
+names(deep) <- c("DBGC_sequence_id","DBGC_nucl_start","DBGC_nucl_end","DBGC_nucl_length","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_deepbgc_score","DBGC_product_activity","DBGC_product_class","DBGC_bio_pfam_ids","DBGC_pfam_ids")
+
+# Merge by the end of the cluster, keeping all.
+deepSMASH <- merge(deep, antismash, by.x = "DBGC_nucl_end", by.y="AS_To", all = T)
+
+# Rearrange
+deepSMASH <- deepSMASH[c("Genome","AS_Correct_name","DBGC_sequence_id","AS_From","DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.","DBGC_nucl_length","AS_classif","AS_new_classif","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","DBGC_product_activity","DBGC_product_class","DBGC_deepbgc_score","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_bio_pfam_ids","DBGC_pfam_ids")]
+
+deepSMASH$Genome <- "OXR-11"
+
+library(dplyr)
+# Fill in NA/empty cells in the DBGC_nucl_start field with those from the AS_from field. This will maintain the longer length from the deep BGC analysis 
+deepSMASH <- deepSMASH %>% mutate(DBGC_nucl_start = coalesce(DBGC_nucl_start,AS_From))
+deepSMASH$AS_From <- NULL
+deepSMASH$AS_Size.bp. <- deepSMASH$DBGC_nucl_end - deepSMASH$DBGC_nucl_start
+names(deepSMASH)[names(deepSMASH) == c("DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.")] <- c("start","end","size.bp")
+deepSMASH$DBGC_nucl_length <- NULL
+
+# Make a new Column with DBGC_product_class data
+deepSMASH$classification <- deepSMASH$DBGC_product_class
+# Copy the data from the AS_new_classif field to the empty cells in the new classification field.
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_new_classif))
+# Make the AS_new_classif "Unclassified" into NA's
+deepSMASH$classification[deepSMASH$classification == "RiPPs"] <- "RiPP"
+deepSMASH$classification[deepSMASH$classification == "Others"] <- "Other"
+
+# Add the missing DBGC_sequence_id
+deepSMASH <- deepSMASH %>% mutate(DBGC_sequence_id = coalesce(DBGC_sequence_id,AS_Correct_name))
+deepSMASH$DBGC_sequence_id <- gsub("*.region[0-9]+","", deepSMASH$DBGC_sequence_id)
+names(deepSMASH)[names(deepSMASH) == "DBGC_sequence_id"] <- "contig"
+# Make other NA to fill in with coalesce and add in AS_Most_similar_classif, followed by AS_classif
+deepSMASH$classification[deepSMASH$classification == "Other"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+# Repeat with Unclassified and unknowns
+deepSMASH$classification[deepSMASH$classification == "Unclassified"] <- NA
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH$classification[is.na(deepSMASH$classification)] <- "Unclassified"
+
+deepSMASH <- deepSMASH[-c(25),]
+
+deepSMASH.11 <- deepSMASH
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-11/trycycler/OXR-11_deepBGC_antismash.txt", "wb")
+write.table(deepSMASH, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-76
+```{r}
+# OXR-76
+
+# read in the antismash data.
+antismash <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-76/deepBGC-antiSMASH_OXR-76_final_assembly/antismash_Conversion_files/all_BGC_info.csv", header = T, na.strings = c("","NA"))
+
+antismash$Region_Type <- NULL
+names(antismash) <- c("Genome","AS_classif","AS_new_classif","AS_From","AS_To","AS_Size.bp.","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","AS_Correct_name")
+
+# Read in deepBGC Data
+deep <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-76/trycycler/deepBGC/deepBGC.bgc.tsv", header = T, sep = "\t",na.strings = c("","NA"))
+
+# Narrow down the fields
+deep <- deep[c("sequence_id","nucl_start","nucl_end","nucl_length","num_proteins","num_domains","num_bio_domains","deepbgc_score","product_activity","product_class","bio_pfam_ids","pfam_ids")]
+# Give them DBGC name
+names(deep) <- c("DBGC_sequence_id","DBGC_nucl_start","DBGC_nucl_end","DBGC_nucl_length","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_deepbgc_score","DBGC_product_activity","DBGC_product_class","DBGC_bio_pfam_ids","DBGC_pfam_ids")
+
+# Merge by the end of the cluster, keeping all.
+deepSMASH <- merge(deep, antismash, by.x = "DBGC_nucl_end", by.y="AS_To", all = T)
+
+# Rearrange
+deepSMASH <- deepSMASH[c("Genome","AS_Correct_name","DBGC_sequence_id","AS_From","DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.","DBGC_nucl_length","AS_classif","AS_new_classif","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","DBGC_product_activity","DBGC_product_class","DBGC_deepbgc_score","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_bio_pfam_ids","DBGC_pfam_ids")]
+
+deepSMASH$Genome <- "OXR-76"
+
+library(dplyr)
+# Fill in NA/empty cells in the DBGC_nucl_start field with those from the AS_from field. This will maintain the longer length from the deep BGC analysis 
+deepSMASH <- deepSMASH %>% mutate(DBGC_nucl_start = coalesce(DBGC_nucl_start,AS_From))
+deepSMASH$AS_From <- NULL
+deepSMASH$AS_Size.bp. <- deepSMASH$DBGC_nucl_end - deepSMASH$DBGC_nucl_start
+names(deepSMASH)[names(deepSMASH) == c("DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.")] <- c("start","end","size.bp")
+deepSMASH$DBGC_nucl_length <- NULL
+
+# Make a new Column with DBGC_product_class data
+deepSMASH$classification <- deepSMASH$DBGC_product_class
+# Copy the data from the AS_new_classif field to the empty cells in the new classification field.
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_new_classif))
+# Make the AS_new_classif "Unclassified" into NA's
+deepSMASH$classification[deepSMASH$classification == "RiPPs"] <- "RiPP"
+deepSMASH$classification[deepSMASH$classification == "Others"] <- "Other"
+
+# Add the missing DBGC_sequence_id
+deepSMASH <- deepSMASH %>% mutate(DBGC_sequence_id = coalesce(DBGC_sequence_id,AS_Correct_name))
+deepSMASH$DBGC_sequence_id <- gsub("*.region[0-9]+","", deepSMASH$DBGC_sequence_id)
+names(deepSMASH)[names(deepSMASH) == "DBGC_sequence_id"] <- "contig"
+# Make other NA to fill in with coalesce and add in AS_Most_similar_classif, followed by AS_classif
+deepSMASH$classification[deepSMASH$classification == "Other"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+# Repeat with Unclassified and unknowns
+deepSMASH$classification[deepSMASH$classification == "Unclassified"] <- NA
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH$classification[is.na(deepSMASH$classification)] <- "Unclassified"
+
+deepSMASH <- deepSMASH[-c(23),]
+
+deepSMASH.76 <- deepSMASH
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-76/trycycler/OXR-76_deepBGC_antismash.txt", "wb")
+write.table(deepSMASH, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-85
+```{r}
+# OXR-85
+
+# read in the antismash data.
+antismash <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-85/deepBGC-antiSMASH_OXR-85_final_assembly/antismash_Conversion_files/all_BGC_info.csv", header = T, na.strings = c("","NA"))
+
+antismash$Region_Type <- NULL
+names(antismash) <- c("Genome","AS_classif","AS_new_classif","AS_From","AS_To","AS_Size.bp.","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","AS_Correct_name")
+
+# Read in deepBGC Data
+deep <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-85/trycycler/deepBGC/deepBGC.bgc.tsv", header = T, sep = "\t",na.strings = c("","NA"))
+
+# Narrow down the fields
+deep <- deep[c("sequence_id","nucl_start","nucl_end","nucl_length","num_proteins","num_domains","num_bio_domains","deepbgc_score","product_activity","product_class","bio_pfam_ids","pfam_ids")]
+# Give them DBGC name
+names(deep) <- c("DBGC_sequence_id","DBGC_nucl_start","DBGC_nucl_end","DBGC_nucl_length","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_deepbgc_score","DBGC_product_activity","DBGC_product_class","DBGC_bio_pfam_ids","DBGC_pfam_ids")
+
+# Merge by the end of the cluster, keeping all.
+deepSMASH <- merge(deep, antismash, by.x = "DBGC_nucl_end", by.y="AS_To", all = T)
+
+# Rearrange
+deepSMASH <- deepSMASH[c("Genome","AS_Correct_name","DBGC_sequence_id","AS_From","DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.","DBGC_nucl_length","AS_classif","AS_new_classif","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","DBGC_product_activity","DBGC_product_class","DBGC_deepbgc_score","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_bio_pfam_ids","DBGC_pfam_ids")]
+
+deepSMASH$Genome <- "OXR-85"
+
+library(dplyr)
+# Fill in NA/empty cells in the DBGC_nucl_start field with those from the AS_from field. This will maintain the longer length from the deep BGC analysis 
+deepSMASH <- deepSMASH %>% mutate(DBGC_nucl_start = coalesce(DBGC_nucl_start,AS_From))
+deepSMASH$AS_From <- NULL
+deepSMASH$AS_Size.bp. <- deepSMASH$DBGC_nucl_end - deepSMASH$DBGC_nucl_start
+names(deepSMASH)[names(deepSMASH) == c("DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.")] <- c("start","end","size.bp")
+deepSMASH$DBGC_nucl_length <- NULL
+
+# Make a new Column with DBGC_product_class data
+deepSMASH$classification <- deepSMASH$DBGC_product_class
+# Copy the data from the AS_new_classif field to the empty cells in the new classification field.
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_new_classif))
+# Make the AS_new_classif "Unclassified" into NA's
+deepSMASH$classification[deepSMASH$classification == "RiPPs"] <- "RiPP"
+deepSMASH$classification[deepSMASH$classification == "Others"] <- "Other"
+
+# Add the missing DBGC_sequence_id
+deepSMASH <- deepSMASH %>% mutate(DBGC_sequence_id = coalesce(DBGC_sequence_id,AS_Correct_name))
+deepSMASH$DBGC_sequence_id <- gsub("*.region[0-9]+","", deepSMASH$DBGC_sequence_id)
+names(deepSMASH)[names(deepSMASH) == "DBGC_sequence_id"] <- "contig"
+# Make other NA to fill in with coalesce and add in AS_Most_similar_classif, followed by AS_classif
+deepSMASH$classification[deepSMASH$classification == "Other"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+# Repeat with Unclassified and unknowns
+deepSMASH$classification[deepSMASH$classification == "Unclassified"] <- NA
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH$classification[is.na(deepSMASH$classification)] <- "Unclassified"
+
+deepSMASH.85 <- deepSMASH
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-85/trycycler/OXR-85_deepBGC_antismash.txt", "wb")
+write.table(deepSMASH, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-96
+```{r}
+# OXR-96
+
+# read in the antismash data.
+antismash <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-96/deepBGC-antiSMASH_OXR-96_final_assembly/antismash_Conversion_files/all_BGC_info.csv", header = T, na.strings = c("","NA"))
+
+antismash$Region_Type <- NULL
+names(antismash) <- c("Genome","AS_classif","AS_new_classif","AS_From","AS_To","AS_Size.bp.","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","AS_Correct_name")
+
+# Read in deepBGC Data
+deep <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-96/trycycler/deepBGC/deepBGC.bgc.tsv", header = T, sep = "\t",na.strings = c("","NA"))
+
+# Narrow down the fields
+deep <- deep[c("sequence_id","nucl_start","nucl_end","nucl_length","num_proteins","num_domains","num_bio_domains","deepbgc_score","product_activity","product_class","bio_pfam_ids","pfam_ids")]
+# Give them DBGC name
+names(deep) <- c("DBGC_sequence_id","DBGC_nucl_start","DBGC_nucl_end","DBGC_nucl_length","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_deepbgc_score","DBGC_product_activity","DBGC_product_class","DBGC_bio_pfam_ids","DBGC_pfam_ids")
+
+# Merge by the end of the cluster, keeping all.
+deepSMASH <- merge(deep, antismash, by.x = "DBGC_nucl_end", by.y="AS_To", all = T)
+
+# Rearrange
+deepSMASH <- deepSMASH[c("Genome","AS_Correct_name","DBGC_sequence_id","AS_From","DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.","DBGC_nucl_length","AS_classif","AS_new_classif","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","DBGC_product_activity","DBGC_product_class","DBGC_deepbgc_score","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_bio_pfam_ids","DBGC_pfam_ids")]
+
+deepSMASH$Genome <- "OXR-96"
+
+library(dplyr)
+# Fill in NA/empty cells in the DBGC_nucl_start field with those from the AS_from field. This will maintain the longer length from the deep BGC analysis 
+deepSMASH <- deepSMASH %>% mutate(DBGC_nucl_start = coalesce(DBGC_nucl_start,AS_From))
+deepSMASH$AS_From <- NULL
+deepSMASH$AS_Size.bp. <- deepSMASH$DBGC_nucl_end - deepSMASH$DBGC_nucl_start
+names(deepSMASH)[names(deepSMASH) == c("DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.")] <- c("start","end","size.bp")
+deepSMASH$DBGC_nucl_length <- NULL
+
+# Make a new Column with DBGC_product_class data
+deepSMASH$classification <- deepSMASH$DBGC_product_class
+# Copy the data from the AS_new_classif field to the empty cells in the new classification field.
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_new_classif))
+# Make the AS_new_classif "Unclassified" into NA's
+deepSMASH$classification[deepSMASH$classification == "RiPPs"] <- "RiPP"
+deepSMASH$classification[deepSMASH$classification == "Others"] <- "Other"
+
+# Add the missing DBGC_sequence_id
+deepSMASH <- deepSMASH %>% mutate(DBGC_sequence_id = coalesce(DBGC_sequence_id,AS_Correct_name))
+deepSMASH$DBGC_sequence_id <- gsub("*.region[0-9]+","", deepSMASH$DBGC_sequence_id)
+names(deepSMASH)[names(deepSMASH) == "DBGC_sequence_id"] <- "contig"
+# Make other NA to fill in with coalesce and add in AS_Most_similar_classif, followed by AS_classif
+deepSMASH$classification[deepSMASH$classification == "Other"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+# Repeat with Unclassified and unknowns
+deepSMASH$classification[deepSMASH$classification == "Unclassified"] <- NA
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH$classification[is.na(deepSMASH$classification)] <- "Unclassified"
+
+deepSMASH <- deepSMASH[-c(43),]
+
+deepSMASH.96 <- deepSMASH
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-96/trycycler/OXR-96_deepBGC_antismash.txt", "wb")
+write.table(deepSMASH, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-134
+```{r}
+# OXR-134
+
+# read in the antismash data.
+antismash <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-134/deepBGC-antiSMASH_OXR-134_final_assembly/antismash_Conversion_files/all_BGC_info.csv", header = T, na.strings = c("","NA"))
+
+antismash$Region_Type <- NULL
+names(antismash) <- c("Genome","AS_classif","AS_new_classif","AS_From","AS_To","AS_Size.bp.","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","AS_Correct_name")
+
+# Read in deepBGC Data
+deep <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-134/trycycler/deepBGC/deepBGC.bgc.tsv", header = T, sep = "\t",na.strings = c("","NA"))
+
+# Narrow down the fields
+deep <- deep[c("sequence_id","nucl_start","nucl_end","nucl_length","num_proteins","num_domains","num_bio_domains","deepbgc_score","product_activity","product_class","bio_pfam_ids","pfam_ids")]
+# Give them DBGC name
+names(deep) <- c("DBGC_sequence_id","DBGC_nucl_start","DBGC_nucl_end","DBGC_nucl_length","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_deepbgc_score","DBGC_product_activity","DBGC_product_class","DBGC_bio_pfam_ids","DBGC_pfam_ids")
+
+# Merge by the end of the cluster, keeping all.
+deepSMASH <- merge(deep, antismash, by.x = "DBGC_nucl_end", by.y="AS_To", all = T)
+
+# Rearrange
+deepSMASH <- deepSMASH[c("Genome","AS_Correct_name","DBGC_sequence_id","AS_From","DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.","DBGC_nucl_length","AS_classif","AS_new_classif","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","DBGC_product_activity","DBGC_product_class","DBGC_deepbgc_score","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_bio_pfam_ids","DBGC_pfam_ids")]
+
+deepSMASH$Genome <- "OXR-134"
+
+library(dplyr)
+# Fill in NA/empty cells in the DBGC_nucl_start field with those from the AS_from field. This will maintain the longer length from the deep BGC analysis 
+deepSMASH <- deepSMASH %>% mutate(DBGC_nucl_start = coalesce(DBGC_nucl_start,AS_From))
+deepSMASH$AS_From <- NULL
+deepSMASH$AS_Size.bp. <- deepSMASH$DBGC_nucl_end - deepSMASH$DBGC_nucl_start
+names(deepSMASH)[names(deepSMASH) == c("DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.")] <- c("start","end","size.bp")
+deepSMASH$DBGC_nucl_length <- NULL
+
+# Make a new Column with DBGC_product_class data
+deepSMASH$classification <- deepSMASH$DBGC_product_class
+# Copy the data from the AS_new_classif field to the empty cells in the new classification field.
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_new_classif))
+# Make the AS_new_classif "Unclassified" into NA's
+deepSMASH$classification[deepSMASH$classification == "RiPPs"] <- "RiPP"
+deepSMASH$classification[deepSMASH$classification == "Others"] <- "Other"
+
+# Add the missing DBGC_sequence_id
+deepSMASH <- deepSMASH %>% mutate(DBGC_sequence_id = coalesce(DBGC_sequence_id,AS_Correct_name))
+deepSMASH$DBGC_sequence_id <- gsub("*.region[0-9]+","", deepSMASH$DBGC_sequence_id)
+names(deepSMASH)[names(deepSMASH) == "DBGC_sequence_id"] <- "contig"
+# Make other NA to fill in with coalesce and add in AS_Most_similar_classif, followed by AS_classif
+deepSMASH$classification[deepSMASH$classification == "Other"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+# Repeat with Unclassified and unknowns
+deepSMASH$classification[deepSMASH$classification == "Unclassified"] <- NA
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH$classification[is.na(deepSMASH$classification)] <- "Unclassified"
+
+deepSMASH <- deepSMASH[-c(17),]
+
+deepSMASH.134 <- deepSMASH
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-134/trycycler/OXR-134_deepBGC_antismash.txt", "wb")
+write.table(deepSMASH, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-137
+```{r}
+# OXR-137
+
+# read in the antismash data.
+antismash <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/deepBGC-antiSMASH_OXR-137_final_assembly/antismash_Conversion_files/all_BGC_info.csv", header = T, na.strings = c("","NA"))
+
+antismash$Region_Type <- NULL
+names(antismash) <- c("Genome","AS_classif","AS_new_classif","AS_From","AS_To","AS_Size.bp.","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","AS_Correct_name")
+
+# Read in deepBGC Data
+deep <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/deepBGC/deepBGC.bgc.tsv", header = T, sep = "\t",na.strings = c("","NA"))
+
+# Narrow down the fields
+deep <- deep[c("sequence_id","nucl_start","nucl_end","nucl_length","num_proteins","num_domains","num_bio_domains","deepbgc_score","product_activity","product_class","bio_pfam_ids","pfam_ids")]
+# Give them DBGC name
+names(deep) <- c("DBGC_sequence_id","DBGC_nucl_start","DBGC_nucl_end","DBGC_nucl_length","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_deepbgc_score","DBGC_product_activity","DBGC_product_class","DBGC_bio_pfam_ids","DBGC_pfam_ids")
+
+# Merge by the end of the cluster, keeping all.
+deepSMASH <- merge(deep, antismash, by.x = "DBGC_nucl_end", by.y="AS_To", all = T)
+
+# Rearrange
+deepSMASH <- deepSMASH[c("Genome","AS_Correct_name","DBGC_sequence_id","AS_From","DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.","DBGC_nucl_length","AS_classif","AS_new_classif","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","DBGC_product_activity","DBGC_product_class","DBGC_deepbgc_score","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_bio_pfam_ids","DBGC_pfam_ids")]
+
+deepSMASH$Genome <- "OXR-137"
+
+library(dplyr)
+# Fill in NA/empty cells in the DBGC_nucl_start field with those from the AS_from field. This will maintain the longer length from the deep BGC analysis 
+deepSMASH <- deepSMASH %>% mutate(DBGC_nucl_start = coalesce(DBGC_nucl_start,AS_From))
+deepSMASH$AS_From <- NULL
+deepSMASH$AS_Size.bp. <- deepSMASH$DBGC_nucl_end - deepSMASH$DBGC_nucl_start
+names(deepSMASH)[names(deepSMASH) == c("DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.")] <- c("start","end","size.bp")
+deepSMASH$DBGC_nucl_length <- NULL
+
+# Make a new Column with DBGC_product_class data
+deepSMASH$classification <- deepSMASH$DBGC_product_class
+# Copy the data from the AS_new_classif field to the empty cells in the new classification field.
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_new_classif))
+# Make the AS_new_classif "Unclassified" into NA's
+deepSMASH$classification[deepSMASH$classification == "RiPPs"] <- "RiPP"
+deepSMASH$classification[deepSMASH$classification == "Others"] <- "Other"
+
+# Add the missing DBGC_sequence_id
+deepSMASH <- deepSMASH %>% mutate(DBGC_sequence_id = coalesce(DBGC_sequence_id,AS_Correct_name))
+deepSMASH$DBGC_sequence_id <- gsub("*.region[0-9]+","", deepSMASH$DBGC_sequence_id)
+names(deepSMASH)[names(deepSMASH) == "DBGC_sequence_id"] <- "contig"
+# Make other NA to fill in with coalesce and add in AS_Most_similar_classif, followed by AS_classif
+deepSMASH$classification[deepSMASH$classification == "Other"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+# Repeat with Unclassified and unknowns
+deepSMASH$classification[deepSMASH$classification == "Unclassified"] <- NA
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH$classification[is.na(deepSMASH$classification)] <- "Unclassified"
+
+deepSMASH.137 <- deepSMASH
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/OXR-137_deepBGC_antismash.txt", "wb")
+write.table(deepSMASH, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-159
+```{r}
+# OXR-159
+
+# read in the antismash data.
+antismash <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-159/deepBGC-antiSMASH_OXR-159_final_assembly/antismash_Conversion_files/all_BGC_info.csv", header = T, na.strings = c("","NA"))
+
+antismash$Region_Type <- NULL
+names(antismash) <- c("Genome","AS_classif","AS_new_classif","AS_From","AS_To","AS_Size.bp.","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","AS_Correct_name")
+
+# Read in deepBGC Data
+deep <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-159/trycycler/deepBGC/deepBGC.bgc.tsv", header = T, sep = "\t",na.strings = c("","NA"))
+
+# Narrow down the fields
+deep <- deep[c("sequence_id","nucl_start","nucl_end","nucl_length","num_proteins","num_domains","num_bio_domains","deepbgc_score","product_activity","product_class","bio_pfam_ids","pfam_ids")]
+# Give them DBGC name
+names(deep) <- c("DBGC_sequence_id","DBGC_nucl_start","DBGC_nucl_end","DBGC_nucl_length","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_deepbgc_score","DBGC_product_activity","DBGC_product_class","DBGC_bio_pfam_ids","DBGC_pfam_ids")
+
+# Merge by the end of the cluster, keeping all.
+deepSMASH <- merge(deep, antismash, by.x = "DBGC_nucl_end", by.y="AS_To", all = T)
+
+# Rearrange
+deepSMASH <- deepSMASH[c("Genome","AS_Correct_name","DBGC_sequence_id","AS_From","DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.","DBGC_nucl_length","AS_classif","AS_new_classif","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","DBGC_product_activity","DBGC_product_class","DBGC_deepbgc_score","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_bio_pfam_ids","DBGC_pfam_ids")]
+
+deepSMASH$Genome <- "OXR-159"
+
+library(dplyr)
+# Fill in NA/empty cells in the DBGC_nucl_start field with those from the AS_from field. This will maintain the longer length from the deep BGC analysis 
+deepSMASH <- deepSMASH %>% mutate(DBGC_nucl_start = coalesce(DBGC_nucl_start,AS_From))
+deepSMASH$AS_From <- NULL
+deepSMASH$AS_Size.bp. <- deepSMASH$DBGC_nucl_end - deepSMASH$DBGC_nucl_start
+names(deepSMASH)[names(deepSMASH) == c("DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.")] <- c("start","end","size.bp")
+deepSMASH$DBGC_nucl_length <- NULL
+
+# Make a new Column with DBGC_product_class data
+deepSMASH$classification <- deepSMASH$DBGC_product_class
+# Copy the data from the AS_new_classif field to the empty cells in the new classification field.
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_new_classif))
+# Make the AS_new_classif "Unclassified" into NA's
+deepSMASH$classification[deepSMASH$classification == "RiPPs"] <- "RiPP"
+deepSMASH$classification[deepSMASH$classification == "Others"] <- "Other"
+
+# Add the missing DBGC_sequence_id
+deepSMASH <- deepSMASH %>% mutate(DBGC_sequence_id = coalesce(DBGC_sequence_id,AS_Correct_name))
+deepSMASH$DBGC_sequence_id <- gsub("*.region[0-9]+","", deepSMASH$DBGC_sequence_id)
+names(deepSMASH)[names(deepSMASH) == "DBGC_sequence_id"] <- "contig"
+# Make other NA to fill in with coalesce and add in AS_Most_similar_classif, followed by AS_classif
+deepSMASH$classification[deepSMASH$classification == "Other"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+# Repeat with Unclassified and unknowns
+deepSMASH$classification[deepSMASH$classification == "Unclassified"] <- NA
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH$classification[is.na(deepSMASH$classification)] <- "Unclassified"
+
+deepSMASH.159 <- deepSMASH
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-159/trycycler/OXR-159_deepBGC_antismash.txt", "wb")
+write.table(deepSMASH, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-189
+```{r}
+# OXR-189
+
+# read in the antismash data.
+antismash <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-189/deepBGC-antiSMASH_OXR-189_final_assembly/antismash_Conversion_files/all_BGC_info.csv", header = T, na.strings = c("","NA"))
+
+antismash$Region_Type <- NULL
+names(antismash) <- c("Genome","AS_classif","AS_new_classif","AS_From","AS_To","AS_Size.bp.","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","AS_Correct_name")
+
+# Read in deepBGC Data
+deep <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-189/trycycler/deepBGC/deepBGC.bgc.tsv", header = T, sep = "\t",na.strings = c("","NA"))
+
+# Narrow down the fields
+deep <- deep[c("sequence_id","nucl_start","nucl_end","nucl_length","num_proteins","num_domains","num_bio_domains","deepbgc_score","product_activity","product_class","bio_pfam_ids","pfam_ids")]
+# Give them DBGC name
+names(deep) <- c("DBGC_sequence_id","DBGC_nucl_start","DBGC_nucl_end","DBGC_nucl_length","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_deepbgc_score","DBGC_product_activity","DBGC_product_class","DBGC_bio_pfam_ids","DBGC_pfam_ids")
+
+# Merge by the end of the cluster, keeping all.
+deepSMASH <- merge(deep, antismash, by.x = "DBGC_nucl_end", by.y="AS_To", all = T)
+
+# Rearrange
+deepSMASH <- deepSMASH[c("Genome","AS_Correct_name","DBGC_sequence_id","AS_From","DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.","DBGC_nucl_length","AS_classif","AS_new_classif","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","DBGC_product_activity","DBGC_product_class","DBGC_deepbgc_score","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_bio_pfam_ids","DBGC_pfam_ids")]
+
+deepSMASH$Genome <- "OXR-189"
+
+library(dplyr)
+# Fill in NA/empty cells in the DBGC_nucl_start field with those from the AS_from field. This will maintain the longer length from the deep BGC analysis 
+deepSMASH <- deepSMASH %>% mutate(DBGC_nucl_start = coalesce(DBGC_nucl_start,AS_From))
+deepSMASH$AS_From <- NULL
+deepSMASH$AS_Size.bp. <- deepSMASH$DBGC_nucl_end - deepSMASH$DBGC_nucl_start
+names(deepSMASH)[names(deepSMASH) == c("DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.")] <- c("start","end","size.bp")
+deepSMASH$DBGC_nucl_length <- NULL
+
+# Make a new Column with DBGC_product_class data
+deepSMASH$classification <- deepSMASH$DBGC_product_class
+# Copy the data from the AS_new_classif field to the empty cells in the new classification field.
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_new_classif))
+# Make the AS_new_classif "Unclassified" into NA's
+deepSMASH$classification[deepSMASH$classification == "RiPPs"] <- "RiPP"
+deepSMASH$classification[deepSMASH$classification == "Others"] <- "Other"
+
+# Add the missing DBGC_sequence_id
+deepSMASH <- deepSMASH %>% mutate(DBGC_sequence_id = coalesce(DBGC_sequence_id,AS_Correct_name))
+deepSMASH$DBGC_sequence_id <- gsub("*.region[0-9]+","", deepSMASH$DBGC_sequence_id)
+names(deepSMASH)[names(deepSMASH) == "DBGC_sequence_id"] <- "contig"
+# Make other NA to fill in with coalesce and add in AS_Most_similar_classif, followed by AS_classif
+deepSMASH$classification[deepSMASH$classification == "Other"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+# Repeat with Unclassified and unknowns
+deepSMASH$classification[deepSMASH$classification == "Unclassified"] <- NA
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH$classification[is.na(deepSMASH$classification)] <- "Unclassified"
+
+deepSMASH <- deepSMASH[-c(14),]
+
+deepSMASH.189 <- deepSMASH
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-189/trycycler/OXR-189_deepBGC_antismash.txt", "wb")
+write.table(deepSMASH, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-199
+```{r}
+# OXR-199
+
+# read in the antismash data.
+antismash <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-199/deepBGC-antiSMASH_OXR-199_final_assembly/antismash_Conversion_files/all_BGC_info.csv", header = T, na.strings = c("","NA"))
+
+antismash$Region_Type <- NULL
+names(antismash) <- c("Genome","AS_classif","AS_new_classif","AS_From","AS_To","AS_Size.bp.","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","AS_Correct_name")
+
+# Read in deepBGC Data
+deep <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-199/trycycler/deepBGC/deepBGC.bgc.tsv", header = T, sep = "\t",na.strings = c("","NA"))
+
+# Narrow down the fields
+deep <- deep[c("sequence_id","nucl_start","nucl_end","nucl_length","num_proteins","num_domains","num_bio_domains","deepbgc_score","product_activity","product_class","bio_pfam_ids","pfam_ids")]
+# Give them DBGC name
+names(deep) <- c("DBGC_sequence_id","DBGC_nucl_start","DBGC_nucl_end","DBGC_nucl_length","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_deepbgc_score","DBGC_product_activity","DBGC_product_class","DBGC_bio_pfam_ids","DBGC_pfam_ids")
+
+# Merge by the end of the cluster, keeping all.
+deepSMASH <- merge(deep, antismash, by.x = "DBGC_nucl_end", by.y="AS_To", all = T)
+
+# Rearrange
+deepSMASH <- deepSMASH[c("Genome","AS_Correct_name","DBGC_sequence_id","AS_From","DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.","DBGC_nucl_length","AS_classif","AS_new_classif","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","DBGC_product_activity","DBGC_product_class","DBGC_deepbgc_score","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_bio_pfam_ids","DBGC_pfam_ids")]
+
+deepSMASH$Genome <- "OXR-199"
+
+library(dplyr)
+# Fill in NA/empty cells in the DBGC_nucl_start field with those from the AS_from field. This will maintain the longer length from the deep BGC analysis 
+deepSMASH <- deepSMASH %>% mutate(DBGC_nucl_start = coalesce(DBGC_nucl_start,AS_From))
+deepSMASH$AS_From <- NULL
+deepSMASH$AS_Size.bp. <- deepSMASH$DBGC_nucl_end - deepSMASH$DBGC_nucl_start
+names(deepSMASH)[names(deepSMASH) == c("DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.")] <- c("start","end","size.bp")
+deepSMASH$DBGC_nucl_length <- NULL
+
+# Make a new Column with DBGC_product_class data
+deepSMASH$classification <- deepSMASH$DBGC_product_class
+# Copy the data from the AS_new_classif field to the empty cells in the new classification field.
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_new_classif))
+# Make the AS_new_classif "Unclassified" into NA's
+deepSMASH$classification[deepSMASH$classification == "RiPPs"] <- "RiPP"
+deepSMASH$classification[deepSMASH$classification == "Others"] <- "Other"
+
+# Add the missing DBGC_sequence_id
+deepSMASH <- deepSMASH %>% mutate(DBGC_sequence_id = coalesce(DBGC_sequence_id,AS_Correct_name))
+deepSMASH$DBGC_sequence_id <- gsub("*.region[0-9]+","", deepSMASH$DBGC_sequence_id)
+names(deepSMASH)[names(deepSMASH) == "DBGC_sequence_id"] <- "contig"
+# Make other NA to fill in with coalesce and add in AS_Most_similar_classif, followed by AS_classif
+deepSMASH$classification[deepSMASH$classification == "Other"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+# Repeat with Unclassified and unknowns
+deepSMASH$classification[deepSMASH$classification == "Unclassified"] <- NA
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH$classification[is.na(deepSMASH$classification)] <- "Unclassified"
+
+deepSMASH.199 <- deepSMASH
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-199/trycycler/OXR-199_deepBGC_antismash.txt", "wb")
+write.table(deepSMASH, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-203
+```{r}
+# OXR-203
+
+# read in the antismash data.
+antismash <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/deepBGC-antiSMASH_OXR-203_final_assembly/antismash_Conversion_files/all_BGC_info.csv", header = T, na.strings = c("","NA"))
+
+antismash$Region_Type <- NULL
+names(antismash) <- c("Genome","AS_classif","AS_new_classif","AS_From","AS_To","AS_Size.bp.","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","AS_Correct_name")
+
+# Read in deepBGC Data
+deep <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/trycycler/deepBGC/deepBGC.bgc.tsv", header = T, sep = "\t",na.strings = c("","NA"))
+
+# Narrow down the fields
+deep <- deep[c("sequence_id","nucl_start","nucl_end","nucl_length","num_proteins","num_domains","num_bio_domains","deepbgc_score","product_activity","product_class","bio_pfam_ids","pfam_ids")]
+# Give them DBGC name
+names(deep) <- c("DBGC_sequence_id","DBGC_nucl_start","DBGC_nucl_end","DBGC_nucl_length","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_deepbgc_score","DBGC_product_activity","DBGC_product_class","DBGC_bio_pfam_ids","DBGC_pfam_ids")
+
+# Merge by the end of the cluster, keeping all.
+deepSMASH <- merge(deep, antismash, by.x = "DBGC_nucl_end", by.y="AS_To", all = T)
+
+# Rearrange
+deepSMASH <- deepSMASH[c("Genome","AS_Correct_name","DBGC_sequence_id","AS_From","DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.","DBGC_nucl_length","AS_classif","AS_new_classif","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","DBGC_product_activity","DBGC_product_class","DBGC_deepbgc_score","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_bio_pfam_ids","DBGC_pfam_ids")]
+
+deepSMASH$Genome <- "OXR-203"
+
+library(dplyr)
+# Fill in NA/empty cells in the DBGC_nucl_start field with those from the AS_from field. This will maintain the longer length from the deep BGC analysis 
+deepSMASH <- deepSMASH %>% mutate(DBGC_nucl_start = coalesce(DBGC_nucl_start,AS_From))
+deepSMASH$AS_From <- NULL
+deepSMASH$AS_Size.bp. <- deepSMASH$DBGC_nucl_end - deepSMASH$DBGC_nucl_start
+names(deepSMASH)[names(deepSMASH) == c("DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.")] <- c("start","end","size.bp")
+deepSMASH$DBGC_nucl_length <- NULL
+
+# Make a new Column with DBGC_product_class data
+deepSMASH$classification <- deepSMASH$DBGC_product_class
+# Copy the data from the AS_new_classif field to the empty cells in the new classification field.
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_new_classif))
+# Make the AS_new_classif "Unclassified" into NA's
+deepSMASH$classification[deepSMASH$classification == "RiPPs"] <- "RiPP"
+deepSMASH$classification[deepSMASH$classification == "Others"] <- "Other"
+
+# Add the missing DBGC_sequence_id
+deepSMASH <- deepSMASH %>% mutate(DBGC_sequence_id = coalesce(DBGC_sequence_id,AS_Correct_name))
+deepSMASH$DBGC_sequence_id <- gsub("*.region[0-9]+","", deepSMASH$DBGC_sequence_id)
+names(deepSMASH)[names(deepSMASH) == "DBGC_sequence_id"] <- "contig"
+# Make other NA to fill in with coalesce and add in AS_Most_similar_classif, followed by AS_classif
+deepSMASH$classification[deepSMASH$classification == "Other"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+# Repeat with Unclassified and unknowns
+deepSMASH$classification[deepSMASH$classification == "Unclassified"] <- NA
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH$classification[is.na(deepSMASH$classification)] <- "Unclassified"
+
+deepSMASH <- deepSMASH[-c(23),]
+
+deepSMASH.203 <- deepSMASH
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/trycycler/OXR-203_deepBGC_antismash.txt", "wb")
+write.table(deepSMASH, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+OXR-209
+```{r}
+# OXR-209
+
+# read in the antismash data.
+antismash <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-209/deepBGC-antiSMASH_OXR-209_final_assembly/antismash_Conversion_files/all_BGC_info.csv", header = T, na.strings = c("","NA"))
+
+antismash$Region_Type <- NULL
+names(antismash) <- c("Genome","AS_classif","AS_new_classif","AS_From","AS_To","AS_Size.bp.","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","AS_Correct_name")
+
+# Read in deepBGC Data
+deep <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-209/trycycler/deepBGC/deepBGC.bgc.tsv", header = T, sep = "\t",na.strings = c("","NA"))
+
+# Narrow down the fields
+deep <- deep[c("sequence_id","nucl_start","nucl_end","nucl_length","num_proteins","num_domains","num_bio_domains","deepbgc_score","product_activity","product_class","bio_pfam_ids","pfam_ids")]
+# Give them DBGC name
+names(deep) <- c("DBGC_sequence_id","DBGC_nucl_start","DBGC_nucl_end","DBGC_nucl_length","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_deepbgc_score","DBGC_product_activity","DBGC_product_class","DBGC_bio_pfam_ids","DBGC_pfam_ids")
+
+# Merge by the end of the cluster, keeping all.
+deepSMASH <- merge(deep, antismash, by.x = "DBGC_nucl_end", by.y="AS_To", all = T)
+
+# Rearrange
+deepSMASH <- deepSMASH[c("Genome","AS_Correct_name","DBGC_sequence_id","AS_From","DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.","DBGC_nucl_length","AS_classif","AS_new_classif","AS_Most_similar_known_cluster","AS_Most_similar_classif","AS_Similarity","DBGC_product_activity","DBGC_product_class","DBGC_deepbgc_score","DBGC_num_proteins","DBGC_num_domains","DBGC_num_bio_domains","DBGC_bio_pfam_ids","DBGC_pfam_ids")]
+
+deepSMASH$Genome <- "OXR-209"
+
+library(dplyr)
+# Fill in NA/empty cells in the DBGC_nucl_start field with those from the AS_from field. This will maintain the longer length from the deep BGC analysis 
+deepSMASH <- deepSMASH %>% mutate(DBGC_nucl_start = coalesce(DBGC_nucl_start,AS_From))
+deepSMASH$AS_From <- NULL
+deepSMASH$AS_Size.bp. <- deepSMASH$DBGC_nucl_end - deepSMASH$DBGC_nucl_start
+names(deepSMASH)[names(deepSMASH) == c("DBGC_nucl_start","DBGC_nucl_end","AS_Size.bp.")] <- c("start","end","size.bp")
+deepSMASH$DBGC_nucl_length <- NULL
+
+# Make a new Column with DBGC_product_class data
+deepSMASH$classification <- deepSMASH$DBGC_product_class
+# Copy the data from the AS_new_classif field to the empty cells in the new classification field.
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_new_classif))
+# Make the AS_new_classif "Unclassified" into NA's
+deepSMASH$classification[deepSMASH$classification == "RiPPs"] <- "RiPP"
+deepSMASH$classification[deepSMASH$classification == "Others"] <- "Other"
+
+# Add the missing DBGC_sequence_id
+deepSMASH <- deepSMASH %>% mutate(DBGC_sequence_id = coalesce(DBGC_sequence_id,AS_Correct_name))
+deepSMASH$DBGC_sequence_id <- gsub("*.region[0-9]+","", deepSMASH$DBGC_sequence_id)
+names(deepSMASH)[names(deepSMASH) == "DBGC_sequence_id"] <- "contig"
+# Make other NA to fill in with coalesce and add in AS_Most_similar_classif, followed by AS_classif
+deepSMASH$classification[deepSMASH$classification == "Other"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+# Repeat with Unclassified and unknowns
+deepSMASH$classification[deepSMASH$classification == "Unclassified"] <- NA
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH <- deepSMASH %>% mutate(classification = coalesce(classification,AS_classif))
+deepSMASH$classification[deepSMASH$classification == "unknown"] <- NA
+deepSMASH$classification[is.na(deepSMASH$classification)] <- "Unclassified"
+
+deepSMASH.209 <- deepSMASH
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-209/trycycler/OXR-209_deepBGC_antismash.txt", "wb")
+write.table(deepSMASH, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+
+Mereg all of the data into a single table
+```{r}
+total.smash <- rbind(deepSMASH.11,deepSMASH.134,deepSMASH.137,deepSMASH.159,deepSMASH.189,deepSMASH.199,deepSMASH.203,deepSMASH.209,deepSMASH.76,deepSMASH.85,deepSMASH.9,deepSMASH.96)
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR_deepBGC_antismash_BGC.txt", "wb")
+write.table(total.smash, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+
+# Trying to summarize for a ggplot
+library(dplyr)
+library(tidyr)
+help <- total.smash %>% group_by(Genome, classification) %>% tally()
+help$Genome <- factor(help$Genome, levels = c("OXR-9","OXR-11","OXR-76","OXR-85","OXR-96","OXR-134","OXR-137","OXR-159","OXR-189","OXR-199","OXR-203","OXR-209"))
+
+library(ggplot2)
+unc <- ggplot(help, aes(fill=Genome, y = n, x = classification)) +
+  geom_bar(position='stack', stat = 'identity')+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))+
+  ylab("Count") +
+  xlab("BGC Classification")+
+  ggtitle("Biosynthetic Gene Cluster Classification by Genome")+
+  facet_wrap(~Genome)
+
+unc
+ggsave("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/BGC_w_unclass_wrap.pdf", width = 15)
+
+
+no.unc <- ggplot(help[! help$classification == "Unclassified",], aes(fill=Genome, y = n, x = classification)) +
+  geom_bar(position='stack', stat = 'identity')+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))+
+  ylab("Count") +
+  xlab("BGC Classification")+
+  ggtitle("Biosynthetic Gene Cluster Classification by Genome")+
+  facet_wrap(~Genome)
+
+no.unc
+ggsave("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/BGC_class_wrap.pdf", width = 15)
+```

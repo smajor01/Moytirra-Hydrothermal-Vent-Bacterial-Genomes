@@ -1,0 +1,206 @@
+---
+title: "Getting transcript regions"
+output: word_document
+date: "2023-12-26"
+---
+
+Get the regions for the 
+
+The chunk below will load the total data of the KEGGs IDs and the RSEM data for each individual isolate. 
+It will also remove duplicated genes from the KEGG data processing.
+```{r}
+oxr.209 <-  read.csv(paste0("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-209/trycycler/eggNOG_annotations/OXR-209_ALL_all_data.txt"), sep = "\t", header = T)
+
+
+read.ALL.keggs <- function(genome, name.table){
+  packages <- c("dplyr")
+  sapply(c(packages), require, character.only = TRUE)
+oxr <-  read.csv(paste0("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/",
+                           genome,
+                           "/trycycler/eggNOG_annotations/",
+                           genome,
+                           "_ALL_all_data.txt"), sep = "\t", header = T)
+oxr <- oxr[,-c(12:16,68:122)]
+oxr <- oxr[,! colnames(oxr) %in% c("TPM.C1B12F1","TPM.C1B12F2","TPM.C1B12F3","TPM.C2B1F1","TPM.C2B1F2","TPM.C2B1F3")]
+oxr$TPM.plume.sum <- rowSums(oxr[,c(12:56)])
+oxr <- oxr[,-c(12:56)]
+
+oxr$isolate <- genome
+oxr$contig <- sub("_\\d+$", "", oxr$eggNOG_alt_name.x)
+oxr <- oxr[! duplicated(oxr$eggNOG_name),]
+oxr <- oxr[,-c(5:11)]
+# oxr <- oxr[! oxr$TPM.plume.sum == 0,]
+
+oxr <- data.frame(do.call('rbind', strsplit(as.character(oxr$eggNOG_name),'_',fixed=TRUE))) %>% cbind(oxr,.)
+
+assign(name.table, oxr, envir = globalenv())
+
+}
+```
+
+
+```{r}
+###
+read.ALL.keggs("OXR-9","oxr.9")
+contigs <- oxr.9[,c("contig","X1")] %>% .[! duplicated(.$X1),]
+oxr.9$contig <- NULL
+oxr.9 <- merge(oxr.9, contigs, all = T)
+oxr.9[oxr.9$contig=="","contig"] <- "cluster_011_consensus_polypolish"
+oxr.9 <- oxr.9[! oxr.9$TPM.plume.sum ==0,]
+oxr.9.circos <- oxr.9[,c("contig","start","stop","TPM.plume.sum")]
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/Circos/OXR Genomes/OXR-9/TPM_regions.txt", "wb")
+write.table(oxr.9.circos, file = output.file, row.names = F, col.names = F)
+close(output.file)
+
+####
+read.ALL.keggs("OXR-11","oxr.11")
+contigs <- oxr.11[,c("contig","X1")] %>% .[! duplicated(.$contig),] %>% .[-1,]
+oxr.11$contig <- NULL
+oxr.11 <- merge(oxr.11, contigs, all = T)
+oxr.11 <- oxr.11[! oxr.11$TPM.plume.sum ==0,]
+oxr.11.circos <- oxr.11[,c("contig","start","stop","TPM.plume.sum")]
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/Circos/OXR Genomes/OXR-11/TPM_regions.txt", "wb")
+write.table(oxr.11.circos, file = output.file, row.names = F, col.names = F)
+close(output.file)
+
+####
+read.ALL.keggs("OXR-76","oxr.76")
+contigs <- oxr.76[,c("contig","X1")] %>% .[! duplicated(.$X1),]
+oxr.76$contig <- NULL
+oxr.76 <- merge(oxr.76, contigs, all = T)
+oxr.76 <- oxr.76[! oxr.76$TPM.plume.sum ==0,]
+oxr.76.circos <- oxr.76[,c("contig","start","stop","TPM.plume.sum")]
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/Circos/OXR Genomes/OXR-76/TPM_regions.txt", "wb")
+write.table(oxr.76.circos, file = output.file, row.names = F, col.names = F)
+close(output.file)
+
+####
+read.ALL.keggs("OXR-85","oxr.85")
+contigs <- oxr.85[,c("contig","X1")] %>% .[! duplicated(.$contig),] %>% .[-2,]
+oxr.85$contig <- NULL
+oxr.85 <- merge(oxr.85, contigs, all = T)
+oxr.85 <- oxr.85[! oxr.85$TPM.plume.sum ==0,]
+oxr.85.circos <- oxr.85[,c("contig","start","stop","TPM.plume.sum")]
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/Circos/OXR Genomes/OXR-85/TPM_regions.txt", "wb")
+write.table(oxr.85.circos, file = output.file, row.names = F, col.names = F)
+close(output.file)
+
+###
+read.ALL.keggs("OXR-96","oxr.96")
+contigs <- oxr.96[,c("contig","X1")] %>% .[! duplicated(.$X1),]
+oxr.96$contig <- NULL
+oxr.96 <- merge(oxr.96, contigs, all = T)
+oxr.96 <- oxr.96[! oxr.96$TPM.plume.sum ==0,]
+oxr.96.circos <- oxr.96[,c("contig","start","stop","TPM.plume.sum")]
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/Circos/OXR Genomes/OXR-96/TPM_regions.txt", "wb")
+write.table(oxr.96.circos, file = output.file, row.names = F, col.names = F)
+close(output.file)
+
+###
+read.ALL.keggs("OXR-134","oxr.134")
+contigs <- oxr.134[,c("contig","X1")] %>% .[! duplicated(.$X1),]
+oxr.134$contig <- NULL
+oxr.134 <- merge(oxr.134, contigs, all = T)
+oxr.134 <- oxr.134[! oxr.134$TPM.plume.sum ==0,]
+oxr.134.circos <- oxr.134[,c("contig","start","stop","TPM.plume.sum")]
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/Circos/OXR Genomes/OXR-134/TPM_regions.txt", "wb")
+write.table(oxr.134.circos, file = output.file, row.names = F, col.names = F)
+close(output.file)
+
+###
+read.ALL.keggs("OXR-137","oxr.137")
+contigs <- oxr.137[,c("contig","X1")] %>% .[! duplicated(.$X1),]
+oxr.137$contig <- NULL
+oxr.137 <- merge(oxr.137, contigs, all = T)
+oxr.137 <- oxr.137[! oxr.137$TPM.plume.sum ==0,]
+oxr.137.circos <- oxr.137[,c("contig","start","stop","TPM.plume.sum")]
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/Circos/OXR Genomes/OXR-137/TPM_regions.txt", "wb")
+write.table(oxr.137.circos, file = output.file, row.names = F, col.names = F)
+close(output.file)
+
+###
+read.ALL.keggs("OXR-159","oxr.159")
+contigs <- oxr.159[,c("contig","X1")] %>% .[! duplicated(.$X1),]
+oxr.159$contig <- NULL
+oxr.159 <- merge(oxr.159, contigs, all = T)
+oxr.159 <- oxr.159[! oxr.159$TPM.plume.sum ==0,]
+oxr.159.circos <- oxr.159[,c("contig","start","stop","TPM.plume.sum")]
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/Circos/OXR Genomes/OXR-159/TPM_regions.txt", "wb")
+write.table(oxr.159.circos, file = output.file, row.names = F, col.names = F)
+close(output.file)
+
+###
+read.ALL.keggs("OXR-189","oxr.189")
+contigs <- oxr.189[,c("contig","X1")] %>% .[! duplicated(.$X1),]
+oxr.189$contig <- NULL
+oxr.189 <- merge(oxr.189, contigs, all = T)
+oxr.189 <- oxr.189[! oxr.189$TPM.plume.sum ==0,]
+oxr.189.circos <- oxr.189[,c("contig","start","stop","TPM.plume.sum")]
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/Circos/OXR Genomes/OXR-189/TPM_regions.txt", "wb")
+write.table(oxr.189.circos, file = output.file, row.names = F, col.names = F)
+close(output.file)
+
+###
+read.ALL.keggs("OXR-199","oxr.199")
+contigs <- oxr.199[,c("contig","X1")] %>% .[! duplicated(.$X1),]
+oxr.199$contig <- NULL
+oxr.199 <- merge(oxr.199, contigs, all = T)
+oxr.199 <- oxr.199[! oxr.199$TPM.plume.sum ==0,]
+oxr.199.circos <- oxr.199[,c("contig","start","stop","TPM.plume.sum")]
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/Circos/OXR Genomes/OXR-199/TPM_regions.txt", "wb")
+write.table(oxr.199.circos, file = output.file, row.names = F, col.names = F)
+close(output.file)
+
+###
+read.ALL.keggs("OXR-203","oxr.203")
+contigs <- oxr.203[,c("contig","X1")] %>% .[! duplicated(.$X1),]
+oxr.203$contig <- NULL
+oxr.203 <- merge(oxr.203, contigs, all = T)
+oxr.203 <- oxr.203[! oxr.203$TPM.plume.sum ==0,]
+oxr.203.circos <- oxr.203[,c("contig","start","stop","TPM.plume.sum")]
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/Circos/OXR Genomes/OXR-203/TPM_regions.txt", "wb")
+write.table(oxr.203.circos, file = output.file, row.names = F, col.names = F)
+close(output.file)
+
+###
+read.ALL.keggs("OXR-209","oxr.209")
+contigs <- oxr.209[,c("contig","X1")] %>% .[! duplicated(.$X1),]
+oxr.209$contig <- NULL
+oxr.209 <- merge(oxr.209, contigs, all = T)
+oxr.209[oxr.209$contig=="","contig"] <- "cluster_007_consensus_polypolish"
+oxr.209 <- oxr.209[! oxr.209$TPM.plume.sum ==0,]
+oxr.209.circos <- oxr.209[,c("contig","start","stop","TPM.plume.sum")]
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/Circos/OXR Genomes/OXR-209/TPM_regions.txt", "wb")
+write.table(oxr.209.circos, file = output.file, row.names = F, col.names = F)
+close(output.file)
+```
+
+
+```{r}
+test <- rbind(oxr.9,oxr.11,oxr.76,
+              oxr.85,oxr.96,oxr.134,
+              oxr.137,oxr.159,oxr.189,
+              oxr.199,oxr.203,oxr.209)
+
+max(test$TPM.plume.sum)
+```
+
+
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

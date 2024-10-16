@@ -1,0 +1,19 @@
+# This file is meant to describe how I explore the identification of hypothetical proteins from the prokka .faa file.
+
+######
+# OXR-9
+
+# make a list of all the AA sequences that identified as being hypothetical | remove the ">" character and write it to a new file
+$ grep "hypothetical" OXR-9.faa | cut -c 2- > hypothetical_protein_list.txt
+
+# use seqtk to subset the named sequences from the 
+$ seqtk subseq OXR-9.faa hypothetical_protein_list.txt > hypothetical_proteins.faa
+
+# blast the proteins
+$ blastp -db refseq_protein -query hypothetical_proteins.faa -outfmt 6 -max_target_seqs 5 -out OXR-9_hypoProts_blast.txt
+
+# this took over the weekend and did not complete. Trying and increasing the number of threads
+$ blastp -db refseq_protein -query hypothetical_proteins.faa -outfmt 6 -max_target_seqs 5 -out OXR-9_hypoProts_blast.txt -num_threads 16
+
+# take the sequence IDs from the blast search
+$ awk '{print $2}' OXR-9_hypoProts_blast.txt > OXR-9_hypoProts_blast_id.txt

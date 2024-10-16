@@ -1,0 +1,108 @@
+---
+title: "OXR_compiling annotations and DESeq"
+output: html_document
+date: "2023-11-30"
+---
+This file will go through the RSEM/DESeq data and compile the annotations
+
+```{r}
+source("C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/OXR_allTX_DGE_and samples.R")
+source("C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/OXR_kos_ALL_geneID.R")
+source("C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/OXR_kegg_pathway_query.R")
+
+# OXR-11
+total.diff.analysis("OXR-9")
+# Run ../../../../scripts/DESeq_diff_expr_from_eggNOG-3.bash OXR-9 from the folders trycycler eggNOG_annotations folder
+part.2("OXR-9")
+kos.geneID("OXR-9")
+# Run ../../../../scripts/kegg_querying-3.bash OXR-9_ALL_ko.txt
+kegg.pathway.queries("OXR-9")
+
+# OXR-11
+total.diff.analysis("OXR-11")
+# Run ../../../../scripts/DESeq_diff_expr_from_eggNOG-3.bash OXR-11 from the folders trycycler eggNOG_annotations folder
+part.2("OXR-11")
+kos.geneID("OXR-11")
+# Run ../../../../scripts/kegg_querying-3.bash OXR-11_ALL_ko.txt
+kegg.pathway.queries("OXR-11")
+
+# OXR-76
+total.diff.analysis.76("OXR-76")
+# Run ../../../../scripts/DESeq_diff_expr_from_eggNOG-3.bash OXR-76 from the folders trycycler eggNOG_annotations folder
+part.2("OXR-76")
+kos.geneID("OXR-76")
+# Run ../../../../scripts/kegg_querying-3.bash OXR-76_ALL_ko.txt
+kegg.pathway.queries("OXR-76")
+
+# OXR-85
+total.diff.analysis("OXR-85")
+# Run ../../../../scripts/DESeq_diff_expr_from_eggNOG-3.bash OXR-85 from the folders trycycler eggNOG_annotations folder
+part.2("OXR-85")
+kos.geneID("OXR-85")
+# Run ../../../../scripts/kegg_querying-3.bash OXR-85_ALL_ko.txt
+kegg.pathway.queries("OXR-85")
+
+# OXR-96
+total.diff.analysis("OXR-96")
+# Run ../../../../scripts/DESeq_diff_expr_from_eggNOG-3.bash OXR-96 from the folders trycycler eggNOG_annotations folder
+part.2("OXR-96")
+kos.geneID("OXR-96")
+# Run ../../../../scripts/kegg_querying-3.bash OXR-96_ALL_ko.txt
+kegg.pathway.queries("OXR-96")
+
+# OXR-134
+total.diff.analysis("OXR-134")
+# Run ../../../../scripts/DESeq_diff_expr_from_eggNOG-3.bash OXR-134 from the folders trycycler eggNOG_annotations folder
+part.2("OXR-134")
+kos.geneID("OXR-134")
+# Run ../../../../scripts/kegg_querying-3.bash OXR-134_ALL_ko.txt
+kegg.pathway.queries("OXR-134")
+
+# OXR-137
+total.diff.analysis("OXR-137")
+# Run ../../../../scripts/DESeq_diff_expr_from_eggNOG-3.bash OXR-137 from the folders trycycler eggNOG_annotations folder
+part.2("OXR-137")
+kos.geneID("OXR-137")
+# Run ../../../../scripts/kegg_querying-3.bash OXR-137_ALL_ko.txt
+kegg.pathway.queries("OXR-137")
+
+# OXR-159
+total.diff.analysis("OXR-159")
+# Run ../../../../scripts/DESeq_diff_expr_from_eggNOG-3.bash OXR-159 from the folders trycycler eggNOG_annotations folder
+part.2("OXR-159")
+kos.geneID("OXR-159")
+# Run ../../../../scripts/kegg_querying-3.bash OXR-159_ALL_ko.txt
+kegg.pathway.queries("OXR-159")
+
+# OXR-189
+total.diff.analysis("OXR-189")
+# Run ../../../../scripts/DESeq_diff_expr_from_eggNOG-3.bash OXR-189 from the folders trycycler eggNOG_annotations folder
+part.2("OXR-189")
+kos.geneID("OXR-189")
+# Run ../../../../scripts/kegg_querying-3.bash OXR-189_ALL_ko.txt
+kegg.pathway.queries("OXR-189")
+
+# OXR-199
+total.diff.analysis("OXR-199")
+# Run ../../../../scripts/DESeq_diff_expr_from_eggNOG-3.bash OXR-199 from the folders trycycler eggNOG_annotations folder
+part.2("OXR-199")
+kos.geneID("OXR-199")
+# Run ../../../../scripts/kegg_querying-3.bash OXR-199_ALL_ko.txt
+kegg.pathway.queries("OXR-199")
+
+# OXR-203
+total.diff.analysis("OXR-203")
+# Run ../../../../scripts/DESeq_diff_expr_from_eggNOG-3.bash OXR-203 from the folders trycycler eggNOG_annotations folder
+part.2("OXR-203")
+kos.geneID("OXR-203")
+# Run ../../../../scripts/kegg_querying-3.bash OXR-203_ALL_ko.txt
+kegg.pathway.queries("OXR-203")
+
+# OXR-209
+total.diff.analysis("OXR-209")
+# Run ../../../../scripts/DESeq_diff_expr_from_eggNOG-3.bash OXR-209 from the folders trycycler eggNOG_annotations folder
+part.2("OXR-209")
+kos.geneID("OXR-209")
+# Run ../../../../scripts/kegg_querying-3.bash OXR-209_ALL_ko.txt
+kegg.pathway.queries("OXR-209")
+```

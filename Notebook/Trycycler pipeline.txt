@@ -1,0 +1,643 @@
+# The Trycycler pipeline for "The Perfect Prokaryotic Genome"
+# https://github.com/rrwick/Perfect-bacterial-genome-tutorial/wiki/Tutorial-%28easy%29
+#
+# Make Spades, Canu+Polca, and Masurca assembly (see "Genome assembly codes.txt" file)
+
+##################################################################
+## Attempting to use Trycycler to get the best read from all three assemblies
+
+# move masurca, canu, and spades assembly to an "assemblies" folder, and make sure they have the .fasta suffix
+
+############################
+## OXR-9
+# start trycycler with more than 3 assemblies (need more than just masurca, canu, and spades) 
+
+# Do assemblies with flye, miniasm_and_minipolish, and raven
+
+$ /data/app/Flye/bin/flye --nano-hq ../../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq --threads 16 --out-dir flye_assembly_01 && cp flye_assembly_01/assembly.fasta ../assemblies/flye_assembly_01.fasta && cp flye_assembly_01/flye_assembly_graph.gfa ../assemblies/flye_assembly_01.gfa && rm -r flye_assembly_01
+# 11 contigs
+
+$ ~/miniasm_and_minipolish.sh ../../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq 16 > ../assemblies/miniasm_assembly_02.gfa 
+$ ~/any2fasta/any2fasta ../assemblies/miniasm_assembly_02.gfa > ../assemblies/miniasm_assembly_02.fasta
+# 9 contigs
+
+$ raven --threads 16 --disable-checkpoints --graphical-fragment-assembly ../assemblies/raven_assembly_03.gfa ../../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq > ../assemblies/raven_assembly_03.fasta
+# 6 contigs
+
+# Cluster all of the assembly reads together
+$ trycycler cluster --assemblies assemblies/*.fasta --reads ../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq  --out_dir trycycler_clusters
+
+# Visualize the tree in Mega and inspect the clusters
+
+### Below is attempts with trycycler reconcile 
+# Manually curate: remove cluster 13, 7, 8, 9, and 10
+
+#Cluster 01:
+# Hadd to change --max_add_seq from default 1000 to 2300 for circularization given the error that fed out saying it needed 2245.
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_001/ --max_add_seq 2300 --max_trim_seq 53000
+
+# Cluster 02: problems with contigs E and D. They are too long. Could not find a solution. Exclude
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_002/
+
+# Cluster 11: D and B looks doubled over. Searched for the end of the sequence in the qhole sequence and deleted everything after the "end" in the middle of the whole sequence
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_011/ --max_add_seq_percent 5.5
+
+# Cluster 12: D and B looks doubled over. Searched for the end of the sequence in the qhole sequence and deleted everything after the "end" in the middle of the whole sequence
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_012/
+
+# Cluster 05: D and E looks doubled over. Searched for the end of the sequence in the qhole sequence and deleted everything after the "end" in the middle of the whole sequence
+trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_005/
+
+# Cluster 04: E and D are too long. E has a big portion of the beginning repeated. This was found and everything after the second instance was deleted. simlar was done with D
+# Contig A was also giving issues, this was excluded.
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_004/
+
+# Cluster 06: E and D are too long. E has a big portion of the beginning repeated. This was found and everything after the second instance was deleted. simlar was done with D
+# Contig A was also giving issues, this was excluded.
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_006/
+
+# Cluster 03: E and D are too long. Could not find a good way to trim the overlap.
+# Contig C was also too long. Was able to find ways to trim the beginning and end down. 
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_003/
+
+### Next proceed with multiple sequence alignment
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_001
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_002
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_003
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_004
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_005
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_006
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_011
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_012
+
+### Proceed with sequence partitioning
+$ trycycler partition --reads ../../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_*
+# Result output
+trycycler_clusters/cluster_001/4_reads.fastq:
+  22,942 reads (63.15%)
+  225,751,446 bases (83.87%)
+
+trycycler_clusters/cluster_002/4_reads.fastq:
+  1,131 reads (3.11%)
+  8,477,156 bases (3.15%)
+
+trycycler_clusters/cluster_003/4_reads.fastq:
+  1,620 reads (4.46%)
+  13,133,090 bases (4.88%)
+
+trycycler_clusters/cluster_004/4_reads.fastq:
+  558 reads (1.54%)
+  3,933,792 bases (1.46%)
+
+trycycler_clusters/cluster_005/4_reads.fastq:
+  577 reads (1.59%)
+  3,886,443 bases (1.44%)
+
+trycycler_clusters/cluster_006/4_reads.fastq:
+  374 reads (1.03%)
+  2,474,100 bases (0.92%)
+
+trycycler_clusters/cluster_011/4_reads.fastq:
+  85 reads (0.23%)
+  333,160 bases (0.12%)
+
+trycycler_clusters/cluster_012/4_reads.fastq:
+  106 reads (0.29%)
+  341,244 bases (0.13%)
+
+## Find the consensus
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_001/
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_002/
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_003/
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_004/
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_005/
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_006/
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_011/
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_012/
+
+# concatenate all the consensus files
+$ cat trycycler_clusters/cluster_*/7_final_consensus.fasta > trycycler_consensus.fasta
+
+# Proceed with polishing; 1st with polypolish
+bwa index trycycler_consensus.fasta
+bwa mem -t 16 -a trycycler_consensus.fasta ../../../Data/illumina/OXR-9_all_R1.trim.fq > alignments_1.sam
+bwa mem -t 16 -a trycycler_consensus.fasta ../../../Data/illumina/OXR-9_all_R2.trim.fq > alignments_2.sam
+polypolish trycyler_consensus.fasta alignments_1.sam alignments_2.sam > polypolish_trycycler.fasta
+
+# Then polish with polca
+polca.sh -a polypolish_.fasta -r "../../../Data/illumina/OXR-9_all_R1.trim.fq ../../../Data/illumina/OXR-9_all_R2.trim.fq" -t 16 -m 1G
+mv *.PolcaCorrected.fa OXR-9_polca_polypolish_trycycler.fasta
+rm *sam
+
+$ busco -i OXR-9_polca_polypolish_trycycler.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+
+$ quast --glimmer ../assemblies/*fasta  
+
+$ python3 /data/app/viralVerify/bin/viralverify -f OXR-9_polca_polypolish_trycycler.fasta -o plasmid_verify --hmm ~/nbc_hmms.hmm -p -t 16
+
+$ prokka --outdir prokka_chromosome_annotation plasmid_verify/Prediction_results_fasta/OXR-9_polca_polypolish_trycycler_chromosome.fasta --prefix OXR-9
+
+$ barrnap ../OXR-9_polca_polypolish_trycycler.fasta -o OXR-9_rRNA.fa > OXR-9_barrnap.gff
+
+# Separate all of the contigs into their own file
+$ mkdir OXR-9_replicon_contigs
+$ awk '/^>/ {OUT="subdir/" substr($0,2) ".fa"}; {print >> OUT; close(OUT)}' Input_File
+
+$ run busco on the cluster_001 to make sure that it has all the BUSCO benchmarks
+$ busco -i cluster_001_consensus_polypolish.fasta -o busco -l ../../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+
+
+###### Made a script to automate the Trycycle assembly called "trycycle_assemblies.sh"
+# Use the path to the long read sequences as the only argument. 
+# need to be in OXR-X/trycycle folder with the other assemblies in a the folder OXR-X/assemblies
+''''''''''''''''''''''''''''''''''''''''''''''''
+#!/bin/bash
+
+/data/app/Flye/bin/flye --nano-hq $1 --threads 16 --out-dir flye_assembly_01 && cp flye_assembly_01/assembly.fasta ../assemblies/flye_assembly_01.fasta && cp flye_assembly_01/assembly_graph.gfa ../assemblies/flye_assembly_01.gfa && rm -r flye_assembly_01
+
+~/miniasm_and_minipolish.sh $1 16 > ../assemblies/miniasm_assembly_02.gfa 
+
+~/any2fasta/any2fasta ../assemblies/miniasm_assembly_02.gfa > ../assemblies/miniasm_assembly_02.fasta
+
+raven --threads 16 --disable-checkpoints --graphical-fragment-assembly ../assemblies/raven_assembly_03.gfa $1 > ../assemblies/raven_assembly_03.fasta
+
+# Cluster all of the assembly reads together
+trycycler cluster --assemblies ../assemblies/*.fasta --reads $1 --out_dir trycycler_clusters
+
+echo "This is how many contigs are in your Flye assembly"
+grep -Fo ">" ../assemblies/flye_assembly_01.fasta | wc -l 
+
+echo "This is how many contigs are in your Miniasm assembly"
+grep -Fo ">" ../assemblies/miniasm_assembly_02.fasta | wc -l 
+
+echo "This is how many contigs are in your Raven assembly"
+grep -Fo ">" ../assemblies/raven_assembly_03.fasta | wc -l 
+'''''''''''''''''''''''''''''''''''''''''''''''''''
+######################
+## Perform with OXR-11
+
+$ ~/trycycle_assemblies.sh ../../../Data/nanopore/qc/OXR-11_BC02_ONT_qc.fastq
+# This is how many contigs are in your Flye assembly
+# 1
+# This is how many contigs are in your Miniasm assembly
+# 1
+# This is how many contigs are in your Raven assembly
+# 1
+
+# Sequence D gave proble,s; requires 62743 bp to be trimmed but settings only allow 50000 bp. So I bumped up the --max_trim_seq parameter.
+# Sequence A "some pairwise worst-1kbp identities are below the minimum allowed value of 25.0%. Please remove offending sequences or lower the --min_1kbp_identity threshold and try again." So remove seq a
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-11_BC02_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_001/ --max_trim_seq 63000
+
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_001
+
+$ trycycler partition --reads ../../../Data/nanopore/qc/OXR-11_BC02_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_*
+# trycycler_clusters/cluster_001/4_reads.fastq:
+#  20,206 reads (36.53%)
+#  141,459,238 bases (89.62%)
+
+# proceed with polypolish short read sequencing
+$ bwa index trycycler_consensus.fasta && bwa mem -t 16 -a trycycler_consensus.fasta ../../../Data/illumina/OXR-11_all_R1.trim.fq > alignments_1.sam && bwa mem -t 16 -a trycycler_consensus.fasta ../../../Data/illumina/OXR-11_all_R2.trim.fq > alignments_2.sam && /data/app/polypolish-v0.5.0/polypolish trycycler_consensus.fasta alignments_1.sam alignments_2.sam > polypolish_trycycler.fasta
+
+# polish again with polca
+$ /data/app/MaSuRCA-4.1.0/bin/polca.sh -a polypolish_trycycler.fasta -r "../../../Data/illumina/OXR-11_all_R1.trim.fq ../../../Data/illumina/OXR-11_all_R2.trim.fq" -t 16 -m 1G
+
+$ mv *.PolcaCorrected.fa OXR-11_polca_polypolish_trycycler.fasta
+$ cp OXR-11_polca_polypolish_trycycler.fasta ../assemblies/
+$ rm *sam 
+
+$ busco -i OXR-11_polca_polypolish_trycycler.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+
+$ cp OXR-11_polca_polypolish_trycycler.fasta ../assemblies/ 
+
+$ quast --glimmer ../assemblies/*fasta  
+
+$ barrnap OXR-11_polca_polypolish_trycycler.fasta -o OXR-11_rRNA.fa > OXR-11_barrnap.gff
+
+$ prokka --outdir prokka_annotation OXR-11_polca_polypolish_trycycler.fasta --prefix OXR-11
+
+
+######################
+## Perform with OXR-76
+
+$ ~/OXR-76_trycycle_assemblies.sh ../../../Data/nanopore/qc/OXR-76_BC03_ONT_qc.fastq
+# This is how many contigs are in your Flye assembly
+# 1
+# This is how many contigs are in your Miniasm assembly
+# 4
+# This is how many contigs are in your Raven assembly
+# 3
+
+# Need to re-do the clustering... very poor. Too many mostly single sequence clusters. Some with 2 or 3
+$ trycycler cluster --assemblies ../assemblies/*.fasta --reads ../../../Data/nanopore/qc/OXR-76_BC03_ONT_qc.fastq --out_dir trycycler_clusters
+# This one had too many, mostly single sequence clustering
+# omit the scaffolds.fasta (spades assembly) because it has a disproportionately large number of contigs. Run the clustering again.
+$ trycycler cluster --assemblies ../assemblies/*.fasta --reads ../../../Data/nanopore/qc/OXR-76_BC03_ONT_qc.fastq --out_dir trycycler_clusters_2 --distance 0.03 --min_contig_len 10000
+$ trycycler cluster --assemblies ../assemblies/*.fasta --reads ../../../Data/nanopore/qc/OXR-76_BC03_ONT_qc.fastq --out_dir trycycler_clusters_3
+$ trycycler cluster --assemblies ../assemblies/*.fasta --reads ../../../Data/nanopore/qc/OXR-76_BC03_ONT_qc.fastq --out_dir trycycler_clusters_4 --distance 0.02
+
+# Will need to try slightly different methods... going through the full pipeline of subsetting the reads 12 times and assembling with only FLYE, MINIASM+POLYPOLISH, and Raven
+$ trycycler subsample --reads ../../../Data/nanopore76_BC03_ONT_qc.fastq --out_dir read_subsets
+$ (run the OXR-76_subset_assemblies.sh script)
+
+# assembly_05 looks very fragment (look at gfa file in bandage program). omit as bad
+# assembly_11 looks branching (look at gfa file in bandage program). omit as bad
+# assembly_12 looks branching (look at gfa file in bandage program). omit as bad
+$ trycycler cluster --assemblies assemblies/*.fasta --reads ../../../Data/nanopore/qc/OXR-76_BC03_ONT_qc.fastq --out_dir trycycler_clusters_subs
+
+# Only Cluster_001 will be used
+# Cluster_001: Sequence B needed saome of the end of the sequence to be trimmed off
+# Cluster_001: Sequence G needed saome of the start of the sequence to be trimmed off... and omitted because it required the addition of >100,000 bp
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-76_BC03_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_001 --min_1kbp_identity 10
+
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_001/
+
+$ trycycler partition --reads ../../../Data/nanopore/qc/OXR-76_BC03_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_001
+
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_001/
+
+$ cat trycycler_clusters/cluster_*/7_final_consensus.fasta > trycycler_consensus.fasta
+
+$ ~/post_assembly_clean_and_annotate.sh ../../../Data/illumina/OXR-76_all_R1.trim.fq ../../../Data/illumina/OXR-76_all_R2.trim.fq OXR-76_polca_polypolish_trycycler.fasta OXR-76
+
+$ barrnap OXR-76_polca_polypolish_trycycler.fasta -o OXR-76_rRNA.fa > OXR-76_barrnap.gff
+
+# Continue with spades assembly as a draft genome
+
+$ mkcd spades_draft_annotations
+
+$ busco -i ../assemblies/contigs.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+
+$ barrnap ../assemblies/contigs.fasta -o OXR-76_rRNA.fa > OXR-76_barrnap.gff
+
+$ prokka --outdir prokka_annotation ../assemblies/contigs.fasta --prefix OXR-76
+
+######################
+## Perform with OXR-85
+$ ~/trycycle_assemblies.sh ../../../Data/nanopore/qc/OXR-85_BC04_ONT_qc.fastq
+This is how many contigs are in your Flye assembly
+3
+This is how many contigs are in your Miniasm assembly
+3
+This is how many contigs are in your Raven assembly
+3
+
+# Cluster_001, sequence F showed issues, deleted some sequence in the beginning and end
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-85_BC04_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_001 --max_trim_seq 60000 --max_add_seq 4000
+# Cluster_002, sequences C and D were too long. found the beginning of the sequence in the end of the sequence and deleted it.
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-85_BC04_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_002 --max_add_seq 1500
+# Cluster_003, sequences C and D were too long. found the beginning of the sequence in the end of the sequence and deleted it.
+trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-85_BC04_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_003
+
+$ $ trycycler msa --cluster_dir trycycler_clusters/cluster_001/ && trycycler msa --cluster_dir trycycler_clusters/cluster_002/ && trycycler msa --cluster_dir trycycler_clusters/cluster_003/
+
+$ trycycler partition --reads ../../../Data/nanopore/qc/OXR-85_BC04_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_*
+
+trycycler_clusters/cluster_001/4_reads.fastq:
+  74,696 reads (75.82%)
+  577,485,334 bases (88.58%)
+
+trycycler_clusters/cluster_002/4_reads.fastq:
+  4,348 reads (4.41%)
+  31,611,297 bases (4.85%)
+
+trycycler_clusters/cluster_003/4_reads.fastq:
+  3,955 reads (4.01%)
+  28,361,573 bases (4.35%)
+
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_001/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_002/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_003/
+# concatenate all the consensus files
+$ cat trycycler_clusters/cluster_*/7_final_consensus.fasta > trycycler_consensus.fasta
+
+$ ~/post_assembly_clean_and_annotate.sh ../../../Data/illumina/OXR-85_all_R1.trim.fq ../../../Data/illumina/OXR-85_all_R2.trim.fq OXR-85_polca_polypolish_trycycler.fasta OXR-85
+
+$ barrnap OXR-85_polca_polypolish_trycycler.fasta -o OXR-85_rRNA.fa > OXR-85_barrnap.gff
+
+######################
+## Perform with OXR-96
+$ ~/trycycle_assemblies.sh ../../../Data/nanopore/qc/OXR-96_BC05_ONT_qc.fastq
+This is how many contigs are in your Flye assembly
+1
+This is how many contigs are in your Miniasm assembly
+1
+This is how many contigs are in your Raven assembly
+1
+
+# Error: failed to circularise sequence A_NODE_1_length_3321528_cov_454.344576 because it contained too large of a start-end gap. You can either increase the value of the --max_add_seq/--max_add_seq_percent parameters or exclude the sequence altogether and try again.
+# Omit A_NODE_1_length_3321528_cov_454.344576
+# Sequence E had some sequence removed from the beginning as the tail of the sequence was found near the beginnig of the sequence
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-96_BC05_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_001/
+
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_001/
+
+trycycler_clusters/cluster_001/4_reads.fastq:
+  55,630 reads (82.34%)
+  380,186,159 bases (97.45%)
+
+$ trycycler partition --reads ../../../Data/nanopore/qc/OXR-96_BC05_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_001/
+
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_001/
+
+# polish with polypolish
+bwa index trycycler_consensus.fasta && bwa mem -t 16 -a trycycler_consensus.fasta ../../../Data/illumina/OXR-96_all_R1.trim.fq > alignments_1.sam && bwa mem -t 16 -a trycycler_consensus.fasta ../../../Data/illumina/OXR-96_all_R2.trim.fq > alignments_2.sam && /data/app/polypolish-v0.5.0/polypolish trycycler_consensus.fasta alignments_1.sam alignments_2.sam > polypolish_trycycler.fasta
+
+# Polish with polca
+ /data/app/MaSuRCA-4.1.0/bin/polca.sh -a polypolish_trycycler.fasta -r "../../../Data/illumina/OXR-96_all_R1.trim.fq ../../../Data/illumina/OXR-96_all_R2.trim.fq" -t 16 -m 1G
+
+$ mv *.PolcaCorrected.fa OXR-96_polca_polypolish_trycycler.fasta
+$ rm *sam
+$ cp OXR-96_polca_polypolish_trycycler.fasta ../assemblies/
+$ quast --glimmer ../assemblies/*fasta
+$ prokka --outdir prokka_annotation ../assemblies/OXR-96_polca_polypolish_trycycler.fasta --prefix OXR-96
+
+######################
+## Perform with OXR-134
+$ ~/trycycle_assemblies.sh ../../../Data/nanopore/qc/OXR-134_BC06_ONT_qc.fastq
+This is how many contigs are in your Flye assembly
+1
+This is how many contigs are in your Miniasm assembly
+1
+This is how many contigs are in your Raven assembly
+1
+
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-134_BC06_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_001/ --max_trim_seq 60000
+
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_001/
+
+$ trycycler partition --reads ../../../Data/nanopore/qc/OXR-134_BC06_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_001/
+
+trycycler_clusters/cluster_001/4_reads.fastq:
+  57,801 reads (74.72%)
+  457,625,232 bases (97.13%)
+
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_001/
+
+$ cp trycycler_clusters/cluster_001/7_final_consensus.fasta trycycler_consensus.fasta
+
+# polish with polypolish
+bwa index trycycler_consensus.fasta && bwa mem -t 16 -a trycycler_consensus.fasta ../../../Data/illumina/OXR-134_all_R1.trim.fq > alignments_1.sam && bwa mem -t 16 -a trycycler_consensus.fasta ../../../Data/illumina/OXR-134_all_R2.trim.fq > alignments_2.sam && /data/app/polypolish-v0.5.0/polypolish trycycler_consensus.fasta alignments_1.sam alignments_2.sam > polypolish_trycycler.fasta
+
+# Polish with polca
+/data/app/MaSuRCA-4.1.0/bin/polca.sh -a polypolish_trycycler.fasta -r "../../../Data/illumina/OXR-134_all_R1.trim.fq ../../../Data/illumina/OXR-134_all_R2.trim.fq" -t 16 -m 1G
+
+$ mv *PolcaCorrected.fa OXR-134_polca_polypolish_trycycler.fasta
+$ cp OXR-134_polca_polypolish_trycycler.fasta ../assemblies/
+$ rm *sam
+
+$ cd ../assemblies/
+$ quast --glimmer *fasta
+$ checkm lineage_wf -t 8 -x fasta ./ checkm
+
+$ cd ../trycycler/
+$ prokka --outdir prokka_annotation OXR-134_polca_polypolish_trycycler.fasta --prefix OXR-134
+$ busco -i OXR-134_polca_polypolish_trycycler.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+$ barrnap OXR-134_polca_polypolish_trycycler.fasta -o OXR-134_rRNA.fa > OXR-134_barrnap.gff
+
+######################
+'''''''''''''''''''''''''''''''''''''''''''''''''''
+#!/bin/bash
+
+# $1 = R1 illumina
+# $2 = R2 illumina
+# $3 = OXR-X_polca_polypolish_trycycler.fasta
+# $4 = OXR-X
+# must be in trycycler folder
+
+bwa index trycycler_consensus.fasta && bwa mem -t 16 -a trycycler_consensus.fasta $1 > alignments_1.sam && bwa mem -t 16 -a trycycler_consensus.fasta $2 > alignments_2.sam && /data/app/polypolish-v0.5.0/polypolish trycycler_consensus.fasta alignments_1.sam alignments_2.sam > polypolish_trycycler.fasta
+
+/data/app/MaSuRCA-4.1.0/bin/polca.sh -a polypolish_trycycler.fasta -r "$1 $2" -t 16 -m 1G
+
+mv *.PolcaCorrected.fa $3
+rm *sam
+cp $3 ../assemblies/
+
+cd ../assemblies/
+quast --glimmer *fasta
+checkm lineage_wf -t 8 -x fasta ./ checkm
+
+
+cd ../trycycler
+busco -i $3 -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+prokka --outdir prokka_annotation $3 --prefix $4
+'''''''''''''''''''''''''''''''''''''''''''''''''''
+######################
+## Perform with OXR-189
+$ ~/trycycle_assemblies.sh ../../../Data/nanopore/qc/OXR-189_BC09_ONT_qc.fastq
+This is how many contigs are in your Flye assembly
+1
+This is how many contigs are in your Miniasm assembly
+1
+This is how many contigs are in your Raven assembly
+1
+
+$ $ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-189_BC09_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_001/ --max_trim_seq 60000 --max_add_seq 6000
+
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_001/
+
+$ trycycler partition --reads ../../../Data/nanopore/qc/OXR-189_BC09_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_001/
+
+trycycler_clusters/cluster_001/4_reads.fastq:
+  62,666 reads (64.98%)
+  347,047,968 bases (94.42%)
+
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_001/
+
+$ cp trycycler_clusters/cluster_001/7_final_consensus.fasta trycycler_consensus.fasta
+
+# polish with polypolish and polca, get stats, do busco and prokka annotation
+$ ~/post_assembly_clean_and_annotate.sh ../../../Data/illumina/OXR-189_all_R1.trim.fq ../../../Data/illumina/OXR-189_all_R2.trim.fq OXR-189_polca_polypolish_trycycler.fasta OXR-189
+
+$ barrnap OXR-189_polca_polypolish_trycycler.fasta -o OXR-189_rRNA.fa > OXR-189_barrnap.gff
+
+######################
+## Perform with OXR-203
+$ ~/trycycle_assemblies.sh ../../../Data/nanopore/qc/OXR-203_BC11_ONT_qc.fastq
+This is how many contigs are in your Flye assembly
+1
+This is how many contigs are in your Miniasm assembly
+1
+This is how many contigs are in your Raven assembly
+1
+
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-203_BC11_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_001/ --max_trim_seq 80000 --max_trim_seq 1500
+
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_001/
+
+$ trycycler partition --reads ../../../Data/nanopore/qc/OXR-203_BC11_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_001/
+
+trycycler_clusters/cluster_001/4_reads.fastq:
+  17,025 reads (89.50%)
+  366,923,278 bases (99.35%)
+
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_001/
+
+$ cp trycycler_clusters/cluster_001/7_final_consensus.fasta trycycler_consensus.fasta
+
+# polish with polypolish and polca, get stats, do busco and prokka annotation
+$ ~/post_assembly_clean_and_annotate.sh ../../../Data/illumina/OXR-203_all_R1.trim.fq ../../../Data/illumina/OXR-203_all_R2.trim.fq OXR-203_polca_polypolish_trycycler.fasta OXR-203
+
+$ barrnap OXR-203_polca_polypolish_trycycler.fasta -o OXR-203_rRNA.fa > OXR-203_barrnap.gff
+
+######################
+## Perform with OXR-137
+
+$ ~/trycycle_assemblies.sh ../../../Data/nanopore/qc/OXR-137_BC07_ONT_qc.fastq
+This is how many contigs are in your Flye assembly
+3
+This is how many contigs are in your Miniasm assembly
+3
+This is how many contigs are in your Raven assembly
+3
+
+# Clusters 2,3,5,6,7,8,10,11, and 12 had single sequences in them and will be removed
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-137_BC07_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_001/
+# Sequences C and D in cluster 4 were too long and found the beginning of the sequence in the middle of the sequence, which were deleted
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-137_BC07_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_004/
+# Sequences C and D in cluster 9 were too long and found the beginning of the sequence in the middle of the sequence, which were deleted
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-137_BC07_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_009/
+
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_001/ && trycycler msa --cluster_dir trycycler_clusters/cluster_004/ && trycycler msa --cluster_dir trycycler_clusters/cluster_009/
+
+$ trycycler partition --reads ../../../Data/nanopore/qc/OXR-137_BC07_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_001/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-137_BC07_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_004/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-137_BC07_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_009/
+
+trycycler_clusters/cluster_001/4_reads.fastq:
+  17,025 reads (89.50%)
+  366,923,278 bases (99.35%)
+
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_001/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_004/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_009/
+
+$ cat trycycler_clusters/cluster_*/7_final_consensus.fasta > trycycler_consensus.fasta
+
+# polish with polypolish and polca, get stats, do busco and prokka annotation
+$ ~/post_assembly_clean_and_annotate.sh ../../../Data/illumina/OXR-137_all_R1.trim.fq ../../../Data/illumina/OXR-137_all_R2.trim.fq OXR-137_polca_polypolish_trycycler.fasta OXR-137
+
+$ barrnap OXR-137_polca_polypolish_trycycler.fasta -o OXR-137_rRNA.fa > OXR-137_barrnap.gff
+
+######################
+## Perform with OXR-159
+
+$ ~/OXR-159_trycycle_assemblies.sh ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq
+This is how many contigs are in your Flye assembly
+18
+This is how many contigs are in your Miniasm assembly
+11
+This is how many contigs are in your Raven assembly
+11
+
+# Clusters 11, 14, 6, 5, 37, 16, 26, 21, 27, 30, 36, 35, 31, 22, 20, 23, 2, 33, 17, 18, 24, 29, 32, 34, 19, 25, 12, 15, and 28 had single sequences and were removed
+# Cluster 001: Issues arose with sequences A, and B, and were labeled as bad. Sequence C was edited and trimmed
+$ trycycler reconcile --cluster_dir trycycler_clusters/cluster_001 --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq --max_add_seq 34000 --min_identity 97.7 --min_1kbp_identity 18
+# Cluster 003: Issues with sequence A. Sequences B and F require trimming some sequence off the beginning and end.
+$ trycycler reconcile --cluster_dir trycycler_clusters/cluster_003 --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq --max_add_seq 5000
+# Cluster 004: Sequence D needed trimming because it was too long and the beginning was found toward the end. Sequence C had too large of a start-end gap and was ommitted.
+$ trycycler reconcile --cluster_dir trycycler_clusters/cluster_004 --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq
+# Cluster 007: Sequence C was too long and the beginning was found toward the end.
+$ trycycler reconcile --cluster_dir trycycler_clusters/cluster_007 --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq
+# Cluster 008: Sequence C and D were too long and the beginning was found toward the end. 
+$ trycycler reconcile --cluster_dir trycycler_clusters/cluster_008 --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq
+# Cluster 009: Sequence D was too long and edited. Sequence F had too long of a start-end gap
+$ trycycler reconcile --cluster_dir trycycler_clusters/cluster_009 --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq
+# Cluster 010: Sequence C and D needed to be trimmed because they were too long
+$ trycycler reconcile --cluster_dir trycycler_clusters/cluster_010 --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq --max_add_seq 3000
+# Cluster 013: Sequence F was too short and was omitted, Sequence C and D were too long and found to have the beginnig near the end
+$ trycycler reconcile --cluster_dir trycycler_clusters/cluster_013 --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq
+
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_001/ && trycycler msa --cluster_dir trycycler_clusters/cluster_003/ && trycycler msa --cluster_dir trycycler_clusters/cluster_004/ && trycycler msa --cluster_dir trycycler_clusters/cluster_007/ && trycycler msa --cluster_dir trycycler_clusters/cluster_008/ && trycycler msa --cluster_dir trycycler_clusters/cluster_009/ && trycycler msa --cluster_dir trycycler_clusters/cluster_010/ && trycycler msa --cluster_dir trycycler_clusters/cluster_013/
+
+$ trycycler partition --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_001/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_003/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_004/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_007/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_008/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_009/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_010/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_013/
+
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_001/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_003/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_004/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_007/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_008/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_009/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_010/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_013/
+
+$ cat trycycler_clusters/cluster_*/7_final_consensus.fasta > trycycler_consensus.fasta
+
+# polish with polypolish and polca, get stats, do busco and prokka annotation
+$ ~/post_assembly_clean_and_annotate.sh ../../../Data/illumina/OXR-159_all_R1.trim.fq ../../../Data/illumina/OXR-159_all_R2.trim.fq OXR-159_polca_polypolish_trycycler.fasta OXR-159
+
+$ barrnap OXR-159_polca_polypolish_trycycler.fasta -o OXR-159_rRNA.fa > OXR-159_barrnap.gff
+
+######################
+## Perform with OXR-199
+
+$ ~/trycycle_assemblies.sh ../../../Data/nanopore/qc/OXR-199_BC10_ONT_qc.fastq
+This is how many contigs are in your Flye assembly
+7
+This is how many contigs are in your Miniasm assembly
+8
+This is how many contigs are in your Raven assembly
+7
+
+# Cluster 001: Removed sequence D because it required almost a third (834137 bp) to be added
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-199_BC10_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_001/ --max_add_seq 6000
+# Cluster 002: Sequence C and D were too long and found the beginning toward the end and trimmed it. 
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-199_BC10_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_001/ --max_add_seq 6000
+# Cluster 003: Sequence C and D were too long and found the beginning toward the end and trimmed it. 
+$ trycycler reconcile --read ../../../Data/nanopore/qc/OXR-199_BC10_ONT_qc.fastq  --cluster_dir trycycler_clusters/cluster_003
+# Cluster 004: Sequence C and D were too long and found the beginning toward the end and trimmed it. Sequence B had some trimmed from the beginning and end.
+$ trycycler reconcile --read ../../../Data/nanopore/qc/OXR-199_BC10_ONT_qc.fastq  --cluster_dir trycycler_clusters/cluster_004/ --max_add_seq 5000
+# Cluster 005: Sequence C and D were too long and found the beginning toward the end and trimmed it.
+$ trycycler reconcile --read ../../../Data/nanopore/qc/OXR-199_BC10_ONT_qc.fastq  --cluster_dir trycycler_clusters/cluster_005/ --max_add_seq 2500
+# Cluster 006: Sequence C and D were too long and found the beginning toward the end and trimmed it.
+$ trycycler reconcile --read ../../../Data/nanopore/qc/OXR-199_BC10_ONT_qc.fastq  --cluster_dir trycycler_clusters/cluster_006/
+# Cluster 007: Sequence C and D were too long and found the beginning toward the end and trimmed it.
+$ trycycler reconcile --read ../../../Data/nanopore/qc/OXR-199_BC10_ONT_qc.fastq  --cluster_dir trycycler_clusters/cluster_007/
+
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_001/ && trycycler msa --cluster_dir trycycler_clusters/cluster_002/ && trycycler msa --cluster_dir trycycler_clusters/cluster_003/ && trycycler msa --cluster_dir trycycler_clusters/cluster_004/ && trycycler msa --cluster_dir trycycler_clusters/cluster_005/ && trycycler msa --cluster_dir trycycler_clusters/cluster_006/ && trycycler msa --cluster_dir trycycler_clusters/cluster_007/
+
+$ trycycler partition --reads ../../../Data/nanopore/qc/OXR-199_BC010_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_001/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-199_BC010_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_002/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-199_BC010_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_003/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-199_BC010_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_004/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-199_BC010_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_005/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-199_BC010_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_006/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-199_BC010_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_007/
+
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_001/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_002/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_003/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_004/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_005/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_006/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_007/
+
+$ cat trycycler_clusters/cluster_*/7_final_consensus.fasta > trycycler_consensus.fasta
+
+$ ~/post_assembly_clean_and_annotate.sh ../../../Data/illumina/OXR-199_all_R1.trim.fq ../../../Data/illumina/OXR-199_all_R2.trim.fq OXR-199_polca_polypolish_trycycler.fasta OXR-199
+
+$ barrnap OXR-199_polca_polypolish_trycycler.fasta -o OXR-199_rRNA.fa > OXR-199_barrnap.gff
+
+######################
+## Perform with OXR-209
+
+$ ~/trycycle_assemblies.sh ../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq
+This is how many contigs are in your Flye assembly
+7
+This is how many contigs are in your Miniasm assembly
+7
+This is how many contigs are in your Raven assembly
+7
+
+# Bad clusters with single sequences: 11, 9, 8, 2, 14, 15, 16, 17, 13, 12
+# Cluster 001: Sequence D had some sequence trim from the beginning
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_001/ --max_trim_seq 65000
+# Cluster 003: Sequence C and D had the beginning toward the end and was trimmed down
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_003/
+# Cluster 004: Sequence C had the beginning toward the end and was trimmed down. Sequence D had the end found near the begnning and was trimmed off
+trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_004/
+# Cluster 005: Sequence C and D had the beginning toward the end and was trimmed down
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_005/
+# Cluster 006: Sequence C and D had the beginning toward the end and was trimmed down
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_006/
+# Cluster 007: Sequence C and D had the beginning toward the end and was trimmed down
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_007/
+# Cluster 010: Sequence C and D had the beginning toward the end and was trimmed down
+$ trycycler reconcile --reads ../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq --cluster_dir trycycler_clusters/cluster_010/
+
+$ trycycler msa --cluster_dir trycycler_clusters/cluster_001/ && trycycler msa --cluster_dir trycycler_clusters/cluster_003/ && trycycler msa --cluster_dir trycycler_clusters/cluster_004/ && trycycler msa --cluster_dir trycycler_clusters/cluster_005/ && trycycler msa --cluster_dir trycycler_clusters/cluster_006/ && trycycler msa --cluster_dir trycycler_clusters/cluster_007/ && trycycler msa --cluster_dir trycycler_clusters/cluster_010/
+
+$ trycycler partition --reads ../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_001/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_003/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_004/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_005/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_006/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_007/ && trycycler partition --reads ../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq --cluster_dirs trycycler_clusters/cluster_010/
+
+$ trycycler consensus --cluster_dir trycycler_clusters/cluster_001/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_003/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_004/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_005/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_006/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_007/ && trycycler consensus --cluster_dir trycycler_clusters/cluster_010/
+
+$ cat trycycler_clusters/cluster_*/7_final_consensus.fasta > trycycler_consensus.fasta
+
+$ ~/post_assembly_clean_and_annotate.sh ../../../Data/illumina/OXR-209_all_R1.trim.fq ../../../Data/illumina/OXR-209_all_R2.trim.fq OXR-209_polca_polypolish_trycycler.fasta OXR-209
+
+$ barrnap OXR-209_polca_polypolish_trycycler.fasta -o OXR-209_rRNA.fa > OXR-209_barrnap.gff
+
+######################
+## Use eggNOG mapper
+
+######################
+## Sort assembled file by contig length and make .fsa for genbank/NCBI submission
+
+$ seqkit sort --by-length --reverse assemblies/OXR-9_polca_polypolish_trycycler.fasta > OXR-9_final_assembly.fsa
+
+# check order and length
+$ seqkit fx2tab --length --name --header-line OXR-9_final_assembly.fsa

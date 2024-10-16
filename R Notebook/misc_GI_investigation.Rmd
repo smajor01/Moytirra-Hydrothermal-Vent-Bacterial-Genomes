@@ -1,0 +1,198 @@
+---
+title: "Untitled"
+output: html_document
+date: "2024-07-25"
+---
+
+I want to: 
+  1) Look at the region between OXR-203 GI15 and GI16 
+  2) Re-evaluate what's considered hypothetical
+This is working off files made in "combining NCBI gff with prokka and eggNOG.rmd"
+
+```{r}
+total.203 <- read.table(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/OXR-203_all_annos.txt", sep = "\t", header = T)
+
+```
+
+In this next part I'll look even more closely at the genomic islands.
+working from a later section in the exploring non-syntenic region.rmd file
+```{r}
+# Here I'm going to include the eggNOG KEGG functional annotations and the NCBI
+# make the ranges to select for genes.
+fixed.2 <- read.csv("C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/203_no_syn_functions_cln.csv", header = T)
+fixed.2$X <- NULL
+# look at the ranges of the genomic islands
+range.203 <- fixed.2 %>%
+  group_by(Non.syntenic_GI) %>%
+  summarize(
+    range_start = min(start),
+    range_stop = max(stop)
+  )
+
+contig <- fixed.2[c("isolate","Contig","Non.syntenic_GI")]
+data <- contig[!duplicated(contig$Non.syntenic_GI),]
+ranges <- merge(data, range.203, by = "Non.syntenic_GI")
+
+range.vi <- data.frame(
+  Non.syntenic_GI = "gap",
+  isolate = "OXR-203",
+  Contig = "Chr",
+  range_start = 3892889, # the end of GI15
+  range_stop = 3940829  # the start of GI16
+)
+
+# Join the data frames on the 'contig' column
+merged_df <- total.203 %>%
+  inner_join(range.vi, by = c("isolate","Contig"))
+
+# Filter the rows
+filtered_df <- merged_df %>% mutate(across(c(start, stop, range_start, range_stop), as.numeric)) %>%
+  filter(start >= range_start & stop <= range_stop)
+
+### ~~~ Uncomment this line to write the file 
+write.csv(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI15-16_total_annotations_functions.csv", filtered_df)
+# write.csv(file = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/203_GI_total_annotations_functions.csv", filtered_df)
+
+# Add an asterisk to the annotation of each gene that is duplicated due to multiple kegg annotations
+filter_dup <- filtered_df[duplicated(filtered_df$all.genes.2),]
+# filter_sing <- filtered_df[!duplicated(filtered_df$all.genes),]
+
+dups <- filtered_df[filtered_df$all.genes.2 %in% filter_dup$all.genes.2,] %>% mutate(prokka.Anno = paste0("*", prokka.Anno)) %>% mutate(NCBI.Anno = paste0("*", NCBI.Anno))
+
+sing <- filtered_df[! filtered_df$all.genes.2 %in% filter_dup$all.genes.2,]
+
+dup.edits.203 <- rbind(dups, sing)
+
+write.csv(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI15-16_total_annotations_functions_dup.csv", dup.edits.203)
+
+# write.csv(file = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/203_GI_annotations_functions_dups.csv", dup.edits)
+
+# prot.names <- as.data.frame(unique(dup.edits.203$all.genes.2)) %>% 
+#   rename_at(vars(1), ~"Gene") %>% 
+#   mutate(Gene = str_extract(Gene, "[^-]+")) %>% unique()
+# 
+# write.table(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI_genes_ncbi.txt", prot.names, quote = F, col.names = F, row.names = F)
+# 
+# 
+# print(paste0("THERE ARE ",nrow(dup.edits[!grepl("WP_",dup.edits.203$all.genes.2),])," proteins not annotated by NCBI PGAP."))
+# 
+# print(paste0("THERE ARE ", sum(is.na(dup.edits.203$all.genes.2))," unnamed genes in the list."))
+
+```
+
+2) Re-evaluating what is a hypothetical
+```{r}
+gk.203 <- read.table(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI_ghostK.txt", sep = "\t", header = T)
+
+names(gk.203)
+
+# take just the annotations that I looked at for the GI analysis
+gk.trim <- gk.203[c("all.genes","Contig","Non.syntenic_GI","prokka.Anno","NCBI.Anno","ghst.def","Description")]
+
+# list of terms that I'm going to search for
+# Define the patterns to match
+patterns <- c("^hypothetical protein", "^*hypothetical protein", "^NA", "^*NA", "Hypothetical")
+
+# Function to check if any of the patterns are in the column
+# Include NAs and empty cells
+matches_any_pattern <- function(column) {
+  sapply(column, function(x) {
+    if (is.na(x) || x == "") {
+      return(TRUE)
+    }
+    any(sapply(patterns, function(p) grepl(p, x)))
+  })
+}
+
+# Filter the data
+gk.hypo <- gk.trim %>%
+  filter(matches_any_pattern(prokka.Anno)) %>%
+  filter(matches_any_pattern(NCBI.Anno)) %>%
+  filter(matches_any_pattern(ghst.def)) %>% 
+  distinct(all.genes, .keep_all = TRUE)
+
+table(gk.hypo$Non.syntenic_GI)
+
+```
+
+3) get the boundaries of each of the GIs not jsut the genes
+```{r}
+gk.203 <- read.table(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI_ghostK.txt", sep = "\t", header = T)
+
+gk.gi.203 <- gk.203[! duplicated(gk.203$Non.syntenic_GI),]
+
+gk.gi.203 <- gk.gi.203[,c("Contig.2","Non.syntenic_GI","range_start","range_stop")]
+names(gk.gi.203) <- c("contig","Non.syntenic_GI","start","stop")
+gk.gi.203$type <- paste0("GI",gk.gi.203$Non.syntenic_GI) 
+
+write.table(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI_boundaries.txt", gk.gi.203, sep = "\t", row.names = F)
+```
+
+
+Look for the proteases and peptidases in each of the bugs
+```{r}
+all.203 <- read.table(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/OXR-203_all_annos.txt", sep = "\t", header = T)
+
+gk.203 <- read.table(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI_ghostK.txt", sep = "\t", header = T)
+
+# Create a logical vector that identifies rows where any column matches "peptidase" or "protease"
+matches <- apply(gk.203, 1, function(row) {
+  any(grepl("peptidase|protease", row, ignore.case = TRUE))
+})
+
+gi.203.pep <- gk.203[matches,]
+
+results.203 <- all.203[matches,]
+
+## all Look for peptidases
+matches <- apply(all, 1, function(row) {
+  any(grepl("peptidase|protease", row, ignore.case = TRUE))
+})
+
+results <- all[matches,]
+results <- results[!duplicated(results$full_name),]
+peps <- as.data.frame(table(results$isolate))
+
+# Genome sizes
+peps$size <- c(4480000,2840000,5650000,4420000,2600000,4040000,3400000,4220000,3540000,4680000,3960000,3320000)
+peps$gene <- table(all$isolate)
+# Ratio of peptidases to genome size
+peps$size.ratio <- peps$size/peps$Freq
+peps$size.logs <- log(peps$size.ratio)
+
+peps$gene.ratio <-peps$gene/peps$Freq
+peps$gene.logs <- log(peps$gene.ratio)
+
+write.csv(file = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/Peptidase-Protease_to_size_ratio.csv", peps)
+```
+
+find the gliding genes
+```{r}
+glide <- all[grepl("gld|spr|por", all$Preferred_name),]
+
+matches <- apply(all, 1, function(row) {
+  any(grepl("gliding|glide", row, ignore.case = TRUE))
+})
+
+results <- all[matches,]
+
+gliding <- merge(glide, results, all = T) %>% distinct(full_name, .keep_all=T)
+
+  
+gld.tble <-  table(gliding$Preferred_name, gliding$location)
+
+# Porphyrin metabolism 
+porph <- all[all$name %in% "Porphyrin metabolism",] %>% distinct(full_name, .keep_all = T)
+ 
+por <- as.data.frame(table(porph$Preferred_name,porph$location)) %>% pivot_wider(names_from = Var2, values_from = Freq)
+row.names(por) <- por$Var1
+
+
+
+write.csv(file = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/table SX-Porphyrin metabolism.csv",por, row.names = T)
+
+```
+```{r}
+test.tab <- as.data.frame(table(o137.plas$name,o137.plas$location)) %>% pivot_wider(names_from = Var2, values_from = Freq)
+row.names(por) <- por$Var1
+```

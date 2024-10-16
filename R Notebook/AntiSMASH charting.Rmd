@@ -1,0 +1,341 @@
+---
+title: "AntiSMASH DeepBGC charts"
+output: pdf_document
+date: "2023-11-14"
+---
+
+Summarize the antismash and DeepBGC data
+
+``` {r}
+# Chart the classification stacked with each sample (don't facet_wrap for stacked chart)
+total.smash <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR_deepBGC_antismash_BGC.txt", sep = "\t")
+total.smash$AS_Most_similar_known_cluster <- gsub("amp;","",total.smash$AS_Most_similar_known_cluster) 
+
+# Trying to summarize for a ggplot
+library(dplyr)
+library(tidyr)
+help <- total.smash %>% group_by(Genome, classification) %>% tally()
+help$Genome <- factor(help$Genome, levels = c("OXR-9","OXR-11","OXR-76","OXR-85","OXR-96","OXR-134","OXR-137","OXR-159","OXR-189","OXR-199","OXR-203","OXR-209"))
+
+library(ggplot2)
+unc <- ggplot(help, aes(fill=Genome, y = n, x = classification)) +
+  geom_bar(position='stack', stat = 'identity')+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))+
+  ylab("Count") +
+  xlab("BGC Classification")+
+  ggtitle("Biosynthetic Gene Cluster Classification by Genome")+
+  facet_wrap(~Genome)
+
+unc
+ggsave("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/BGC_w_unclass_wrap.pdf", width = 15)
+
+
+no.unc <- ggplot(help[! help$classification == "Unclassified",], aes(fill=Genome, y = n, x = classification)) +
+  geom_bar(position='stack', stat = 'identity')+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))+
+  scale_y_continuous(breaks = c(2,4,6,8,10))+
+  ylab("Count") +
+  xlab("BGC Classification")+
+  ggtitle("Biosynthetic Gene Cluster Classification by Genome")+
+  facet_wrap(~Genome)
+
+no.unc
+ggsave("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/BGC_class_wrap.png", width = 12, height = 6)
+
+# Take a look at the primary contig inthe plasmid containing samples. Will repeat with just the plasmids
+# Separat the primary  contig
+# remove the unclassifieds
+no.unc <- total.smash[! total.smash$classification == "Unclassified",]
+no.unc.prim <- no.unc[grep("cluster_001",no.unc$contig),]
+# prim.plas <- no.unc.prim[no.unc.prim$Genome %in% c("OXR-9","OXR-85","OXR-137","OXR-159","OXR-199","OXR-209"),]
+
+primary <- no.unc.prim %>% group_by(Genome, contig, classification) %>% tally()
+primary$Genome <- factor(primary$Genome, levels = c("OXR-9","OXR-11","OXR-76","OXR-85","OXR-96","OXR-134","OXR-137","OXR-159","OXR-189","OXR-199","OXR-203","OXR-209"))
+  #"OXR-9","OXR-85","OXR-137","OXR-159","OXR-199","OXR-209"))
+primary$classification <- gsub("_", " ", primary$classification)
+
+# prim.bgc <- ggplot(primary, aes(fill=Genome, y = n, x = classification)) +
+#   geom_bar(position='stack', stat = 'identity')+
+#   theme_bw()+
+#   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+#         axis.text.y = element_text(size = 10),
+#         axis.title = element_text(size = 11),
+#         title = element_text(size = 12),
+#         legend.text = element_text(size = 10),
+#         legend.title = element_text(size = 11),
+#         strip.text = element_text(size = 11)) +
+#     scale_y_continuous(breaks = c(2,4,6,8,10),)+
+#   ylab("Count") +
+#   xlab("BGC Classification")+
+#   ggtitle("Biosynthetic Gene Cluster Classification in Primary Chromosomes")+
+#   facet_wrap(~Genome)
+
+prim.bgc <- ggplot(primary, aes(y = Genome, x = classification)) +
+  geom_point(position='dodge', stat = 'identity', aes(size = n, color = Genome))+
+  theme_bw()+
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 11),
+        title = element_text(size = 12),
+        legend.text = element_text(size = 10),
+        legend.title = element_text(size = 11))+
+        # strip.text = element_text(size = 11)) +
+    # scale_y_continuous(breaks = c(2,4,6,8,10),)+
+  # scale_shape_manual(values = c(1, 1)) +
+  # scale_fill_manual(values = c("white", "white")) +
+  scale_size_continuous(range = c(1,8), breaks = c(1,2,3,4,5,6,7,8,9))+ #10))+
+  guides(color = "none",
+         size = guide_legend(title = "Count", override.aes = list(shape = 1)))+
+          # = guide_legend(override.aes = list(shape = 1))) +
+  ylab("Genome") +
+  xlab("BGC Classification")+
+  ggtitle("Biosynthetic Gene Cluster Classification in Primary Chromosomes")
+  # facet_wrap(~Genome)
+
+prim.bgc
+ggsave("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/BGC_class_prim_wrap_20240603_point.png", width = 7.6, height = 5.2)
+
+# Take a look at the just the plasmids
+# Separat the primary  contig
+# remove the unclassifieds
+no.unc.plas <- no.unc[- grep("cluster_001",no.unc$contig),]
+
+no.unc.plas$plasmid <- paste(no.unc.plas$Genome, no.unc.plas$contig, sep = " ")
+# Remove unnessecary information
+no.unc.plas$plasmid <- gsub("_consensus_polypolish", "",no.unc.plas$plasmid)
+
+##~~~ Rename the plasmids
+plasmid.names <- read.csv("C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/plasmid_names.csv", header = T)
+
+plasmid.names$plasmid <- paste(plasmid.names$Genome, plasmid.names$CLUSTER_NAME, sep = " ")
+
+new.names <- merge(no.unc.plas, plasmid.names, by = "plasmid")
+## ~~~ change the new.names back to the no.unc
+no.unc.plas <- new.names
+no.unc.plas$plasmid <- paste(no.unc.plas$Genome.x, no.unc.plas$PLASMID_NAME, sep = ": ")
+
+plasmid <- no.unc.plas %>% group_by(Genome.x, plasmid, classification) %>% tally()
+names(plasmid) <- c("Genome","Plasmid","Classification", "n")
+
+plasmid$Genome <- factor(plasmid$Genome, levels = c("OXR-9","OXR-85","OXR-137","OXR-159","OXR-199","OXR-209"))
+
+plasmid$Plasmid <- factor(plasmid$Plasmid, levels = c("OXR-9: pOXR009-01","OXR-9: pOXR009-02","OXR-9: pOXR009-04",
+                                                      "OXR-9: pOXR009-05","OXR-85: pOXR085-01","OXR-85: pOXR085-02",
+                                                      "OXR-137: pOXR137-01","OXR-159: pOXR159-02","OXR-159: pOXR159-03",
+                                                      "OXR-199: pOXR199-01","OXR-199: pOXR199-04","OXR-199: pOXR199-05",
+                                                      "OXR-209: pOXR209-01","OXR-209: pOXR209-02","OXR-209: pOXR209-03",
+                                                      "OXR-209: pOXR209-04"))
+## ~~~                            
+                            
+# plasmid$plasmid <- factor(plasmid$plasmid, levels = c("OXR-9 cluster_002","OXR-9 cluster_003","OXR-9 cluster_005","OXR-9 cluster_006","OXR-85 cluster_002","OXR-85 cluster_003","OXR-137 cluster_004","OXR-159 cluster_003","OXR-159 cluster_007", "OXR-199 cluster_002","OXR-199 cluster_005","OXR-199 cluster_006","OXR-209 cluster_003","OXR-209 cluster_004","OXR-209 cluster_005","OXR-209 cluster_006"))
+plasmid$Classification <- gsub("_", " ", plasmid$Classification)
+
+# plas.bgc <- ggplot(plasmid, aes(fill=Plasmid, y = n, x = Classification)) +
+#   geom_bar(position='stack', stat = 'identity')+
+#   theme_bw()+
+#   theme(axis.text.x = element_text(size = 10, angle = 90, vjust = 0.5, hjust = 1),
+#         axis.text.y = element_text(size = 10),
+#         axis.title = element_text(size = 11),
+#         title = element_text(size = 12),
+#         legend.text = element_text(size = 10),
+#         legend.title = element_text(size = 11),
+#         strip.text = element_text(size = 11)) +
+#         # legend.justification = c("right","top"),
+#         # legend.title = element_text(hjust = 0.5, vjust = 1))
+#         # legend.position =  c(1,0.6))+
+#   scale_y_continuous(breaks = c(2,4,6,8,10))+
+#   ylab("Count") +
+#   xlab("BGC Classification")+
+#   ggtitle("Biosynthetic Gene Cluster Classification in Plasmids")+
+#   facet_wrap(~Genome)
+
+plas.bgc <- ggplot(plasmid, aes(y = Plasmid, x = Classification)) +
+  geom_point(position='dodge', stat = 'identity', aes(size = n, color = Genome))+
+  theme_bw()+
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 11),
+        title = element_text(size = 12),
+        legend.text = element_text(size = 10),
+        legend.title = element_text(size = 11))+
+        # strip.text = element_text(size = 11)) +
+    # scale_y_continuous(breaks = c(2,4,6,8,10),)+
+   scale_size_continuous(range = c(2,4), breaks = c(1,2,3,4,5,6,7,8,9))+ #10))+
+  guides(color = "none",
+         size = guide_legend(title = "Count", override.aes = list(shape = 1)))+
+  ylab("Plasmid") +
+  xlab("BGC Classification")+
+  ggtitle("Biosynthetic Gene Cluster Classification in Plasmids")
+  # facet_wrap(~Genome)
+
+plas.bgc
+ggsave("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/BGC_class_plas_genome_wrap_20240603_point.png", width = 7.5, height = 6)
+```
+
+Look at the activity
+```{r}
+# Chart the activity stacked with each sample (don't facet_wrap for stacked chart)
+total.smash <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR_deepBGC_antismash_BGC_edits.txt", sep = "\t")
+
+# Trying to summarize for a ggplot
+library(dplyr)
+library(tidyr)
+help <- total.smash %>% group_by(Genome, DBGC_product_activity) %>% tally()
+help$Genome <- factor(help$Genome, levels = c("OXR-9","OXR-11","OXR-76","OXR-85","OXR-96","OXR-134","OXR-137","OXR-159","OXR-189","OXR-199","OXR-203","OXR-209"))
+
+help <- help[! is.na(help$DBGC_product_activity),]
+
+library(ggplot2)
+act <- ggplot(help, aes(fill=Genome, y = n, x = DBGC_product_activity)) +
+  geom_bar(position='stack', stat = 'identity')+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))+
+  ylab("Count") +
+  xlab("Predicted Activity")+
+  ggtitle("Biosynthetic Gene Cluster Activity by Genome")+
+  facet_wrap(~Genome)
+
+act
+
+ggsave("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/BGC_activity_wrap.pdf", width = 15)
+
+
+```
+
+Look at the Most Similar cluster
+```{r}
+# Chart the activity stacked with each sample (don't facet_wrap for stacked chart)
+# total.smash <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR_deepBGC_antismash_BGC_edits.txt", sep = "\t")
+
+# Trying to summarize for a ggplot
+library(dplyr)
+library(tidyr)
+no.unc <- total.smash[! total.smash$classification == "Unclassified",]
+no.unc.prim <- no.unc[grep("cluster_001",no.unc$contig),]
+
+known.clust.prim <- no.unc.prim %>% group_by(Genome, AS_Most_similar_known_cluster, AS_Similarity) %>% tally()
+
+known.clust.prim <- known.clust.prim[! is.na(known.clust.prim$AS_Most_similar_known_cluster),]
+
+known.clust.prim$Genome <- factor(known.clust.prim$Genome, levels = c("OXR-9","OXR-11","OXR-76","OXR-85","OXR-96","OXR-134","OXR-137","OXR-159","OXR-189","OXR-199","OXR-203","OXR-209"))
+
+known.clust.prim$AS_Similarity <- as.numeric(sub("%", "", known.clust.prim$AS_Similarity))
+
+library(ggplot2)
+library(RColorBrewer)
+# act <- ggplot(known.clust.prim, aes(fill = Genome, y = AS_Similarity, x = AS_Most_similar_known_cluster)) +
+#   geom_bar(position='dodge', stat = 'identity', aes(fill = Genome))+
+#   # geom_bar( position = position_dodge(width = 1), stat = 'identity', aes(fill = Genome))+
+#   theme_bw()+
+#   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))+
+#   ylab("% Similarity") +
+#   xlab("Most Similar Known Cluster")+
+#   ggtitle("Most Similar Biosynthetic Gene Cluster in Primary Chromosomes")#+
+#   facet_wrap(~Genome)
+  
+# act <- ggplot(known.clust.prim, aes(color = Genome, y = AS_Similarity, x = AS_Most_similar_known_cluster, size = AS_Similarity)) +
+#   geom_point(position='dodge', stat = 'identity', aes(fill = Genome))+
+#   scale_size_continuous(range = c(1,5)) +
+#   # geom_bar( position = position_dodge(width = 1), stat = 'identity', aes(fill = Genome))+
+#   theme_bw()+
+#   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))+
+#   ylab("% Similarity") +
+#   xlab("Most Similar Known Cluster")+
+#   ggtitle("Most Similar Biosynthetic Gene Cluster in Primary Chromosomes")
+  # facet_wrap(~Genome)
+
+# act + guides(size = "none", color = guide_legend(override.aes = list(size=5)))
+
+
+myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))
+
+# known.clust.prim.trim <- known.clust.prim[! known.clust.prim$AS_Similarity <= 25,]
+
+# [! known.clust.prim$AS_Similarity < 25,]
+act <- ggplot(known.clust.prim, aes(y = Genome, x = AS_Most_similar_known_cluster)) +
+  geom_point(position='dodge', stat = 'identity', aes(size = AS_Similarity, color = AS_Similarity)) +
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 50, vjust = 1.0, hjust = 1))+
+  ylab("Genome") +
+  xlab("Most Similar Known Cluster")+
+  ggtitle("Most Similar Biosynthetic Gene Clusters in Primary Chromosomes") + 
+  guides(size = guide_legend(title = "% Similarity"), 
+         color = guide_legend(title = "% Similarity")) +
+  scale_colour_gradientn(colours = myPalette(100), limits=c(1, 100),breaks = c(5,10,20,30,40,50,60,70,80,90,100))+ # 20,40,60,80,100))+ #25,50,75,100)) +
+  scale_size_continuous(range = c(2,7.15), breaks = c(5,10,20,30,40,50,60,70,80,90,100)) #20,40,60,80,100)) #25,50,75,100)) 
+
+act
+
+ggsave("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/BGC_known_cluster_prim_20241014_all.png", width = 7.4, height = 5.15)
+
+# Trying to summarize for a plasmids
+library(dplyr)
+library(tidyr)
+known.clust.plas <- no.unc.plas %>% group_by(Genome.x, AS_Most_similar_known_cluster, AS_Similarity, plasmid) %>% tally()
+
+known.clust.plas <- known.clust.plas[! is.na(known.clust.plas$AS_Most_similar_known_cluster),]
+
+
+known.clust.plas$Genome <- factor(known.clust.plas$Genome.x, levels = c("OXR-9","OXR-85","OXR-137","OXR-159","OXR-199","OXR-209"))
+
+known.clust.plas$plasmid <- factor(known.clust.plas$plasmid, levels = c("OXR-9: pOXR009-01","OXR-9: pOXR009-02","OXR-9: pOXR009-04",
+                                                      "OXR-9: pOXR009-05","OXR-85: pOXR085-01","OXR-85: pOXR085-02",
+                                                      "OXR-137: pOXR137-01","OXR-159: pOXR159-02","OXR-159: pOXR159-03",
+                                                      "OXR-199: pOXR199-01","OXR-199: pOXR199-04","OXR-199: pOXR199-05",
+                                                      "OXR-209: pOXR209-01","OXR-209: pOXR209-02","OXR-209: pOXR209-03",
+                                                      "OXR-209: pOXR209-04"))
+
+
+known.clust.plas$AS_Similarity <- as.numeric(sub("%", "", known.clust.plas$AS_Similarity))
+
+known.clust.plas.2 <- known.clust.plas %>% select(plasmid,AS_Most_similar_known_cluster,AS_Similarity,n)
+known.clust.plas.2$Genome.x <- NULL
+# 
+# library(ggplot2)
+# act <- ggplot(known.clust.plas, aes(fill=plasmid, y = AS_Similarity, x = AS_Most_similar_known_cluster)) +
+#   geom_bar(position='dodge', stat = 'identity', aes(fill = plasmid))+
+#   theme_bw()+
+#   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))+
+#   ylab("% Similarity") +
+#   xlab("Most Similar Known Cluster")+
+#   ggtitle("Most Similar Biosynthetic Gene Cluster in Plasmids")#+
+#   facet_wrap(~Genome)
+# 
+# act
+# 
+# ggsave("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/BGC_known_cluster_plas.png", width = 7, height = 5)
+
+# ~~~
+myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))
+
+# act <- ggplot(known.clust.plas, aes(y = sort(known.clust.plas$plasmid, decreasing = F), x = AS_Most_similar_known_cluster)) +
+#   geom_point(position='dodge', stat = 'identity', aes(size = AS_Similarity, color = AS_Similarity)) +
+#   theme_bw()+
+#   theme(axis.text.x = element_text(angle = 50, vjust = 1, hjust = 1))+
+#   ylab("Plasmid") +
+#   xlab("Most Similar Known Cluster")+
+#   ggtitle("Most Similar Biosynthetic Gene Clusters in Plasmids") + 
+#   guides(size = guide_legend(title = "% Similarity"), 
+#          color = guide_legend(title = "% Similarity")) +
+#   scale_colour_gradientn(colours = myPalette(100), limits=c(1, 100),breaks = c(5,10,15,20,25,30))+ # 20,40,60,80,100))+ #25,50,75,100)) +
+#   scale_size_continuous(range = c(2,7.15))#, breaks = c(10,20,30))#20,40,60,80,100))#25,50,75,100)) 
+
+act <- ggplot(known.clust.plas.2, aes(y = plasmid, x = AS_Most_similar_known_cluster)) +
+  geom_point(position='dodge', stat = 'identity', aes(size = AS_Similarity, color = AS_Similarity)) +
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 50, vjust = 1, hjust = 1))+
+  ylab("Plasmid") +
+  xlab("Most Similar Known Cluster")+
+  ggtitle("Most Similar Biosynthetic Gene Clusters in Plasmids") + 
+  guides(size = guide_legend(title = "% Similarity"), 
+         color = guide_legend(title = "% Similarity"))+#, override.aes = list(size=4))) +
+  scale_colour_gradientn(colours = myPalette(100), limits=c(1, 100),breaks = c(5,10,15,20))+ # 20,40,60,80,100))+ #25,50,75,100)) +
+  scale_size_continuous(range = c(2,4), breaks = c(5,10,15,20)) #20,40,60,80,100))#25,50,75,100))
+
+act
+
+ggsave("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/BGC_known_cluster_plas_20241014_all.png", width = 7.05, height = 4)
+
+```

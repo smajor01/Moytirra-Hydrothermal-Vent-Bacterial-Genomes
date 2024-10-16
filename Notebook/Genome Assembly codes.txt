@@ -1,0 +1,1831 @@
+
+# Quality filter with {-q 10} and minimum length {-l 150}
+
+[smajor@localhost Data]$ python3 /data/app/nanopore/nanofilt/NanoFilt.py -q 10 -l 150 nanopore/OXR-11_BC02_ONT-raw.fastq > nanopore/qc/OXR-11_BC02_ONT_qc.fastq
+[smajor@localhost Data]$ python3 /data/app/nanopore/nanofilt/NanoFilt.py -q 10 -l 150 nanopore/OXR-134_BC06_ONT-raw.fastq > nanopore/qc/OXR-134_BC06_ONT_qc.fastq
+[smajor@localhost Data]$ python3 /data/app/nanopore/nanofilt/NanoFilt.py -q 10 -l 150 nanopore/OXR-137_BC07_ONT-raw.fastq > nanopore/qc/OXR-137_BC07_ONT_qc.fastq          
+[smajor@localhost Data]$ python3 /data/app/nanopore/nanofilt/NanoFilt.py -q 10 -l 150 nanopore/OXR-159_BC08_ONT-raw.fastq > nanopore/qc/OXR-159_BC08_ONT_qc.fastq
+[smajor@localhost Data]$ python3 /data/app/nanopore/nanofilt/NanoFilt.py -q 10 -l 150 nanopore/OXR-189_BC09_ONT-raw.fastq > nanopore/qc/OXR-189_BC09_ONT_qc.fastq
+[smajor@localhost Data]$ python3 /data/app/nanopore/nanofilt/NanoFilt.py -q 10 -l 150 nanopore/OXR-199_BC10_ONT-raw.fastq > nanopore/qc/OXR-199_BC10_ONT_qc.fastq
+python3 /data/app/nanopore/nanofilt/NanoFilt.py -q 10 -l 150 nanopore/OXR-203_BC11_ONT-raw.fastq > nanopore/qc/OXR-203_BC11_ONT_qc.fastq && python3 /data/app/nanopore/nanofilt/NanoFilt.py -q 10 -l 150 nanopore/OXR-209_BC12_ONT-raw.fastq > nanopore/qc/OXR-209_BC12_ONT_qc.fastq &&  python3 /data/app/nanopore/nanofilt/NanoFilt.py -q 10 -l 150 nanopore/OXR-76_BC03_ONT-raw.fastq > nanopore/qc/OXR-76_BC03_ONT_qc.fastq && python3 /data/app/nanopore/nanofilt/NanoFilt.py -q 10 -l 150 nanopore/OXR-85_BC04_ONT-raw.fastq > nanopore/qc/OXR-85_BC04_ONT_qc.fastq && python3 /data/app/nanopore/nanofilt/NanoFilt.py -q 10 -l 150 nanopore/OXR-96_BC05_ONT-raw.fastq > nanopore/qc/OXR-96_BC05_ONT_qc.fastq && python3 /data/app/nanopore/nanofilt/NanoFilt.py -q 10 -l 150 nanopore/OXR-9_BC01_ONT-raw.fastq > nanopore/qc/OXR-9_BC01_ONT_qc.fastq
+# write the quality filtering summary to a file
+/app/data/seqkit stats nanopore/qc/*.fastq > nanopore/qc/OXR_qc_sum.txt
+/app/data/seqkit stats nanopore/*.fastq > nanopore/OXR_raw_sum.txt
+
+#################################################################
+# Assembly of OXR-11
+[smajor@localhost OXR-11]$ /data/app/MaSuRCA-4.1.0/bin/masurca -t 16 -i ../../../Data/illumina/OXR-11_all_R1.fastq.gz,../../../Data/illumina/OXR-11_all_R2.fastq.gz -r ../../../Data/nanopore/qc/OXR-11_BC02_ONT_qc.fastq
+Verifying PATHS...
+jellyfish OK
+runCA OK
+createSuperReadsForDirectory.perl OK
+creating script file for the actions...done.
+execute assemble.sh to run assembly
+[Wed May 31 09:07:01 EDT 2023] Processing pe library reads
+[Wed May 31 09:07:12 EDT 2023] Average PE read length 249
+[Wed May 31 09:07:13 EDT 2023] Using kmer size of 99 for the graph
+[Wed May 31 09:07:14 EDT 2023] MIN_Q_CHAR: 33
+[Wed May 31 09:07:14 EDT 2023] Creating mer database for Quorum
+[Wed May 31 09:07:30 EDT 2023] Error correct PE
+[Wed May 31 09:09:29 EDT 2023] Estimating genome size
+[Wed May 31 09:09:47 EDT 2023] Estimated genome size: 5412548
+[Wed May 31 09:09:47 EDT 2023] Creating k-unitigs with k=99
+[Wed May 31 09:10:56 EDT 2023] Computing super reads from PE
+[Wed May 31 09:11:29 EDT 2023] Using CABOG from /data/app/MaSuRCA-4.1.0/bin/../C                                                                              A8/Linux-amd64/bin
+[Wed May 31 09:11:29 EDT 2023] Running mega-reads correction/assembly
+[Wed May 31 09:11:29 EDT 2023] Using mer size 17 for mapping, B=15, d=0.02
+[Wed May 31 09:11:29 EDT 2023] Estimated Genome Size 5412548
+[Wed May 31 09:11:29 EDT 2023] Estimated Ploidy 2
+[Wed May 31 09:11:29 EDT 2023] Using 16 threads
+[Wed May 31 09:11:29 EDT 2023] Output prefix mr.99.17.15.0.02
+[Wed May 31 09:11:29 EDT 2023] Creating k-unitigs for k=19
+[Wed May 31 09:11:48 EDT 2023] Pre-correcting long reads
+[Wed May 31 09:12:12 EDT 2023] Pre-corrected reads are in longest_reads.25x.fa
+[Wed May 31 09:12:12 EDT 2023] Computing mega-reads
+[Wed May 31 09:12:12 EDT 2023] Running locally in 1 batch
+[Wed May 31 09:13:13 EDT 2023] Refining alignments
+[Wed May 31 09:13:25 EDT 2023] Computing allowed merges
+[Wed May 31 09:13:25 EDT 2023] Joining
+[Wed May 31 09:13:28 EDT 2023] Gap consensus
+[Wed May 31 09:13:30 EDT 2023] Generating assembly input files
+[Wed May 31 09:13:52 EDT 2023] Coverage threshold for splitting unitigs is 15 mi                                                                              nimum ovl 499
+[Wed May 31 09:13:52 EDT 2023] Running assembly
+[Wed May 31 09:18:52 EDT 2023] Mega-reads initial assembly complete
+[Wed May 31 09:18:52 EDT 2023] No gap closing possible
+[Wed May 31 09:18:52 EDT 2023] Removing redundant scaffolds
+[Wed May 31 09:19:01 EDT 2023] Assembly complete, primary scaffold sequences are in CA.mr.99.17.15.0.02/primary.genome.scf.fasta
+[Wed May 31 09:19:01 EDT 2023] redundant or haplotype variant scaffold sequences are in CA.mr.99.17.15.0.02/alternative.genome.scf.fasta
+[Wed May 31 09:19:01 EDT 2023] All done, final assembly is in CA.mr.99.17.15.0.02/primary.genome.scf.fasta
+[Wed May 31 09:19:01 EDT 2023] Final stats for CA.mr.99.17.15.0.02/primary.genome.scf.fasta
+N50 4542710
+Sequence 4542710
+Average 4.54271e+06
+E-size 4.54271e+06
+Count 1
+
+# Assembly of OXR-134
+[smajor@localhost OXR-134]$ /data/app/MaSuRCA-4.1.0/bin/masurca -t 16 -i ../../../Data/illumina/OXR-134_all_R1.fastq.gz,../../../Data/illumina/OXR-134_all_R2.          fastq.gz -r ../../../Data/nanopore/qc/OXR-134_BC06_ONT_qc.fastq
+Verifying PATHS...
+jellyfish OK
+runCA OK
+createSuperReadsForDirectory.perl OK
+creating script file for the actions...done.
+execute assemble.sh to run assembly
+[Wed May 31 10:02:44 EDT 2023] Processing pe library reads
+[Wed May 31 10:03:14 EDT 2023] Average PE read length 249
+[Wed May 31 10:03:14 EDT 2023] Using kmer size of 83 for the graph
+[Wed May 31 10:03:15 EDT 2023] MIN_Q_CHAR: 33
+[Wed May 31 10:03:15 EDT 2023] Creating mer database for Quorum
+[Wed May 31 10:03:59 EDT 2023] Error correct PE
+[Wed May 31 10:09:55 EDT 2023] Estimating genome size
+[Wed May 31 10:10:43 EDT 2023] Estimated genome size: 6228947
+[Wed May 31 10:10:43 EDT 2023] Creating k-unitigs with k=83
+[Wed May 31 10:14:19 EDT 2023] Computing super reads from PE
+[Wed May 31 10:17:10 EDT 2023] Using CABOG from /data/app/MaSuRCA-4.1.0/bin/../CA8/Linux-amd64/bin
+[Wed May 31 10:17:10 EDT 2023] Running mega-reads correction/assembly
+[Wed May 31 10:17:10 EDT 2023] Using mer size 17 for mapping, B=15, d=0.02
+[Wed May 31 10:17:10 EDT 2023] Estimated Genome Size 6228947
+[Wed May 31 10:17:10 EDT 2023] Estimated Ploidy 2
+[Wed May 31 10:17:10 EDT 2023] Using 16 threads
+[Wed May 31 10:17:10 EDT 2023] Output prefix mr.83.17.15.0.02
+[Wed May 31 10:17:10 EDT 2023] Creating k-unitigs for k=19
+[Wed May 31 10:17:59 EDT 2023] Pre-correcting long reads
+[Wed May 31 10:19:34 EDT 2023] Pre-corrected reads are in longest_reads.25x.fa
+[Wed May 31 10:19:35 EDT 2023] Computing mega-reads
+[Wed May 31 10:19:35 EDT 2023] Running locally in 1 batch
+[Wed May 31 10:21:33 EDT 2023] Refining alignments
+[Wed May 31 10:22:04 EDT 2023] Computing allowed merges
+[Wed May 31 10:22:05 EDT 2023] Joining
+[Wed May 31 10:22:08 EDT 2023] Gap consensus
+[Wed May 31 10:22:08 EDT 2023] Generating assembly input files
+[Wed May 31 10:22:34 EDT 2023] Coverage threshold for splitting unitigs is 25 minimum ovl 499
+[Wed May 31 10:22:34 EDT 2023] Running assembly
+[Wed May 31 10:41:33 EDT 2023] Mega-reads initial assembly complete
+[Wed May 31 10:41:33 EDT 2023] No gap closing possible
+[Wed May 31 10:41:33 EDT 2023] Removing redundant scaffolds
+[Wed May 31 10:41:35 EDT 2023] Assembly complete, primary scaffold sequences are in CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+[Wed May 31 10:41:35 EDT 2023] redundant or haplotype variant scaffold sequences are in CA.mr.83.17.15.0.02/alternative.genome.scf.fasta
+[Wed May 31 10:41:35 EDT 2023] All done, final assembly is in CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+[Wed May 31 10:41:35 EDT 2023] Final stats for CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+N50 2898147
+Sequence 2898147
+Average 2.89815e+06
+E-size 2.89815e+06
+Count 1
+
+# assembling OXR-137
+[smajor@localhost OXR-137]$ /data/app/MaSuRCA-4.1.0/bin/masurca -t 16 -i ../../../Data/illumina/OXR-137_all_R1.fastq.gz,../../../Data/illumina/OXR-137_all_R2.fastq.gz -r ../../../Data/nanopore/qc/OXR-137_BC07_ONT_qc.fastq
+Verifying PATHS...
+jellyfish OK
+runCA OK
+createSuperReadsForDirectory.perl OK
+creating script file for the actions...done.
+execute assemble.sh to run assembly
+[Fri Jun  2 08:52:36 EDT 2023] Processing pe library reads
+[Fri Jun  2 08:53:11 EDT 2023] Average PE read length 249
+[Fri Jun  2 08:53:11 EDT 2023] Using kmer size of 83 for the graph
+[Fri Jun  2 08:53:12 EDT 2023] MIN_Q_CHAR: 33
+[Fri Jun  2 08:53:12 EDT 2023] Creating mer database for Quorum
+[Fri Jun  2 08:54:07 EDT 2023] Error correct PE
+[Fri Jun  2 09:01:37 EDT 2023] Estimating genome size
+[Fri Jun  2 09:02:39 EDT 2023] Estimated genome size: 9651470
+[Fri Jun  2 09:02:39 EDT 2023] Creating k-unitigs with k=83
+[Fri Jun  2 09:07:00 EDT 2023] Computing super reads from PE
+[Fri Jun  2 09:10:28 EDT 2023] Using CABOG from /data/app/MaSuRCA-4.1.0/bin/../CA8/Linux-amd64/bin
+[Fri Jun  2 09:10:28 EDT 2023] Running mega-reads correction/assembly
+[Fri Jun  2 09:10:28 EDT 2023] Using mer size 17 for mapping, B=15, d=0.02
+[Fri Jun  2 09:10:28 EDT 2023] Estimated Genome Size 9651470
+[Fri Jun  2 09:10:28 EDT 2023] Estimated Ploidy 2
+[Fri Jun  2 09:10:28 EDT 2023] Using 16 threads
+[Fri Jun  2 09:10:28 EDT 2023] Output prefix mr.83.17.15.0.02
+[Fri Jun  2 09:10:28 EDT 2023] Creating k-unitigs for k=19
+[Fri Jun  2 09:12:50 EDT 2023] Pre-correcting long reads
+[Fri Jun  2 09:14:42 EDT 2023] Pre-corrected reads are in longest_reads.25x.fa
+[Fri Jun  2 09:14:43 EDT 2023] Computing mega-reads
+[Fri Jun  2 09:14:43 EDT 2023] Running locally in 1 batch
+[Fri Jun  2 09:17:12 EDT 2023] Refining alignments
+[Fri Jun  2 09:17:48 EDT 2023] Computing allowed merges
+[Fri Jun  2 09:17:49 EDT 2023] Joining
+[Fri Jun  2 09:17:54 EDT 2023] Gap consensus
+[Fri Jun  2 09:17:56 EDT 2023] Generating assembly input files
+[Fri Jun  2 09:18:42 EDT 2023] Coverage threshold for splitting unitigs is 24 minimum ovl 499
+[Fri Jun  2 09:18:42 EDT 2023] Running assembly
+[Fri Jun  2 09:44:41 EDT 2023] Mega-reads initial assembly complete
+[Fri Jun  2 09:44:41 EDT 2023] No gap closing possible
+[Fri Jun  2 09:44:41 EDT 2023] Removing redundant scaffolds
+[Fri Jun  2 09:44:49 EDT 2023] Assembly complete, primary scaffold sequences are in CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 09:44:49 EDT 2023] redundant or haplotype variant scaffold sequences are in CA.mr.83.17.15.0.02/alternative.genome.scf.fasta
+[Fri Jun  2 09:44:49 EDT 2023] All done, final assembly is in CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 09:44:49 EDT 2023] Final stats for CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+N50 5499701
+Sequence 5740472
+Average 1.91349e+06
+E-size 5.27746e+06
+Count 3
+
+# Assembling OXR-159
+/data/app/MaSuRCA-4.1.0/bin/masurca -t 16 -i ../../../Data/illumina/OXR-159_all_R1.fastq.gz,../../../Data/illumina/OXR-159_all_R2.fastq.gz -r ../../../Data/nanopore/qc/OXR-159_BC08_ONT-qc.fastq
+Verifying PATHS...
+jellyfish OK
+runCA OK
+createSuperReadsForDirectory.perl OK
+creating script file for the actions...done.
+execute assemble.sh to run assembly
+[Wed May 31 10:57:12 EDT 2023] Processing pe library reads
+[Wed May 31 10:57:23 EDT 2023] Average PE read length 249
+[Wed May 31 10:57:23 EDT 2023] Using kmer size of 83 for the graph
+[Wed May 31 10:57:24 EDT 2023] MIN_Q_CHAR: 33
+[Wed May 31 10:57:24 EDT 2023] Creating mer database for Quorum
+[Wed May 31 10:57:40 EDT 2023] Error correct PE
+[Wed May 31 10:59:28 EDT 2023] Estimating genome size
+[Wed May 31 10:59:44 EDT 2023] Estimated genome size: 5231344
+[Wed May 31 10:59:44 EDT 2023] Creating k-unitigs with k=83
+[Wed May 31 11:00:55 EDT 2023] Computing super reads from PE
+[Wed May 31 11:01:41 EDT 2023] Using CABOG from /data/app/MaSuRCA-4.1.0/bin/../CA8/Linux-amd64/bin
+[Wed May 31 11:01:41 EDT 2023] Running mega-reads correction/assembly
+[Wed May 31 11:01:41 EDT 2023] Using mer size 17 for mapping, B=15, d=0.02
+[Wed May 31 11:01:41 EDT 2023] Estimated Genome Size 5231344
+[Wed May 31 11:01:41 EDT 2023] Estimated Ploidy 2
+[Wed May 31 11:01:41 EDT 2023] Using 16 threads
+[Wed May 31 11:01:41 EDT 2023] Output prefix mr.83.17.15.0.02
+[Wed May 31 11:01:41 EDT 2023] Creating k-unitigs for k=19
+[Wed May 31 11:01:59 EDT 2023] Pre-correcting long reads
+[Wed May 31 11:02:32 EDT 2023] Pre-corrected reads are in longest_reads.25x.fa
+[Wed May 31 11:02:33 EDT 2023] Computing mega-reads
+[Wed May 31 11:02:33 EDT 2023] Running locally in 1 batch
+[Wed May 31 11:03:37 EDT 2023] Refining alignments
+[Wed May 31 11:03:58 EDT 2023] Computing allowed merges
+[Wed May 31 11:03:58 EDT 2023] Joining
+[Wed May 31 11:04:01 EDT 2023] Gap consensus
+[Wed May 31 11:04:03 EDT 2023] Generating assembly input files
+[Wed May 31 11:04:26 EDT 2023] Coverage threshold for splitting unitigs is 20 minimum ovl 499
+[Wed May 31 11:04:26 EDT 2023] Running assembly
+[Wed May 31 11:17:19 EDT 2023] Mega-reads initial assembly complete
+[Wed May 31 11:17:19 EDT 2023] No gap closing possible
+[Wed May 31 11:17:19 EDT 2023] Removing redundant scaffolds
+[Wed May 31 11:17:33 EDT 2023] Assembly complete, primary scaffold sequences are in CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+[Wed May 31 11:17:33 EDT 2023] redundant or haplotype variant scaffold sequences are in CA.mr.83.17.15.0.02/alternative.genome.scf.fasta
+[Wed May 31 11:17:33 EDT 2023] All done, final assembly is in CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+[Wed May 31 11:17:33 EDT 2023] Final stats for CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+N50 3496255
+Sequence 4796734
+Average 532970
+E-size 2.60101e+06
+Count 9
+
+# assembling OXR-189
+
+[smajor@localhost OXR-189]$ /data/app/MaSuRCA-4.1.0/bin/masurca -t 16 -i ../../../Data/illumina/OXR-189_all_R1.fastq.gz,../../../Data/illumina/OXR-189_all_R2.fastq.gz -r ../../../Data/nanopore/qc/OXR-189_BC09_ONT_qc.fastq
+Verifying PATHS...
+jellyfish OK
+runCA OK
+createSuperReadsForDirectory.perl OK
+creating script file for the actions...done.
+execute assemble.sh to run assembly
+[Fri Jun  2 09:03:51 EDT 2023] Processing pe library reads
+[Fri Jun  2 09:04:09 EDT 2023] Average PE read length 249
+[Fri Jun  2 09:04:10 EDT 2023] Using kmer size of 99 for the graph
+[Fri Jun  2 09:04:11 EDT 2023] MIN_Q_CHAR: 33
+[Fri Jun  2 09:04:11 EDT 2023] Creating mer database for Quorum
+[Fri Jun  2 09:04:37 EDT 2023] Error correct PE
+[Fri Jun  2 09:07:48 EDT 2023] Estimating genome size
+[Fri Jun  2 09:08:15 EDT 2023] Estimated genome size: 3648836
+[Fri Jun  2 09:08:15 EDT 2023] Creating k-unitigs with k=99
+[Fri Jun  2 09:10:06 EDT 2023] Computing super reads from PE
+[Fri Jun  2 09:10:59 EDT 2023] Using CABOG from /data/app/MaSuRCA-4.1.0/bin/../CA8/Linux-amd64/bin
+[Fri Jun  2 09:10:59 EDT 2023] Running mega-reads correction/assembly
+[Fri Jun  2 09:10:59 EDT 2023] Using mer size 17 for mapping, B=15, d=0.02
+[Fri Jun  2 09:10:59 EDT 2023] Estimated Genome Size 3648836
+[Fri Jun  2 09:10:59 EDT 2023] Estimated Ploidy 2
+[Fri Jun  2 09:10:59 EDT 2023] Using 16 threads
+[Fri Jun  2 09:10:59 EDT 2023] Output prefix mr.99.17.15.0.02
+[Fri Jun  2 09:10:59 EDT 2023] Creating k-unitigs for k=19
+[Fri Jun  2 09:11:27 EDT 2023] Pre-correcting long reads
+[Fri Jun  2 09:12:15 EDT 2023] Pre-corrected reads are in longest_reads.25x.fa
+[Fri Jun  2 09:12:16 EDT 2023] Computing mega-reads
+[Fri Jun  2 09:12:16 EDT 2023] Running locally in 1 batch
+[Fri Jun  2 09:13:08 EDT 2023] Refining alignments
+[Fri Jun  2 09:13:29 EDT 2023] Computing allowed merges
+[Fri Jun  2 09:13:29 EDT 2023] Joining
+[Fri Jun  2 09:13:31 EDT 2023] Gap consensus
+[Fri Jun  2 09:13:32 EDT 2023] Generating assembly input files
+[Fri Jun  2 09:13:46 EDT 2023] Coverage threshold for splitting unitigs is 22 minimum ovl 499
+[Fri Jun  2 09:13:46 EDT 2023] Running assembly
+[Fri Jun  2 09:22:25 EDT 2023] Mega-reads initial assembly complete
+[Fri Jun  2 09:22:25 EDT 2023] No gap closing possible
+[Fri Jun  2 09:22:25 EDT 2023] Removing redundant scaffolds
+[Fri Jun  2 09:22:27 EDT 2023] Assembly complete, primary scaffold sequences are in CA.mr.99.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 09:22:27 EDT 2023] redundant or haplotype variant scaffold sequences are in CA.mr.99.17.15.0.02/alternative.genome.scf.fasta
+[Fri Jun  2 09:22:27 EDT 2023] All done, final assembly is in CA.mr.99.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 09:22:27 EDT 2023] Final stats for CA.mr.99.17.15.0.02/primary.genome.scf.fasta
+N50 2635391
+Sequence 2635391
+Average 2.63539e+06
+E-size 2.63539e+06
+Count 1
+
+# Assembling OXR-199
+
+[smajor@localhost OXR-199]$ /data/app/MaSuRCA-4.1.0/bin/masurca -t 16 -i ../../../Data/illumina/OXR-199_all_R1.fastq.gz,../../../Data/illumina/OXR-199_all_R2.fastq.gz -r ../../../Data/nanopore/qc/OXR-199_BC10_ONT_qc.fastq
+Verifying PATHS...
+jellyfish OK
+runCA OK
+createSuperReadsForDirectory.perl OK
+creating script file for the actions...done.
+execute assemble.sh to run assembly
+[Fri Jun  2 09:05:36 EDT 2023] Processing pe library reads
+[Fri Jun  2 09:06:02 EDT 2023] Average PE read length 249
+[Fri Jun  2 09:06:03 EDT 2023] Using kmer size of 83 for the graph
+[Fri Jun  2 09:06:04 EDT 2023] MIN_Q_CHAR: 33
+[Fri Jun  2 09:06:04 EDT 2023] Creating mer database for Quorum
+[Fri Jun  2 09:06:43 EDT 2023] Error correct PE
+[Fri Jun  2 09:11:13 EDT 2023] Estimating genome size
+[Fri Jun  2 09:11:57 EDT 2023] Estimated genome size: 5670910
+[Fri Jun  2 09:11:57 EDT 2023] Creating k-unitigs with k=83
+[Fri Jun  2 09:14:46 EDT 2023] Computing super reads from PE
+[Fri Jun  2 09:16:31 EDT 2023] Using CABOG from /data/app/MaSuRCA-4.1.0/bin/../CA8/Linux-amd64/bin
+[Fri Jun  2 09:16:31 EDT 2023] Running mega-reads correction/assembly
+[Fri Jun  2 09:16:31 EDT 2023] Using mer size 17 for mapping, B=15, d=0.02
+[Fri Jun  2 09:16:31 EDT 2023] Estimated Genome Size 5670910
+[Fri Jun  2 09:16:31 EDT 2023] Estimated Ploidy 2
+[Fri Jun  2 09:16:31 EDT 2023] Using 16 threads
+[Fri Jun  2 09:16:31 EDT 2023] Output prefix mr.83.17.15.0.02
+[Fri Jun  2 09:16:31 EDT 2023] Creating k-unitigs for k=19
+[Fri Jun  2 09:17:07 EDT 2023] Pre-correcting long reads
+[Fri Jun  2 09:18:12 EDT 2023] Pre-corrected reads are in longest_reads.25x.fa
+[Fri Jun  2 09:18:12 EDT 2023] Computing mega-reads
+[Fri Jun  2 09:18:12 EDT 2023] Running locally in 1 batch
+[Fri Jun  2 09:19:25 EDT 2023] Refining alignments
+[Fri Jun  2 09:19:43 EDT 2023] Computing allowed merges
+[Fri Jun  2 09:19:43 EDT 2023] Joining
+[Fri Jun  2 09:19:46 EDT 2023] Gap consensus
+[Fri Jun  2 09:19:46 EDT 2023] Generating assembly input files
+[Fri Jun  2 09:20:09 EDT 2023] Coverage threshold for splitting unitigs is 24 minimum ovl 499
+[Fri Jun  2 09:20:09 EDT 2023] Running assembly
+[Fri Jun  2 09:33:05 EDT 2023] Mega-reads initial assembly complete
+[Fri Jun  2 09:33:05 EDT 2023] No gap closing possible
+[Fri Jun  2 09:33:05 EDT 2023] Removing redundant scaffolds
+[Fri Jun  2 09:33:13 EDT 2023] Assembly complete, primary scaffold sequences are in CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 09:33:13 EDT 2023] redundant or haplotype variant scaffold sequences are in CA.mr.83.17.15.0.02/alternative.genome.scf.fasta
+[Fri Jun  2 09:33:13 EDT 2023] All done, final assembly is in CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 09:33:13 EDT 2023] Final stats for CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+N50 3085350
+Sequence 4254888
+Average 607841
+E-size 2.30803e+06
+Count 7
+
+# Assembling OXR-203
+
+[smajor@localhost OXR-203]$ /data/app/MaSuRCA-4.1.0/bin/masurca -t 16 -i ../../../Data/illumina/OXR-203_all_R1.fastq.gz,../../../Data/illumina/OXR-203_all_R2.fastq.gz -r ../../../Data/nanopore/qc/OXR-203_BC11_ONT_qc.fastq
+Verifying PATHS...
+jellyfish OK
+runCA OK
+createSuperReadsForDirectory.perl OK
+creating script file for the actions...done.
+execute assemble.sh to run assembly
+[Fri Jun  2 09:08:30 EDT 2023] Processing pe library reads
+[Fri Jun  2 09:08:52 EDT 2023] Average PE read length 249
+[Fri Jun  2 09:08:52 EDT 2023] Using kmer size of 99 for the graph
+[Fri Jun  2 09:08:53 EDT 2023] MIN_Q_CHAR: 33
+[Fri Jun  2 09:08:53 EDT 2023] Creating mer database for Quorum
+[Fri Jun  2 09:09:23 EDT 2023] Error correct PE
+[Fri Jun  2 09:12:42 EDT 2023] Estimating genome size
+[Fri Jun  2 09:13:10 EDT 2023] Estimated genome size: 4804913
+[Fri Jun  2 09:13:10 EDT 2023] Creating k-unitigs with k=99
+[Fri Jun  2 09:15:17 EDT 2023] Computing super reads from PE
+[Fri Jun  2 09:16:35 EDT 2023] Using CABOG from /data/app/MaSuRCA-4.1.0/bin/../CA8/Linux-amd64/bin
+[Fri Jun  2 09:16:35 EDT 2023] Running mega-reads correction/assembly
+[Fri Jun  2 09:16:35 EDT 2023] Using mer size 17 for mapping, B=15, d=0.02
+[Fri Jun  2 09:16:35 EDT 2023] Estimated Genome Size 4804913
+[Fri Jun  2 09:16:35 EDT 2023] Estimated Ploidy 2
+[Fri Jun  2 09:16:35 EDT 2023] Using 16 threads
+[Fri Jun  2 09:16:35 EDT 2023] Output prefix mr.99.17.15.0.02
+[Fri Jun  2 09:16:35 EDT 2023] Creating k-unitigs for k=19
+[Fri Jun  2 09:17:03 EDT 2023] Pre-correcting long reads
+[Fri Jun  2 09:18:00 EDT 2023] Pre-corrected reads are in longest_reads.25x.fa
+[Fri Jun  2 09:18:00 EDT 2023] Computing mega-reads
+[Fri Jun  2 09:18:00 EDT 2023] Running locally in 1 batch
+[Fri Jun  2 09:19:26 EDT 2023] Refining alignments
+[Fri Jun  2 09:20:11 EDT 2023] Computing allowed merges
+[Fri Jun  2 09:20:12 EDT 2023] Joining
+[Fri Jun  2 09:20:14 EDT 2023] Gap consensus
+[Fri Jun  2 09:20:21 EDT 2023] Generating assembly input files
+[Fri Jun  2 09:20:42 EDT 2023] Coverage threshold for splitting unitigs is 26 minimum ovl 499
+[Fri Jun  2 09:20:42 EDT 2023] Running assembly
+[Fri Jun  2 09:35:35 EDT 2023] Mega-reads initial assembly complete
+[Fri Jun  2 09:35:36 EDT 2023] No gap closing possible
+[Fri Jun  2 09:35:36 EDT 2023] Removing redundant scaffolds
+[Fri Jun  2 09:35:38 EDT 2023] Assembly complete, primary scaffold sequences are in CA.mr.99.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 09:35:38 EDT 2023] redundant or haplotype variant scaffold sequences are in CA.mr.99.17.15.0.02/alternative.genome.scf.fasta
+[Fri Jun  2 09:35:38 EDT 2023] All done, final assembly is in CA.mr.99.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 09:35:38 EDT 2023] Final stats for CA.mr.99.17.15.0.02/primary.genome.scf.fasta
+N50 3458851
+Sequence 3458851
+Average 3.45885e+06
+E-size 3.45885e+06
+Count 1
+
+# Assembling OXR-85
+
+[smajor@localhost OXR-85]$ /data/app/MaSuRCA-4.1.0/bin/masurca -t 16 -i ../../../Data/illumina/OXR-85_all_R1.fastq.gz,../../../Data/illumina/OXR-85_all_R2.fastq.gz -r ../../../Data/nanopore/qc/OXR-85_BC04_ONT_qc.fastq
+Verifying PATHS...
+jellyfish OK
+runCA OK
+createSuperReadsForDirectory.perl OK
+creating script file for the actions...done.
+execute assemble.sh to run assembly
+[Fri Jun  2 10:14:00 EDT 2023] Processing pe library reads
+[Fri Jun  2 10:14:16 EDT 2023] Average PE read length 249
+[Fri Jun  2 10:14:17 EDT 2023] Using kmer size of 83 for the graph
+[Fri Jun  2 10:14:18 EDT 2023] MIN_Q_CHAR: 33
+[Fri Jun  2 10:14:18 EDT 2023] Creating mer database for Quorum
+[Fri Jun  2 10:14:44 EDT 2023] Error correct PE
+[Fri Jun  2 10:17:46 EDT 2023] Estimating genome size
+[Fri Jun  2 10:18:12 EDT 2023] Estimated genome size: 5784502
+[Fri Jun  2 10:18:12 EDT 2023] Creating k-unitigs with k=83
+[Fri Jun  2 10:20:08 EDT 2023] Computing super reads from PE
+[Fri Jun  2 10:21:06 EDT 2023] Using CABOG from /data/app/MaSuRCA-4.1.0/bin/../CA8/Linux-amd64/bin
+[Fri Jun  2 10:21:06 EDT 2023] Running mega-reads correction/assembly
+[Fri Jun  2 10:21:06 EDT 2023] Using mer size 17 for mapping, B=15, d=0.02
+[Fri Jun  2 10:21:06 EDT 2023] Estimated Genome Size 5784502
+[Fri Jun  2 10:21:06 EDT 2023] Estimated Ploidy 2
+[Fri Jun  2 10:21:06 EDT 2023] Using 16 threads
+[Fri Jun  2 10:21:06 EDT 2023] Output prefix mr.83.17.15.0.02
+[Fri Jun  2 10:21:06 EDT 2023] Creating k-unitigs for k=19
+[Fri Jun  2 10:21:39 EDT 2023] Pre-correcting long reads
+[Fri Jun  2 10:23:03 EDT 2023] Pre-corrected reads are in longest_reads.25x.fa
+[Fri Jun  2 10:23:03 EDT 2023] Computing mega-reads
+[Fri Jun  2 10:23:03 EDT 2023] Running locally in 1 batch
+[Fri Jun  2 10:24:24 EDT 2023] Refining alignments
+[Fri Jun  2 10:24:55 EDT 2023] Computing allowed merges
+[Fri Jun  2 10:24:55 EDT 2023] Joining
+[Fri Jun  2 10:24:59 EDT 2023] Gap consensus
+[Fri Jun  2 10:24:59 EDT 2023] Generating assembly input files
+[Fri Jun  2 10:25:26 EDT 2023] Coverage threshold for splitting unitigs is 24 minimum ovl 499
+[Fri Jun  2 10:25:26 EDT 2023] Running assembly
+[Fri Jun  2 10:41:08 EDT 2023] Mega-reads initial assembly complete
+[Fri Jun  2 10:41:08 EDT 2023] No gap closing possible
+[Fri Jun  2 10:41:08 EDT 2023] Removing redundant scaffolds
+[Fri Jun  2 10:41:16 EDT 2023] Assembly complete, primary scaffold sequences are in CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 10:41:16 EDT 2023] redundant or haplotype variant scaffold sequences are in CA.mr.83.17.15.0.02/alternative.genome.scf.fasta
+[Fri Jun  2 10:41:16 EDT 2023] All done, final assembly is in CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 10:41:16 EDT 2023] Final stats for CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+N50 4101726
+Sequence 4821807
+Average 1.60727e+06
+E-size 3.543e+06
+Count 3
+
+# Assembling OXR-76
+
+[smajor@localhost OXR-76]$ /data/app/MaSuRCA-4.1.0/bin/masurca -t 16 -i ../../../Data/illumina/OXR-76_all_R1.fastq.gz,../../../Data/illumina/OXR-76_all_R2.fastq.gz -r ../../../Data/nanopore/qc/OXR-76_BC03_ONT_qc.fastq
+Verifying PATHS...
+jellyfish OK
+runCA OK
+createSuperReadsForDirectory.perl OK
+creating script file for the actions...done.
+execute assemble.sh to run assembly
+[Fri Jun  2 10:12:20 EDT 2023] Processing pe library reads
+[Fri Jun  2 10:12:43 EDT 2023] Average PE read length 249
+[Fri Jun  2 10:12:44 EDT 2023] Using kmer size of 99 for the graph
+[Fri Jun  2 10:12:45 EDT 2023] MIN_Q_CHAR: 33
+[Fri Jun  2 10:12:45 EDT 2023] Creating mer database for Quorum
+[Fri Jun  2 10:13:21 EDT 2023] Error correct PE
+[Fri Jun  2 10:18:17 EDT 2023] Estimating genome size
+[Fri Jun  2 10:18:53 EDT 2023] Estimated genome size: 6488352
+[Fri Jun  2 10:18:53 EDT 2023] Creating k-unitigs with k=99
+[Fri Jun  2 10:21:39 EDT 2023] Computing super reads from PE
+[Fri Jun  2 10:24:36 EDT 2023] Using CABOG from /data/app/MaSuRCA-4.1.0/bin/../CA8/Linux-amd64/bin
+[Fri Jun  2 10:24:36 EDT 2023] Running mega-reads correction/assembly
+[Fri Jun  2 10:24:36 EDT 2023] Using mer size 17 for mapping, B=15, d=0.02
+[Fri Jun  2 10:24:36 EDT 2023] Estimated Genome Size 6488352
+[Fri Jun  2 10:24:36 EDT 2023] Estimated Ploidy 2
+[Fri Jun  2 10:24:36 EDT 2023] Using 16 threads
+[Fri Jun  2 10:24:36 EDT 2023] Output prefix mr.99.17.15.0.02
+[Fri Jun  2 10:24:36 EDT 2023] Creating k-unitigs for k=19
+[Fri Jun  2 10:25:14 EDT 2023] Pre-correcting long reads
+[Fri Jun  2 10:29:09 EDT 2023] Pre-corrected reads are in longest_reads.25x.fa
+[Fri Jun  2 10:29:10 EDT 2023] Computing mega-reads
+[Fri Jun  2 10:29:10 EDT 2023] Running locally in 1 batch
+[Fri Jun  2 10:31:08 EDT 2023] Refining alignments
+[Fri Jun  2 10:31:33 EDT 2023] Computing allowed merges
+[Fri Jun  2 10:31:34 EDT 2023] Joining
+[Fri Jun  2 10:31:37 EDT 2023] Gap consensus
+[Fri Jun  2 10:31:43 EDT 2023] Generating assembly input files
+[Fri Jun  2 10:32:14 EDT 2023] Coverage threshold for splitting unitigs is 23 minimum ovl 499
+[Fri Jun  2 10:32:14 EDT 2023] Running assembly
+[Fri Jun  2 10:50:19 EDT 2023] Mega-reads initial assembly complete
+[Fri Jun  2 10:50:19 EDT 2023] No gap closing possible
+[Fri Jun  2 10:50:19 EDT 2023] Removing redundant scaffolds
+[Fri Jun  2 10:50:27 EDT 2023] Assembly complete, primary scaffold sequences are in CA.mr.99.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 10:50:27 EDT 2023] redundant or haplotype variant scaffold sequences are in CA.mr.99.17.15.0.02/alternative.genome.scf.fasta
+[Fri Jun  2 10:50:27 EDT 2023] All done, final assembly is in CA.mr.99.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 10:50:27 EDT 2023] Final stats for CA.mr.99.17.15.0.02/primary.genome.scf.fasta
+N50 2407961
+Sequence 3708293
+Average 927073
+E-size 1.73337e+06
+Count 4
+
+# Assembling OXR-9
+
+[smajor@localhost OXR-9]$ /data/app/MaSuRCA-4.1.0/bin/masurca -t 16 -i ../../../Data/illumina/OXR-9_all_R1.fastq.gz,../../../Data/illumina/OXR-9_all_R2.fastq.gz -r ../../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq
+Verifying PATHS...
+jellyfish OK
+runCA OK
+createSuperReadsForDirectory.perl OK
+creating script file for the actions...done.
+execute assemble.sh to run assembly
+[Fri Jun  2 10:15:06 EDT 2023] Processing pe library reads
+[Fri Jun  2 10:15:35 EDT 2023] Average PE read length 249
+[Fri Jun  2 10:15:35 EDT 2023] Using kmer size of 83 for the graph
+[Fri Jun  2 10:15:37 EDT 2023] MIN_Q_CHAR: 33
+[Fri Jun  2 10:15:37 EDT 2023] Creating mer database for Quorum
+[Fri Jun  2 10:16:19 EDT 2023] Error correct PE
+[Fri Jun  2 10:22:17 EDT 2023] Estimating genome size
+[Fri Jun  2 10:22:51 EDT 2023] Estimated genome size: 6661650
+[Fri Jun  2 10:22:51 EDT 2023] Creating k-unitigs with k=83
+[Fri Jun  2 10:26:13 EDT 2023] Computing super reads from PE
+[Fri Jun  2 10:29:14 EDT 2023] Using CABOG from /data/app/MaSuRCA-4.1.0/bin/../CA8/Linux-amd64/bin
+[Fri Jun  2 10:29:14 EDT 2023] Running mega-reads correction/assembly
+[Fri Jun  2 10:29:14 EDT 2023] Using mer size 17 for mapping, B=15, d=0.02
+[Fri Jun  2 10:29:14 EDT 2023] Estimated Genome Size 6661650
+[Fri Jun  2 10:29:14 EDT 2023] Estimated Ploidy 2
+[Fri Jun  2 10:29:14 EDT 2023] Using 16 threads
+[Fri Jun  2 10:29:14 EDT 2023] Output prefix mr.83.17.15.0.02
+[Fri Jun  2 10:29:14 EDT 2023] Creating k-unitigs for k=19
+[Fri Jun  2 10:29:55 EDT 2023] Pre-correcting long reads
+[Fri Jun  2 10:30:48 EDT 2023] Pre-corrected reads are in longest_reads.25x.fa
+[Fri Jun  2 10:30:49 EDT 2023] Computing mega-reads
+[Fri Jun  2 10:30:49 EDT 2023] Running locally in 1 batch
+[Fri Jun  2 10:33:00 EDT 2023] Refining alignments
+[Fri Jun  2 10:33:35 EDT 2023] Computing allowed merges
+[Fri Jun  2 10:33:35 EDT 2023] Joining
+[Fri Jun  2 10:33:39 EDT 2023] Gap consensus
+[Fri Jun  2 10:33:40 EDT 2023] Generating assembly input files
+[Fri Jun  2 10:34:11 EDT 2023] Coverage threshold for splitting unitigs is 24 minimum ovl 499
+[Fri Jun  2 10:34:11 EDT 2023] Running assembly
+[Fri Jun  2 10:51:45 EDT 2023] Mega-reads initial assembly complete
+[Fri Jun  2 10:51:45 EDT 2023] No gap closing possible
+[Fri Jun  2 10:51:45 EDT 2023] Removing redundant scaffolds
+[Fri Jun  2 10:51:54 EDT 2023] Assembly complete, primary scaffold sequences are in CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 10:51:54 EDT 2023] redundant or haplotype variant scaffold sequences are in CA.mr.83.17.15.0.02/alternative.genome.scf.fasta
+[Fri Jun  2 10:51:54 EDT 2023] All done, final assembly is in CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 10:51:54 EDT 2023] Final stats for CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+N50 3268995
+Sequence 4329047
+Average 721508
+E-size 2.5279e+06
+Count 6
+
+# Assembling OXR-96
+
+[smajor@localhost OXR-96]$ /data/app/MaSuRCA-4.1.0/bin/masurca -t 16 -i ../../../Data/illumina/OXR-96_all_R1.fastq.gz,../../../Data/illumina/OXR-96_all_R2.fastq.gz -r ../../../Data/nanopore/qc/OXR-96_BC05_ONT_qc.fastq
+Verifying PATHS...
+jellyfish OK
+runCA OK
+createSuperReadsForDirectory.perl OK
+creating script file for the actions...done.
+execute assemble.sh to run assembly
+[Fri Jun  2 10:14:32 EDT 2023] Processing pe library reads
+[Fri Jun  2 10:15:23 EDT 2023] Average PE read length 249
+[Fri Jun  2 10:15:23 EDT 2023] Using kmer size of 83 for the graph
+[Fri Jun  2 10:15:24 EDT 2023] MIN_Q_CHAR: 33
+[Fri Jun  2 10:15:24 EDT 2023] Creating mer database for Quorum
+[Fri Jun  2 10:16:38 EDT 2023] Error correct PE
+[Fri Jun  2 10:26:17 EDT 2023] Estimating genome size
+[Fri Jun  2 10:27:21 EDT 2023] Estimated genome size: 11177818
+[Fri Jun  2 10:27:21 EDT 2023] Creating k-unitigs with k=83
+[Fri Jun  2 10:33:35 EDT 2023] Computing super reads from PE
+[Fri Jun  2 10:40:51 EDT 2023] Using CABOG from /data/app/MaSuRCA-4.1.0/bin/../CA8/Linux-amd64/bin
+[Fri Jun  2 10:40:51 EDT 2023] Running mega-reads correction/assembly
+[Fri Jun  2 10:40:51 EDT 2023] Using mer size 17 for mapping, B=15, d=0.02
+[Fri Jun  2 10:40:51 EDT 2023] Estimated Genome Size 11177818
+[Fri Jun  2 10:40:51 EDT 2023] Estimated Ploidy 2
+[Fri Jun  2 10:40:51 EDT 2023] Using 16 threads
+[Fri Jun  2 10:40:51 EDT 2023] Output prefix mr.83.17.15.0.02
+[Fri Jun  2 10:40:51 EDT 2023] Creating k-unitigs for k=19
+[Fri Jun  2 10:44:11 EDT 2023] Pre-correcting long reads
+[Fri Jun  2 10:46:01 EDT 2023] Pre-corrected reads are in longest_reads.25x.fa
+[Fri Jun  2 10:46:05 EDT 2023] Computing mega-reads
+[Fri Jun  2 10:46:05 EDT 2023] Running locally in 1 batch
+[Fri Jun  2 10:49:20 EDT 2023] Refining alignments
+[Fri Jun  2 10:49:59 EDT 2023] Computing allowed merges
+[Fri Jun  2 10:50:00 EDT 2023] Joining
+[Fri Jun  2 10:50:06 EDT 2023] Gap consensus
+[Fri Jun  2 10:50:07 EDT 2023] Generating assembly input files
+[Fri Jun  2 10:50:58 EDT 2023] Coverage threshold for splitting unitigs is 22 minimum ovl 499
+[Fri Jun  2 10:50:58 EDT 2023] Running assembly
+[Fri Jun  2 11:23:07 EDT 2023] Mega-reads initial assembly complete
+[Fri Jun  2 11:23:07 EDT 2023] No gap closing possible
+[Fri Jun  2 11:23:07 EDT 2023] Removing redundant scaffolds
+[Fri Jun  2 11:23:10 EDT 2023] Assembly complete, primary scaffold sequences are in CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 11:23:10 EDT 2023] redundant or haplotype variant scaffold sequences are in CA.mr.83.17.15.0.02/alternative.genome.scf.fasta
+[Fri Jun  2 11:23:10 EDT 2023] All done, final assembly is in CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+[Fri Jun  2 11:23:10 EDT 2023] Final stats for CA.mr.83.17.15.0.02/primary.genome.scf.fasta
+N50 3366783
+Sequence 3366783
+Average 3.36678e+06
+E-size 3.36678e+06
+Count 1
+
+#################################################################
+# BUSCO Scoring 
+
+$ PATH=$PATH:/data/app/maker-v2.31.10/exe/augustus/:/data/app/maker-v2.31.10/exe/augustus/bin/:/data/app/maker-v2.31.10/exe/augustus/scripts/:/data/app/Prodigal/
+
+$ export AUGUSTUS_CONFIG_PATH=/data/app/maker-v2.31.10/exe/augustus/config
+
+#OXR-11
+$ busco -i masurca_assembly/CA.mr.99.17.15.0.02/primary.genome.scf.fasta -o busco/ -l bacteria_odb10 --mode genome --long -c 12 
+        --------------------------------------------------
+        |Results from dataset bacteria_odb10              
+        --------------------------------------------------
+        |C:99.2%[S:99.2%,D:0.0%],F:0.0%,M:0.8%,n:124
+        |123    Complete BUSCOs (C)                       
+        |123    Complete and single-copy BUSCOs (S)
+        |0      Complete and duplicated BUSCOs (D)
+        |0      Fragmented BUSCOs (F)
+        |1      Missing BUSCOs (M)
+        |124    Total BUSCO groups searched
+        --------------------------------------------------
+
+#OXR-134
+$ busco -i masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta -o busco/ -l ../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             
+        --------------------------------------------------
+        |C:99.2%[S:99.2%,D:0.0%],F:0.8%,M:0.0%,n:124      
+        |123    Complete BUSCOs (C)                       
+        |123    Complete and single-copy BUSCOs (S)       
+        |0      Complete and duplicated BUSCOs (D)        
+        |1      Fragmented BUSCOs (F)                     
+        |0      Missing BUSCOs (M)                        
+        |124    Total BUSCO groups searched               
+        --------------------------------------------------
+
+#OXR-137
+$ busco -i masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta -o busco/ -l ../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             
+        --------------------------------------------------
+        |C:100.0%[S:99.2%,D:0.8%],F:0.0%,M:0.0%,n:124     
+        |124    Complete BUSCOs (C)                       
+        |123    Complete and single-copy BUSCOs (S)       
+        |1      Complete and duplicated BUSCOs (D)        
+        |0      Fragmented BUSCOs (F)                     
+        |0      Missing BUSCOs (M)                        
+        |124    Total BUSCO groups searched               
+        --------------------------------------------------
+
+#OXR-159
+$ busco -i masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta -o busco/ -l ../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             
+        --------------------------------------------------
+        |C:100.0%[S:100.0%,D:0.0%],F:0.0%,M:0.0%,n:124    
+        |124    Complete BUSCOs (C)                       
+        |124    Complete and single-copy BUSCOs (S)       
+        |0      Complete and duplicated BUSCOs (D)        
+        |0      Fragmented BUSCOs (F)                     
+        |0      Missing BUSCOs (M)                        
+        |124    Total BUSCO groups searched               
+        --------------------------------------------------
+
+#OXR-189
+$ busco -i masurca_assembly/CA.mr.99.17.15.0.02/primary.genome.scf.fasta -o busco/ -l ../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             
+        --------------------------------------------------
+        |C:99.2%[S:99.2%,D:0.0%],F:0.8%,M:0.0%,n:124      
+        |123    Complete BUSCOs (C)                       
+        |123    Complete and single-copy BUSCOs (S)       
+        |0      Complete and duplicated BUSCOs (D)        
+        |1      Fragmented BUSCOs (F)                     
+        |0      Missing BUSCOs (M)                        
+        |124    Total BUSCO groups searched               
+        --------------------------------------------------
+
+#OXR-199
+$ busco -i masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta -o busco/ -l ../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             
+        --------------------------------------------------
+        |C:99.2%[S:97.6%,D:1.6%],F:0.8%,M:0.0%,n:124      
+        |123    Complete BUSCOs (C)                       
+        |121    Complete and single-copy BUSCOs (S)       
+        |2      Complete and duplicated BUSCOs (D)        
+        |1      Fragmented BUSCOs (F)                     
+        |0      Missing BUSCOs (M)                        
+        |124    Total BUSCO groups searched               
+        --------------------------------------------------
+
+#OXR-203
+$ busco -i masurca_assembly/CA.mr.99.17.15.0.02/primary.genome.scf.fasta -o busco/ -l ../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             
+        --------------------------------------------------
+        |C:99.2%[S:75.8%,D:23.4%],F:0.8%,M:0.0%,n:124     
+        |123    Complete BUSCOs (C)                       
+        |94     Complete and single-copy BUSCOs (S)       
+        |29     Complete and duplicated BUSCOs (D)        
+        |1      Fragmented BUSCOs (F)                     
+        |0      Missing BUSCOs (M)                        
+        |124    Total BUSCO groups searched               
+        --------------------------------------------------
+
+#OXR-209
+$ busco -i masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta -o busco/ -l ../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             
+        --------------------------------------------------
+        |C:99.2%[S:98.4%,D:0.8%],F:0.8%,M:0.0%,n:124      
+        |123    Complete BUSCOs (C)                       
+        |122    Complete and single-copy BUSCOs (S)       
+        |1      Complete and duplicated BUSCOs (D)        
+        |1      Fragmented BUSCOs (F)                     
+        |0      Missing BUSCOs (M)                        
+        |124    Total BUSCO groups searched               
+        --------------------------------------------------
+
+#OXR-85
+$ busco -i masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta -o busco/ -l ../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             
+        --------------------------------------------------
+        |C:100.0%[S:99.2%,D:0.8%],F:0.0%,M:0.0%,n:124     
+        |124    Complete BUSCOs (C)                       
+        |123    Complete and single-copy BUSCOs (S)       
+        |1      Complete and duplicated BUSCOs (D)        
+        |0      Fragmented BUSCOs (F)                     
+        |0      Missing BUSCOs (M)                        
+        |124    Total BUSCO groups searched               
+        --------------------------------------------------
+
+#OXR-76
+$ busco -i masurca_assembly/CA.mr.99.17.15.0.02/primary.genome.scf.fasta -o busco/ -l ../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             
+        --------------------------------------------------
+        |C:98.4%[S:98.4%,D:0.0%],F:1.6%,M:0.0%,n:124      
+        |122    Complete BUSCOs (C)                       
+        |122    Complete and single-copy BUSCOs (S)       
+        |0      Complete and duplicated BUSCOs (D)        
+        |2      Fragmented BUSCOs (F)                     
+        |0      Missing BUSCOs (M)                        
+        |124    Total BUSCO groups searched               
+        --------------------------------------------------
+
+#OXR-9
+$ busco -i masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta -o busco/ -l ../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             
+        --------------------------------------------------
+        |C:100.0%[S:99.2%,D:0.8%],F:0.0%,M:0.0%,n:124     
+        |124    Complete BUSCOs (C)                       
+        |123    Complete and single-copy BUSCOs (S)       
+        |1      Complete and duplicated BUSCOs (D)        
+        |0      Fragmented BUSCOs (F)                     
+        |0      Missing BUSCOs (M)                        
+        |124    Total BUSCO groups searched               
+        --------------------------------------------------
+
+#OXR-96
+$ busco -i masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta -o busco/ -l ../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             
+        --------------------------------------------------
+        |C:98.4%[S:97.6%,D:0.8%],F:1.6%,M:0.0%,n:124      
+        |122    Complete BUSCOs (C)                       
+        |121    Complete and single-copy BUSCOs (S)       
+        |1      Complete and duplicated BUSCOs (D)        
+        |2      Fragmented BUSCOs (F)                     
+        |0      Missing BUSCOs (M)                        
+        |124    Total BUSCO groups searched               
+        --------------------------------------------------
+
+#################################################################
+# Canu 
+# Try to Canu and polca to assemble long reads and polish with short reads using polca (from MaSuRCA)
+# Perform this on samples from masurca that did not yield a single contig.
+
+## OXR-159
+$ canu -p OXR-159 -d canu_out genomeSize=4.6m -nanopore ../../Data/nanopore/OXR-159_BC08_ONT-raw.fastq
+# made 13 contigs
+
+# Make an alias for polca in the .bashrc file
+alias polca='/data/app/MaSuRCA-4.0.3/bin/polca.sh'
+# add bwa to the path (or add to path in .bashrc)
+export PATH=$PATH:/data/app/bwa/
+
+$ mkcd polca-corrected
+
+$ polca -a ../canu_out/OXR-159.contigs.fasta -r '../../../Data/illumina/OXR-159_all_R1.trim.fq ../../../Data/illumina/OXR-159_all_R2.trim.fq' -t 16 -m 1G
+# Success! Final report is in OXR-159.contigs.fasta.report; polished assembly is in OXR-159.contigs.fasta.PolcaCorrected.fa
+# Substitution Errors: 250
+# Insertion/Deletion Errors: 10496
+# Assembly Size: 4815508
+# Consensus Quality: 99.7768
+# There are still 13 contigs as opposed to the 9 contigs from MaSuRCA
+
+$ mkcd purge_dups-corrected
+
+# Step 1. Run minimap2 to align minion data and generate paf files, then calculate read depth histogram and base-level read depth
+$ /data/app/minimap2/minimap2 -x map-ont -t 8 ../OXR-159.contigs.fasta.PolcaCorrected.fa ../../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq | gzip -c - > OXR-159.paf.gz
+
+$ /data/app/purge_dups/bin/pbcstat OXR-159.paf.gz
+$ mv PB.stat ONT.stat # renaming
+$ /data/app/purge_dups/bin/calcuts ONT.stat > cutoffs 2>calcults.log
+
+# Step 2. Split an assembly and do a self-self alignment
+$ /data/app/purge_dups/bin/split_fa ../OXR-159.contigs.fasta.PolcaCorrected.fa > split.assembly.fa
+$ /data/app/minimap2/minimap2 -x asm5 -t 16 -DP split.assembly.fa split.assembly.fa | gzip -c - > split.assembly.self.paf.gz
+
+# Step 3. Purge haplotigs and overlap
+$ /data/app/purge_dups/bin/purge_dups -2 -T cutoffs -c PB.base.cov split.assembly.self.paf.gz > dups.bed 2> purge_dups.log
+
+# Step 4. Get purged primary and haplotig sequences from draft assembly
+$ /data/app/purge_dups/bin/get_seqs dups.bed ../OXR-159.contigs.fasta.PolcaCorrected.fa
+$ mv purged.fa OXR-159_canu_purged-all.fa
+
+# Check results:
+
+$ /data/app/assembly-stats/assembly-stats OXR-159_canu_purged-all.fa
+# stats for OXR-159_canu_purged-all.fa
+# sum = 4501660, n = 8, ave = 562707.50, largest = 3535719
+# N50 = 3535719, n = 1
+# N60 = 3535719, n = 1
+# N70 = 3535719, n = 1
+# N80 = 221659, n = 2
+# N90 = 198502, n = 4
+# N100 = 13826, n = 8
+# N_count = 0
+# Gaps = 0
+# Canu + polca reduced contigs from 9 to 8. I will try this again with the "raw" reads
+
+# Check completeness with busco
+busco -i purge_dups-corrected/OXR-159_canu_purged-all.fa -o busco/ -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:100.0%[S:100.0%,D:0.0%],F:0.0%,M:0.0%,n:124    |
+        |124    Complete BUSCOs (C)                       |
+        |124    Complete and single-copy BUSCOs (S)       |
+        |0      Complete and duplicated BUSCOs (D)        |
+        |0      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+# Busco scores are the same with canu+polca vs MaSuRCA
+
+## OXR-159 Raw read canu
+$ canu -p OXR-159 -d canu_out_raw genomeSize=4.6m -nanopore ../../Data/nanopore/OXR-159_BC08_ONT-raw.fastq
+# made 10 contigs
+
+# Make an alias for polca in the .bashrc file
+alias polca='/data/app/MaSuRCA-4.0.3/bin/polca.sh'
+# add bwa to the path (or add to path in .bashrc)
+export PATH=$PATH:/data/app/bwa/
+
+$ mkcd polca-corrected_raw
+
+$ polca -a ../canu_out_raw/OXR-159.contigs.fasta -r '../../../Data/illumina/OXR-159_all_R1.trim.fq ../../../Data/illumina/OXR-159_all_R2.trim.fq' -t 16 -m 1G
+# Success! Final report is in OXR-159.contigs.fasta.report; polished assembly is in OXR-159.contigs.fasta.PolcaCorrected.fa
+Substitution Errors: 132
+Insertion/Deletion Errors: 10776
+Assembly Size: 4890658
+Consensus Quality: 99.777
+# There are still 10 contigs as opposed to the 9 contigs from MaSuRCA
+
+$ mkcd purge_dups-corrected
+
+# Step 1. Run minimap2 to align minion data and generate paf files, then calculate read depth histogram and base-level read depth
+$ /data/app/minimap2/minimap2 -x map-ont -t 8 ../OXR-159.contigs.fasta.PolcaCorrected.fa ../../../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq | gzip -c - > OXR-159.paf.gz
+
+$ /data/app/purge_dups/bin/pbcstat OXR-159.paf.gz
+$ mv PB.stat ONT.stat # renaming
+$ /data/app/purge_dups/bin/calcuts ONT.stat > cutoffs 2>calcults.log
+
+# Step 2. Split an assembly and do a self-self alignment
+$ /data/app/purge_dups/bin/split_fa ../OXR-159.contigs.fasta.PolcaCorrected.fa > split.assembly.fa
+$ /data/app/minimap2/minimap2 -x asm5 -t 16 -DP split.assembly.fa split.assembly.fa | gzip -c - > split.assembly.self.paf.gz
+
+# Step 3. Purge haplotigs and overlap
+$ /data/app/purge_dups/bin/purge_dups -2 -T cutoffs -c PB.base.cov split.assembly.self.paf.gz > dups.bed 2> purge_dups.log
+
+# Step 4. Get purged primary and haplotig sequences from draft assembly
+$ /data/app/purge_dups/bin/get_seqs dups.bed ../OXR-159.contigs.fasta.PolcaCorrected.fa
+$ mv purged.fa OXR-159_canu_raw_purged-all.fa
+
+# Check results:
+
+$ /data/app/assembly-stats/assembly-stats OXR-159_canu_raw_purged-all.fa
+# stats for OXR-159_canu_raw_purged-all.fa
+# sum = 4654082, n = 8, ave = 581760.25, largest = 3491574
+# N50 = 3491574, n = 1
+# N60 = 3491574, n = 1
+# N70 = 3491574, n = 1
+# N80 = 255522, n = 2
+# N90 = 220958, n = 4
+# N100 = 66628, n = 8
+# N_count = 23
+# Gaps = 1
+# Canu + polca reduced contigs from 9 to 8. Using the raw nanopore reads maintained some N's and had 1 gap. This will not be repeated for the other samples
+
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:100.0%[S:100.0%,D:0.0%],F:0.0%,M:0.0%,n:124      |
+        |124    Complete BUSCOs (C)                       |
+        |124    Complete and single-copy BUSCOs (S)       |
+        |0      Complete and duplicated BUSCOs (D)        |
+        |0      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+# Better busco scores with canu+polca
+
+## OXR-199
+$ canu -p OXR-199 -d canu_out genomeSize=4.3m -nanopore ../../Data/nanopore/qc/OXR-199_BC10_ONT_qc.fastq
+# made 8 contigs
+
+$ mkcd polca-corrected
+
+$ polca -a ../canu_out/OXR-199.contigs.fasta -r '../../../Data/illumina/OXR-199_all_R1.trim.fq ../../../Data/illumina/OXR-199_all_R2.trim.fq' -t 16 -m 1G
+# Success! Final report is in OXR-159.contigs.fasta.report; polished assembly is in OXR-159.contigs.fasta.PolcaCorrected.fa
+Substitution Errors: 40
+Insertion/Deletion Errors: 6555
+Assembly Size: 4289441
+Consensus Quality: 99.8463
+# There are still 8 contigs as opposed to the 7 contigs from MaSuRCA
+
+$ mkcd purge_dups-corrected
+
+# Step 1. Run minimap2 to align minion data and generate paf files, then calculate read depth histogram and base-level read depth
+$  /data/app/minimap2/minimap2 -x map-ont -t 8 ../OXR-199.contigs.fasta.PolcaCorrected.fa ../../../../Data/nanopore/qc/OXR-199_BC10_ONT_qc.fastq | gzip -c - > OXR-199.paf.gz
+
+$ /data/app/purge_dups/bin/pbcstat OXR-199.paf.gz
+$ mv PB.stat ONT.stat # renaming
+$ /data/app/purge_dups/bin/calcuts ONT.stat > cutoffs 2>calcults.log
+
+# Step 2. Split an assembly and do a self-self alignment
+$ /data/app/purge_dups/bin/split_fa ../OXR-199.contigs.fasta.PolcaCorrected.fa > split.assembly.fa
+$ /data/app/minimap2/minimap2 -x asm5 -t 16 -DP split.assembly.fa split.assembly.fa | gzip -c - > split.assembly.self.paf.gz
+
+# Step 3. Purge haplotigs and overlap
+$ /data/app/purge_dups/bin/purge_dups -2 -T cutoffs -c PB.base.cov split.assembly.self.paf.gz > dups.bed 2> purge_dups.log
+
+# Step 4. Get purged primary and haplotig sequences from draft assembly
+$ /data/app/purge_dups/bin/get_seqs dups.bed ../OXR-199.contigs.fasta.PolcaCorrected.fa
+$ mv purged.fa OXR-199_canu_purged-all.fa
+
+# Check results:
+
+$ /data/app/assembly-stats/assembly-stats OXR-199_canu_purged-all.fa
+# stats for OXR-199_canu_purged-all.fa
+# sum = 4248028, n = 7, ave = 606861.14, largest = 3066910
+# N50 = 3066910, n = 1
+# N60 = 3066910, n = 1
+# N70 = 3066910, n = 1
+# N80 = 434338, n = 2
+# N90 = 158307, n = 4
+# N100 = 119039, n = 7
+# N_count = 0
+# Gaps = 0
+# There was no apparent improvement in the number of contigs using canu vs masurca
+
+# check busco for comparability
+$ busco -i purge_dups-corrected/OXR-199_canu_purged-all.fa -o busco/ -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:99.2%[S:99.2%,D:0.0%],F:0.8%,M:0.0%,n:124      |
+        |123    Complete BUSCOs (C)                       |
+        |123    Complete and single-copy BUSCOs (S)       |
+        |0      Complete and duplicated BUSCOs (D)        |
+        |1      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+# Better busco scores with canu+polca
+
+
+## OXR-209
+$ canu -p OXR-209 -d canu_out genomeSize=4.6m -nanopore ../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq
+# Made 7 contigs
+
+$ mkcd polca-corrected
+
+$ polca -a ../canu_out/OXR-209.contigs.fasta -r '../../../Data/illumina/OXR-209_all_R1.trim.fq ../../../Data/illumina/OXR-209_all_R2.trim.fq' -t 16 -m 1G
+# Success! Final report is in OXR-209.contigs.fasta.report; polished assembly is in OXR-209.contigs.fasta.PolcaCorrected.fa
+Substitution Errors: 42
+Insertion/Deletion Errors: 6219
+Assembly Size: 4583279
+Consensus Quality: 99.8634
+# There are still 8 contigs as opposed to the 7 contigs from MaSuRCA
+
+$ mkcd purge_dups-corrected
+
+# Step 1. Run minimap2 to align minion data and generate paf files, then calculate read depth histogram and base-level read depth
+$  /data/app/minimap2/minimap2 -x map-ont -t 8 ../OXR-209.contigs.fasta.PolcaCorrected.fa ../../../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq | gzip -c - > OXR-209.paf.gz
+
+$ /data/app/purge_dups/bin/pbcstat OXR-209.paf.gz
+$ mv PB.stat ONT.stat # renaming
+$ /data/app/purge_dups/bin/calcuts ONT.stat > cutoffs 2>calcults.log
+
+# Step 2. Split an assembly and do a self-self alignment
+$ /data/app/purge_dups/bin/split_fa ../OXR-209.contigs.fasta.PolcaCorrected.fa > split.assembly.fa
+$ /data/app/minimap2/minimap2 -x asm5 -t 16 -DP split.assembly.fa split.assembly.fa | gzip -c - > split.assembly.self.paf.gz
+
+# Step 3. Purge haplotigs and overlap
+$ /data/app/purge_dups/bin/purge_dups -2 -T cutoffs -c PB.base.cov split.assembly.self.paf.gz > dups.bed 2> purge_dups.log
+
+# Step 4. Get purged primary and haplotig sequences from draft assembly
+$ /data/app/purge_dups/bin/get_seqs dups.bed ../OXR-209.contigs.fasta.PolcaCorrected.fa
+$ mv purged.fa OXR-209_canu_purged-all.fa
+
+# Check results:
+
+$ /data/app/assembly-stats/assembly-stats OXR-209_canu_purged-all.fa
+# stats for OXR-209_canu_purged-all.fa
+# sum = 4590893, n = 7, ave = 655841.86, largest = 3236354
+# N50 = 3236354, n = 1
+# N60 = 3236354, n = 1
+# N70 = 3236354, n = 1
+# N80 = 307623, n = 3
+# N90 = 266697, n = 4
+# N100 = 93390, n = 7
+# N_count = 0
+# Gaps = 0
+# There was no apparent improvement in the number of contigs using canu vs masurca
+
+# check busco for comparability
+$ busco -i purge_dups-corrected/OXR-209_canu_purged-all.fa -o busco/ -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:99.2%[S:98.4%,D:0.8%],F:0.8%,M:0.0%,n:124      |
+        |123    Complete BUSCOs (C)                       |
+        |122    Complete and single-copy BUSCOs (S)       |
+        |1      Complete and duplicated BUSCOs (D)        |
+        |1      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+
+
+## OXR-137
+$ canu -p OXR-137 -d canu_out genomeSize=5.7m -nanopore ../../Data/nanopore/qc/OXR-137_BC07_ONT_qc.fastq
+# Made 3 contigs
+
+$ mkcd polca-corrected
+
+$ polca -a ../canu_out/OXR-137.contigs.fasta -r '../../../Data/illumina/OXR-137_all_R1.trim.fq ../../../Data/illumina/OXR-137_all_R2.trim.fq' -t 16 -m 1G
+# Success! Final report is in OXR-159.contigs.fasta.report; polished assembly is in OXR-137.contigs.fasta.PolcaCorrected.fa
+Substitution Errors: 99
+Insertion/Deletion Errors: 7424
+Assembly Size: 5722429
+Consensus Quality: 99.8685
+# There are still 3 contigs as opposed to the 3 contigs from MaSuRCA
+
+$ mkcd purge_dups-corrected
+
+# Step 1. Run minimap2 to align minion data and generate paf files, then calculate read depth histogram and base-level read depth
+$  /data/app/minimap2/minimap2 -x map-ont -t 8 ../OXR-137.contigs.fasta.PolcaCorrected.fa ../../../../Data/nanopore/qc/OXR-137_BC07_ONT_qc.fastq | gzip -c - > OXR-137.paf.gz
+
+$ /data/app/purge_dups/bin/pbcstat OXR-137.paf.gz
+$ mv PB.stat ONT.stat # renaming
+$ /data/app/purge_dups/bin/calcuts ONT.stat > cutoffs 2>calcults.log
+
+# Step 2. Split an assembly and do a self-self alignment
+$ /data/app/purge_dups/bin/split_fa ../OXR-137.contigs.fasta.PolcaCorrected.fa > split.assembly.fa
+$ /data/app/minimap2/minimap2 -x asm5 -t 16 -DP split.assembly.fa split.assembly.fa | gzip -c - > split.assembly.self.paf.gz
+
+# Step 3. Purge haplotigs and overlap
+$ /data/app/purge_dups/bin/purge_dups -2 -T cutoffs -c PB.base.cov split.assembly.self.paf.gz > dups.bed 2> purge_dups.log
+
+# Step 4. Get purged primary and haplotig sequences from draft assembly
+$ /data/app/purge_dups/bin/get_seqs dups.bed ../OXR-137.contigs.fasta.PolcaCorrected.fa
+$ mv purged.fa OXR-137_canu_purged-all.fa
+
+# Check results:
+
+$ /data/app/assembly-stats/assembly-stats OXR-137_canu_purged-all.fa
+# stats for OXR-137_canu_purged-all.fa
+# sum = 5731211, n = 3, ave = 1910403.67, largest = 5487160
+# N50 = 5487160, n = 1
+# N60 = 5487160, n = 1
+# N70 = 5487160, n = 1
+# N80 = 5487160, n = 1
+# N90 = 5487160, n = 1
+# N100 = 36027, n = 3
+# N_count = 0
+# Gaps = 0
+# There was no apparent improvement in the number of contigs using canu vs masurca
+
+# check busco for comparability
+$ busco -i purge_dups-corrected/OXR-137_canu_purged-all.fa -o busco/ -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:100.0%[S:99.2%,D:0.8%],F:0.0%,M:0.0%,n:124     |
+        |124    Complete BUSCOs (C)                       |
+        |123    Complete and single-copy BUSCOs (S)       |
+        |1      Complete and duplicated BUSCOs (D)        |
+        |0      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+# The BUSCO scores are identical to the MaSuRCA assembly
+
+
+## OXR-9
+$ canu -p OXR-9 -d canu_out genomeSize=4.3m -nanopore ../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq
+# made 8 contigs
+
+$ mkcd polca-corrected
+
+$ polca -a ../canu_out/OXR-9.contigs.fasta -r '../../../Data/illumina/OXR-9_all_R1.trim.fq ../../../Data/illumina/OXR-9_all_R2.trim.fq' -t 16 -m 1G
+# Success! Final report is in OXR-9.contigs.fasta.report; polished assembly is in OXR-9.contigs.fasta.PolcaCorrected.fa
+Substitution Errors: 48
+Insertion/Deletion Errors: 7508
+Assembly Size: 4349832
+Consensus Quality: 99.8263
+# There are still 8 contigs as opposed to the 3 contigs from MaSuRCA
+
+$ mkcd purge_dups-corrected
+
+# Step 1. Run minimap2 to align minion data and generate paf files, then calculate read depth histogram and base-level read depth
+$  /data/app/minimap2/minimap2 -x map-ont -t 8 ../OXR-9.contigs.fasta.PolcaCorrected.fa ../../../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq | gzip -c - > OXR-9.paf.gz
+
+$ /data/app/purge_dups/bin/pbcstat OXR-9.paf.gz
+$ mv PB.stat ONT.stat # renaming
+$ /data/app/purge_dups/bin/calcuts ONT.stat > cutoffs 2>calcults.log
+
+# Step 2. Split an assembly and do a self-self alignment
+$ /data/app/purge_dups/bin/split_fa ../OXR-9.contigs.fasta.PolcaCorrected.fa > split.assembly.fa
+$ /data/app/minimap2/minimap2 -x asm5 -t 16 -DP split.assembly.fa split.assembly.fa | gzip -c - > split.assembly.self.paf.gz
+
+# Step 3. Purge haplotigs and overlap
+$ /data/app/purge_dups/bin/purge_dups -2 -T cutoffs -c PB.base.cov split.assembly.self.paf.gz > dups.bed 2> purge_dups.log
+
+# Step 4. Get purged primary and haplotig sequences from draft assembly
+$ /data/app/purge_dups/bin/get_seqs dups.bed ../OXR-9.contigs.fasta.PolcaCorrected.fa
+$ mv purged.fa OXR-9_canu_purged-all.fa
+
+# Check results:
+
+$ /data/app/assembly-stats/assembly-stats OXR-9_canu_purged-all.fa
+# stats for OXR-9_canu_purged-all.fa
+# sum = 4358480, n = 8, ave = 544810.00, largest = 3274193
+# N50 = 3274193, n = 1
+# N60 = 3274193, n = 1
+# N70 = 3274193, n = 1
+# N80 = 351381, n = 2
+# N90 = 178364, n = 4
+# N100 = 9769, n = 8
+# N_count = 0
+# Gaps = 0
+# There was an increase in the contigs with canu+polca to 8 from using MaSuRCA
+
+# check busco for comparability
+$ busco -i purge_dups-corrected/OXR-9_canu_purged-all.fa -o busco/ -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:100.0%[S:99.2%,D:0.8%],F:0.0%,M:0.0%,n:124     |
+        |124    Complete BUSCOs (C)                       |
+        |123    Complete and single-copy BUSCOs (S)       |
+        |1      Complete and duplicated BUSCOs (D)        |
+        |0      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+
+
+## OXR-76
+$ canu -p OXR-76 -d canu_out genomeSize=3.7m -nanopore ../../Data/nanopore/qc/OXR-76_BC03_ONT_qc.fastq
+# made 16 contigs
+
+$ mkcd polca-corrected
+
+$ polca -a ../canu_out/OXR-76.contigs.fasta -r '../../../Data/illumina/OXR-76_all_R1.trim.fq ../../../Data/illumina/OXR-76_all_R2.trim.fq' -t 16 -m 1G
+# Success! Final report is in OXR-9.contigs.fasta.report; polished assembly is in OXR-9.contigs.fasta.PolcaCorrected.fa
+# Substitution Errors: 31
+# Insertion/Deletion Errors: 9436
+# Assembly Size: 3990879
+# Consensus Quality: 99.7628
+# There are 16 contigs as opposed to the 4 contigs from MaSuRCA
+
+$ mkcd purge_dups-corrected
+
+# Step 1. Run minimap2 to align minion data and generate paf files, then calculate read depth histogram and base-level read depth
+$ /data/app/minimap2/minimap2 -x map-ont -t 8 ../OXR-76.contigs.fasta.PolcaCorrected.fa ../../../../Data/nanopore/qc/OXR-76_BC03_ONT_qc.fastq | gzip -c - > OXR-76.paf.gz
+
+$ /data/app/purge_dups/bin/pbcstat OXR-76.paf.gz
+$ mv PB.stat ONT.stat # renaming
+$ /data/app/purge_dups/bin/calcuts ONT.stat > cutoffs 2>calcults.log
+
+# Step 2. Split an assembly and do a self-self alignment
+$ /data/app/purge_dups/bin/split_fa ../OXR-76.contigs.fasta.PolcaCorrected.fa > split.assembly.fa
+$ /data/app/minimap2/minimap2 -x asm5 -t 16 -DP split.assembly.fa split.assembly.fa | gzip -c - > split.assembly.self.paf.gz
+
+# Step 3. Purge haplotigs and overlap
+$ /data/app/purge_dups/bin/purge_dups -2 -T cutoffs -c PB.base.cov split.assembly.self.paf.gz > dups.bed 2> purge_dups.log
+
+# Step 4. Get purged primary and haplotig sequences from draft assembly
+$ /data/app/purge_dups/bin/get_seqs dups.bed ../OXR-76.contigs.fasta.PolcaCorrected.fa
+$ mv purged.fa OXR-76_canu_purged-all.fa
+
+# Check results:
+
+$ /data/app/assembly-stats/assembly-stats OXR-76_canu_purged-all.fa
+stats for OXR-76_canu_purged-all.fa
+# sum = 3564625, n = 3, ave = 1188208.33, largest = 2287247
+# N50 = 2287247, n = 1
+# N60 = 2287247, n = 1
+# N70 = 850400, n = 2
+# N80 = 850400, n = 2
+# N90 = 426978, n = 3
+# N100 = 426978, n = 3
+# N_count = 0
+# Gaps = 0
+# canu + polca improved the contigs from 4 to 3
+
+# check busco for comparability
+$ busco -i purge_dups-corrected/OXR-76_canu_purged-all.fa -o busco/ -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:94.4%[S:94.4%,D:0.0%],F:4.8%,M:0.8%,n:124      |
+        |117    Complete BUSCOs (C)                       |
+        |117    Complete and single-copy BUSCOs (S)       |
+        |0      Complete and duplicated BUSCOs (D)        |
+        |6      Fragmented BUSCOs (F)                     |
+        |1      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+# This assembly has a worse busco score than the MaSuRCA assembly
+
+## OXR-85
+$ canu -p OXR-85 -d canu_out genomeSize=3.7m -nanopore ../../Data/nanopore/qc/OXR-85_BC04_ONT_qc.fastq
+# made 4 contigs
+
+$ mkcd polca-corrected
+
+$ polca -a ../canu_out/OXR-85.contigs.fasta -r '../../../Data/illumina/OXR-85_all_R1.trim.fq ../../../Data/illumina/OXR-85_all_R2.trim.fq' -t 16 -m 1G
+# Success! Final report is in OXR-9.contigs.fasta.report; polished assembly is in OXR-9.contigs.fasta.PolcaCorrected.fa
+Substitution Errors: 34
+Insertion/Deletion Errors: 6615
+Assembly Size: 4816943
+Consensus Quality: 99.862
+# There are still 4 contigs as opposed to the 3 contigs from MaSuRCA
+
+$ mkcd purge_dups-corrected
+
+# Step 1. Run minimap2 to align minion data and generate paf files, then calculate read depth histogram and base-level read depth
+$ /data/app/minimap2/minimap2 -x map-ont -t 8 ../OXR-85.contigs.fasta.PolcaCorrected.fa ../../../../Data/nanopore/qc/OXR-85_BC04_ONT_qc.fastq | gzip -c - > OXR-85.paf.gz
+
+$ /data/app/purge_dups/bin/pbcstat OXR-85.paf.gz
+$ mv PB.stat ONT.stat # renaming
+$ /data/app/purge_dups/bin/calcuts ONT.stat > cutoffs 2>calcults.log
+
+# Step 2. Split an assembly and do a self-self alignment
+$ /data/app/purge_dups/bin/split_fa ../OXR-85.contigs.fasta.PolcaCorrected.fa > split.assembly.fa
+$ /data/app/minimap2/minimap2 -x asm5 -t 16 -DP split.assembly.fa split.assembly.fa | gzip -c - > split.assembly.self.paf.gz
+
+# Step 3. Purge haplotigs and overlap
+$ /data/app/purge_dups/bin/purge_dups -2 -T cutoffs -c PB.base.cov split.assembly.self.paf.gz > dups.bed 2> purge_dups.log
+
+# Step 4. Get purged primary and haplotig sequences from draft assembly
+$ /data/app/purge_dups/bin/get_seqs dups.bed ../OXR-85.contigs.fasta.PolcaCorrected.fa
+$ mv purged.fa OXR-85_canu_purged-all.fa
+
+# Check results:
+
+$ /data/app/assembly-stats/assembly-stats OXR-85_canu_purged-all.fa
+# stats for OXR-85_canu_purged-all.fa
+# sum = 4795258, n = 3, ave = 1598419.33, largest = 4103611
+# N50 = 4103611, n = 1
+# N60 = 4103611, n = 1
+# N70 = 4103611, n = 1
+# N80 = 4103611, n = 1
+# N90 = 364172, n = 2
+# N100 = 327475, n = 3
+# N_count = 0
+# Gaps = 0
+# There was no apparent improvement in the number of contigs using canu vs masurca
+
+# check busco for comparability
+$ busco -i purge_dups-corrected/OXR-85_canu_purged-all.fa -o busco/ -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:100.0%[S:99.2%,D:0.8%],F:0.0%,M:0.0%,n:124     |
+        |124    Complete BUSCOs (C)                       |
+        |123    Complete and single-copy BUSCOs (S)       |
+        |1      Complete and duplicated BUSCOs (D)        |
+        |0      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+
+
+## OXR-11
+$ canu -p OXR-11 -d canu_out genomeSize=4.5m -nanopore ../../Data/nanopore/qc/OXR-11_BC02_ONT-qc.fastq
+# made 1 contigs
+
+$ mkcd polca-corrected
+
+$ polca -a ../canu_out/OXR-11.contigs.fasta -r '../../../Data/illumina/OXR-11_all_R1.trim.fq ../../../Data/illumina/OXR-11_all_R2.trim.fq' -t 16 -m 1G
+# Success! Final report is in OXR-11.contigs.fasta.report; polished assembly is in OXR-11.contigs.fasta.PolcaCorrected.fa
+# Substitution Errors: 262
+# Insertion/Deletion Errors: 7733
+# Assembly Size: 4533975
+# Consensus Quality: 99.8237
+# There are still 13 contigs as opposed to the 9 contigs from MaSuRCA
+
+$ mkcd purge_dups-corrected
+
+# Step 1. Run minimap2 to align minion data and generate paf files, then calculate read depth histogram and base-level read depth
+$ /data/app/minimap2/minimap2 -x map-ont -t 8 ../OXR-11.contigs.fasta.PolcaCorrected.fa ../../../../Data/nanopore/qc/OXR-11_BC02_ONT_qc.fastq | gzip -c - > OXR-11.paf.gz
+
+$ /data/app/purge_dups/bin/pbcstat OXR-11.paf.gz
+$ mv PB.stat ONT.stat # renaming
+$ /data/app/purge_dups/bin/calcuts ONT.stat > cutoffs 2>calcults.log
+
+# Step 2. Split an assembly and do a self-self alignment
+$ /data/app/purge_dups/bin/split_fa ../OXR-11.contigs.fasta.PolcaCorrected.fa > split.assembly.fa
+$ /data/app/minimap2/minimap2 -x asm5 -t 16 -DP split.assembly.fa split.assembly.fa | gzip -c - > split.assembly.self.paf.gz
+
+# Step 3. Purge haplotigs and overlap
+$ /data/app/purge_dups/bin/purge_dups -2 -T cutoffs -c PB.base.cov split.assembly.self.paf.gz > dups.bed 2> purge_dups.log
+
+# Step 4. Get purged primary and haplotig sequences from draft assembly
+$ /data/app/purge_dups/bin/get_seqs dups.bed ../OXR-11.contigs.fasta.PolcaCorrected.fa
+$ mv purged.fa OXR-11_canu_purged-all.fa
+
+# Check results:
+
+$ /data/app/assembly-stats/assembly-stats OXR-11_canu_purged-all.fa
+# stats for OXR-11_canu_purged-all.fa
+# sum = 4542659, n = 1, ave = 4542659.00, largest = 4542659
+# N50 = 4542659, n = 1
+# N60 = 4542659, n = 1
+# N70 = 4542659, n = 1
+# N80 = 4542659, n = 1
+# N90 = 4542659, n = 1
+# N100 = 4542659, n = 1
+# N_count = 0
+# Gaps = 0
+# Canu + polca reduced contigs from 9 to 8. I will try this again with the "raw" reads
+
+# Check completeness with busco
+busco -i purge_dups-corrected/OXR-11_canu_purged-all.fa -o busco/ -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:99.2%[S:96.0%,D:3.2%],F:0.0%,M:0.8%,n:124      |
+        |123    Complete BUSCOs (C)                       |
+        |119    Complete and single-copy BUSCOs (S)       |
+        |4      Complete and duplicated BUSCOs (D)        |
+        |0      Fragmented BUSCOs (F)                     |
+        |1      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+# Busco scores worse with canu+polca
+
+
+## OXR-96
+$ canu -p OXR-96 -d canu_out genomeSize=3.4m -nanopore ../../Data/nanopore/qc/OXR-96_BC05_ONT-qc.fastq
+# made 2 contigs
+
+$ mkcd polca-corrected
+
+$ polca -a ../canu_out/OXR-96.contigs.fasta -r '../../../Data/illumina/OXR-96_all_R1.trim.fq ../../../Data/illumina/OXR-96_all_R2.trim.fq' -t 16 -m 1G
+# Success! Final report is in OXR-159.contigs.fasta.report; polished assembly is in OXR-159.contigs.fasta.PolcaCorrected.fa
+# Substitution Errors: 25
+# Insertion/Deletion Errors: 6087
+# Assembly Size: 3406395
+# Consensus Quality: 99.8206
+# There are still 2 contigs as opposed to the 1 contigs from MaSuRCA
+
+$ mkcd purge_dups-corrected
+
+# Step 1. Run minimap2 to align minion data and generate paf files, then calculate read depth histogram and base-level read depth
+$ /data/app/minimap2/minimap2 -x map-ont -t 8 ../OXR-96.contigs.fasta.PolcaCorrected.fa ../../../../Data/nanopore/qc/OXR-96_BC05_ONT_qc.fastq | gzip -c - > OXR-96.paf.gz
+
+$ /data/app/purge_dups/bin/pbcstat OXR-96.paf.gz
+$ mv PB.stat ONT.stat # renaming
+$ /data/app/purge_dups/bin/calcuts ONT.stat > cutoffs 2>calcults.log
+
+# Step 2. Split an assembly and do a self-self alignment
+$ /data/app/purge_dups/bin/split_fa ../OXR-96.contigs.fasta.PolcaCorrected.fa > split.assembly.fa
+$ /data/app/minimap2/minimap2 -x asm5 -t 16 -DP split.assembly.fa split.assembly.fa | gzip -c - > split.assembly.self.paf.gz
+
+# Step 3. Purge haplotigs and overlap
+$ /data/app/purge_dups/bin/purge_dups -2 -T cutoffs -c PB.base.cov split.assembly.self.paf.gz > dups.bed 2> purge_dups.log
+
+# Step 4. Get purged primary and haplotig sequences from draft assembly
+$ /data/app/purge_dups/bin/get_seqs dups.bed ../OXR-96.contigs.fasta.PolcaCorrected.fa
+$ mv purged.fa OXR-96_canu_purged-all.fa
+
+# Check results:
+
+$ /data/app/assembly-stats/assembly-stats OXR-96_canu_purged-all.fa
+# stats for OXR-96_canu_purged-all.fa
+# sum = 3350767, n = 1, ave = 3350767.00, largest = 3350767
+# N50 = 3350767, n = 1
+# N60 = 3350767, n = 1
+# N70 = 3350767, n = 1
+# N80 = 3350767, n = 1
+# N90 = 3350767, n = 1
+# N100 = 3350767, n = 1
+# N_count = 0
+# Gaps = 0
+# Canu + polca produced 1 contig.
+
+# Check completeness with busco
+busco -i purge_dups-corrected/OXR-96_canu_purged-all.fa -o busco/ -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:98.4%[S:98.4%,D:0.0%],F:1.6%,M:0.0%,n:124      |
+        |122    Complete BUSCOs (C)                       |
+        |122    Complete and single-copy BUSCOs (S)       |
+        |0      Complete and duplicated BUSCOs (D)        |
+        |2      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+# Busco scores are the same with canu+polca vs MaSuRCA
+
+
+## OXR-134
+$ canu -p OXR-134 -d canu_out genomeSize=2.9m -nanopore ../../Data/nanopore/qc/OXR-134_BC06_ONT-qc.fastq
+# made 1 contigs
+
+$ mkcd polca-corrected
+
+$ polca -a ../canu_out/OXR-134.contigs.fasta -r '../../../Data/illumina/OXR-134_all_R1.trim.fq ../../../Data/illumina/OXR-134_all_R2.trim.fq' -t 16 -m 1G
+# Success! Final report is in OXR-134.contigs.fasta.report; polished assembly is in OXR-134.contigs.fasta.PolcaCorrected.fa
+# Substitution Errors: 5
+# Insertion/Deletion Errors: 2606
+# Assembly Size: 2880004
+# Consensus Quality: 99.9093
+# There are still 1 contig
+
+$ mkcd purge_dups-corrected
+
+# Step 1. Run minimap2 to align minion data and generate paf files, then calculate read depth histogram and base-level read depth
+$ /data/app/minimap2/minimap2 -x map-ont -t 8 ../OXR-134.contigs.fasta.PolcaCorrected.fa ../../../../Data/nanopore/qc/OXR-134_BC06_ONT_qc.fastq | gzip -c - > OXR-134.paf.gz
+
+$ /data/app/purge_dups/bin/pbcstat OXR-134.paf.gz
+$ mv PB.stat ONT.stat # renaming
+$ /data/app/purge_dups/bin/calcuts ONT.stat > cutoffs 2>calcults.log
+
+# Step 2. Split an assembly and do a self-self alignment
+$ /data/app/purge_dups/bin/split_fa ../OXR-134.contigs.fasta.PolcaCorrected.fa > split.assembly.fa
+$ /data/app/minimap2/minimap2 -x asm5 -t 16 -DP split.assembly.fa split.assembly.fa | gzip -c - > split.assembly.self.paf.gz
+
+# Step 3. Purge haplotigs and overlap
+$ /data/app/purge_dups/bin/purge_dups -2 -T cutoffs -c PB.base.cov split.assembly.self.paf.gz > dups.bed 2> purge_dups.log
+
+# Step 4. Get purged primary and haplotig sequences from draft assembly
+$ /data/app/purge_dups/bin/get_seqs dups.bed ../OXR-134.contigs.fasta.PolcaCorrected.fa
+$ mv purged.fa OXR-134_canu_purged-all.fa
+
+# Check results:
+
+$ /data/app/assembly-stats/assembly-stats OXR-134_canu_purged-all.fa
+# stats for OXR-134_canu_purged-all.fa
+# sum = 2883175, n = 1, ave = 2883175.00, largest = 2883175
+# N50 = 2883175, n = 1
+# N60 = 2883175, n = 1
+# N70 = 2883175, n = 1
+# N80 = 2883175, n = 1
+# N90 = 2883175, n = 1
+# N100 = 2883175, n = 1
+# N_count = 0
+# Gaps = 0
+# Canu + polca produced 1 contig
+
+# Check completeness with busco
+busco -i purge_dups-corrected/OXR-134_canu_purged-all.fa -o busco/ -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:99.2%[S:96.8%,D:2.4%],F:0.8%,M:0.0%,n:124      |
+        |123    Complete BUSCOs (C)                       |
+        |120    Complete and single-copy BUSCOs (S)       |
+        |3      Complete and duplicated BUSCOs (D)        |
+        |1      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+# Busco scores are the same with canu+polca vs MaSuRCA
+
+
+## OXR-189
+$ canu -p OXR-189 -d canu_out genomeSize=2.6m -nanopore ../../Data/nanopore/qc/OXR-189_BC09_ONT_qc.fastq
+# made 1 contigs
+
+$ mkcd polca-corrected
+
+$ polca -a ../canu_out/OXR-189.contigs.fasta -r '../../../Data/illumina/OXR-189_all_R1.trim.fq ../../../Data/illumina/OXR-189_all_R2.trim.fq' -t 16 -m 1G
+# Success! Final report is in OXR-159.contigs.fasta.report; polished assembly is in OXR-159.contigs.fasta.PolcaCorrected.fa
+# Substitution Errors: 56
+# Insertion/Deletion Errors: 4021
+# Assembly Size: 2655602
+# Consensus Quality: 99.8465
+# There are still 1 contigs as opposed to the 1 contigs from MaSuRCA
+
+$ mkcd purge_dups-corrected
+
+# Step 1. Run minimap2 to align minion data and generate paf files, then calculate read depth histogram and base-level read depth
+$ /data/app/minimap2/minimap2 -x map-ont -t 8 ../OXR-189.contigs.fasta.PolcaCorrected.fa ../../../../Data/nanopore/qc/OXR-189_BC09_ONT_qc.fastq | gzip -c - > OXR-189.paf.gz
+
+$ /data/app/purge_dups/bin/pbcstat OXR-189.paf.gz
+$ mv PB.stat ONT.stat # renaming
+$ /data/app/purge_dups/bin/calcuts ONT.stat > cutoffs 2>calcults.log
+
+# Step 2. Split an assembly and do a self-self alignment
+$ /data/app/purge_dups/bin/split_fa ../OXR-189.contigs.fasta.PolcaCorrected.fa > split.assembly.fa
+$ /data/app/minimap2/minimap2 -x asm5 -t 16 -DP split.assembly.fa split.assembly.fa | gzip -c - > split.assembly.self.paf.gz
+
+# Step 3. Purge haplotigs and overlap
+$ /data/app/purge_dups/bin/purge_dups -2 -T cutoffs -c PB.base.cov split.assembly.self.paf.gz > dups.bed 2> purge_dups.log
+
+# Step 4. Get purged primary and haplotig sequences from draft assembly
+$ /data/app/purge_dups/bin/get_seqs dups.bed ../OXR-189.contigs.fasta.PolcaCorrected.fa
+$ mv purged.fa OXR-189_canu_purged-all.fa
+
+# Check results:
+
+$ /data/app/assembly-stats/assembly-stats OXR-189_canu_purged-all.fa
+# stats for OXR-189_canu_purged-all.fa
+# sum = 2658706, n = 1, ave = 2658706.00, largest = 2658706
+# N50 = 2658706, n = 1
+# N60 = 2658706, n = 1
+# N70 = 2658706, n = 1
+# N80 = 2658706, n = 1
+# N90 = 2658706, n = 1
+# N100 = 2658706, n = 1
+# N_count = 0
+# Gaps = 0
+# Canu + polca produced 1 contig
+
+# Check completeness with busco
+busco -i purge_dups-corrected/OXR-189_canu_purged-all.fa -o busco/ -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+         |Results from dataset                            |
+        --------------------------------------------------
+        |C:99.2%[S:98.4%,D:0.8%],F:0.8%,M:0.0%,n:124      |
+        |123    Complete BUSCOs (C)                       |
+        |122    Complete and single-copy BUSCOs (S)       |
+        |1      Complete and duplicated BUSCOs (D)        |
+        |1      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+
+# Busco scores are the same with canu+polca vs MaSuRCA
+
+
+## OXR-203
+$ canu -p OXR-203 -d canu_out genomeSize=3.4m -nanopore ../../Data/nanopore/qc/OXR-203_BC11_ONT_qc.fastq
+# made 1 contigs
+
+
+$ mkcd polca-corrected
+
+$ polca -a ../canu_out/OXR-203.contigs.fasta -r '../../../Data/illumina/OXR-203_all_R1.trim.fq ../../../Data/illumina/OXR-203_all_R2.trim.fq' -t 16 -m 1G
+# Success! Final report is in OXR-203.contigs.fasta.report; polished assembly is in OXR-203.contigs.fasta.PolcaCorrected.fa
+# Substitution Errors: 678
+# Insertion/Deletion Errors: 7589
+# Assembly Size: 3465419
+# Consensus Quality: 99.7614
+# There is still 1 contig
+
+$ mkcd purge_dups-corrected
+
+# Step 1. Run minimap2 to align minion data and generate paf files, then calculate read depth histogram and base-level read depth
+$ /data/app/minimap2/minimap2 -x map-ont -t 8 ../OXR-203.contigs.fasta.PolcaCorrected.fa ../../../../Data/nanopore/qc/OXR-203_BC11_ONT_qc.fastq | gzip -c - > OXR-203.paf.gz
+
+$ /data/app/purge_dups/bin/pbcstat OXR-203.paf.gz
+$ mv PB.stat ONT.stat # renaming
+$ /data/app/purge_dups/bin/calcuts ONT.stat > cutoffs 2>calcults.log
+
+# Step 2. Split an assembly and do a self-self alignment
+$ /data/app/purge_dups/bin/split_fa ../OXR-203.contigs.fasta.PolcaCorrected.fa > split.assembly.fa
+$ /data/app/minimap2/minimap2 -x asm5 -t 16 -DP split.assembly.fa split.assembly.fa | gzip -c - > split.assembly.self.paf.gz
+
+# Step 3. Purge haplotigs and overlap
+$ /data/app/purge_dups/bin/purge_dups -2 -T cutoffs -c PB.base.cov split.assembly.self.paf.gz > dups.bed 2> purge_dups.log
+
+# Step 4. Get purged primary and haplotig sequences from draft assembly
+$ /data/app/purge_dups/bin/get_seqs dups.bed ../OXR-203.contigs.fasta.PolcaCorrected.fa
+$ mv purged.fa OXR-203_canu_purged-all.fa
+
+# Check results:
+
+$ /data/app/assembly-stats/assembly-stats OXR-203_canu_purged-all.fa
+# stats for OXR-203_canu_purged-all.fa
+# sum = 3473819, n = 1, ave = 3473819.00, largest = 3473819
+# N50 = 3473819, n = 1
+# N60 = 3473819, n = 1
+# N70 = 3473819, n = 1
+# N80 = 3473819, n = 1
+# N90 = 3473819, n = 1
+# N100 = 3473819, n = 1
+# N_count = 0
+# Gaps = 0
+# Canu + polca produced 1 contig
+
+# Check completeness with busco
+busco -i purge_dups-corrected/OXR-203_canu_purged-all.fa -o busco/ -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:99.2%[S:99.2%,D:0.0%],F:0.8%,M:0.0%,n:124      |
+        |123    Complete BUSCOs (C)                       |
+        |123    Complete and single-copy BUSCOs (S)       |
+        |0      Complete and duplicated BUSCOs (D)        |
+        |1      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+# Busco scores are the same with canu+polca vs MaSuRCA
+
+#################################################################
+# Attempting to run spades for the multi contig samples
+
+## OXR-9
+$ spades.py --isolate -1 ../../Data/illumina/OXR-9_all_R1.trim.fq -2 ../../Data/illumina/OXR-9_all_R2.trim.fq --nanopore ../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq -o spades_out_2
+$ grep -Fo '>' spades_out_2/contigs.fasta | wc -l
+# 43 contigs
+$ busco -i contigs.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:100.0%[S:100.0%,D:0.0%],F:0.0%,M:0.0%,n:124    |
+        |124    Complete BUSCOs (C)                       |
+        |124    Complete and single-copy BUSCOs (S)       |
+        |0      Complete and duplicated BUSCOs (D)        |
+        |0      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+
+
+## OXR-76
+$ spades.py --isolate -1 ../../Data/illumina/OXR-76_all_R1.trim.fq -2 ../../Data/illumina/OXR-76_all_R2.trim.fq --nanopore ../../Data/nanopore/qc/OXR-76_BC03_ONT_qc.fastq -o spades_out_2
+=== Error correction and assembling warnings:
+ * 0:01:57.094   550M / 11G   WARN    General                 (kmer_coverage_model.cpp   : 218)   Too many erroneous kmers, the estimates might be unreliable
+ * 0:02:07.443   669M / 10G   WARN    General                 (kmer_coverage_model.cpp   : 327)   Valley value was estimated improperly, reset to 2
+ * 0:02:09.648   651M / 9499M WARN    General                 (kmer_coverage_model.cpp   : 327)   Valley value was estimated improperly, reset to 5
+======= Warnings saved to /data/prj/ecosystem-diversity/OceanX/YEP3_culture-WGS/Analysis/OXR-76/spades_out_2/warnings.log
+$ grep -Fo '>' spades_out_2/contigs.fasta | wc -l
+# 107 contigs
+$ busco -i contigs.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:99.2%[S:99.2%,D:0.0%],F:0.8%,M:0.0%,n:124      |
+        |123    Complete BUSCOs (C)                       |
+        |123    Complete and single-copy BUSCOs (S)       |
+        |0      Complete and duplicated BUSCOs (D)        |
+        |1      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+
+
+## OXR-137
+$ spades.py --isolate -1 ../../Data/illumina/OXR-137_all_R1.trim.fq -2 ../../Data/illumina/OXR-137_all_R2.trim.fq --nanopore ../../Data/nanopore/qc/OXR-137_BC07_ONT_qc.fastq -o spades_out_2
+$ grep -Fo '>' spades_out_2/contigs.fasta | wc -l
+# 48 contigs
+$ busco -i contigs.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:100.0%[S:99.2%,D:0.8%],F:0.0%,M:0.0%,n:124     |
+        |124    Complete BUSCOs (C)                       |
+        |123    Complete and single-copy BUSCOs (S)       |
+        |1      Complete and duplicated BUSCOs (D)        |
+        |0      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+
+
+## OXR-85
+$ spades.py --isolate -1 ../../Data/illumina/OXR-85_all_R1.trim.fq -2 ../../Data/illumina/OXR-85_all_R2.trim.fq --nanopore ../../Data/nanopore/qc/OXR-85_BC04_ONT_qc.fastq -o spades_out
+$ grep -Fo '>' spades_out/contigs.fasta
+# 33 contigs
+$ busco -i contigs.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:100.0%[S:99.2%,D:0.8%],F:0.0%,M:0.0%,n:124     |
+        |124    Complete BUSCOs (C)                       |
+        |123    Complete and single-copy BUSCOs (S)       |
+        |1      Complete and duplicated BUSCOs (D)        |
+        |0      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+
+
+## OXR-159
+$ spades.py --isolate -1 ../../Data/illumina/OXR-159_all_R1.trim.fq -2 ../../Data/illumina/OXR-159_all_R2.trim.fq --nanopore ../../Data/nanopore/qc/OXR-159_BC08_ONT_qc.fastq -o spades_out
+=== Error correction and assembling warnings:
+ * 0:01:00.382   317M / 11G   WARN    General                 (kmer_coverage_model.cpp   : 327)   Valley value was estimated improperly, reset to 8
+ * 0:01:07.013   420M / 11G   WARN    General                 (kmer_coverage_model.cpp   : 327)   Valley value was estimated improperly, reset to 7
+ * 0:01:06.051   398M / 9614M WARN    General                 (kmer_coverage_model.cpp   : 327)   Valley value was estimated improperly, reset to 5
+ * 0:01:09.959   393M / 11G   WARN    General                 (kmer_coverage_model.cpp   : 327)   Valley value was estimated improperly, reset to 4
+======= Warnings saved to /data/prj/ecosystem-diversity/OceanX/YEP3_culture-WGS/Analysis/OXR-159/spades_out/warnings.log
+$ grep -Fo '>' spades_out/contigs.fasta
+# 56 contigs
+$ busco -i contigs.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genomes --long -c 12
+		--------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:100.0%[S:100.0%,D:0.0%],F:0.0%,M:0.0%,n:124    |
+        |124    Complete BUSCOs (C)                       |
+        |124    Complete and single-copy BUSCOs (S)       |
+        |0      Complete and duplicated BUSCOs (D)        |
+        |0      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+
+
+## OXR-199
+$ spades.py --isolate -1 ../../Data/illumina/OXR-199_all_R1.trim.fq -2 ../../Data/illumina/OXR-199_all_R2.trim.fq --nanopore ../../Data/nanopore/qc/OXR-199_BC10_ONT_qc.fastq -o spades_out
+$ grep -Fo '>' spades_out/contigs.fasta
+# 43 contigs
+$ busco -i contigs.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:99.2%[S:99.2%,D:0.0%],F:0.8%,M:0.0%,n:124      |
+        |123    Complete BUSCOs (C)                       |
+        |123    Complete and single-copy BUSCOs (S)       |
+        |0      Complete and duplicated BUSCOs (D)        |
+        |1      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+
+
+## OXR-209
+$ spades.py --isolate -1 ../../Data/illumina/OXR-209_all_R1.trim.fq -2 ../../Data/illumina/OXR-209_all_R2.trim.fq --nanopore ../../Data/nanopore/qc/OXR-209_BC12_ONT_qc.fastq -o spades_out
+$ grep -Fo '>' spades_out/contigs.fasta
+# 102 contigs
+$ busco -i contigs.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:99.2%[S:98.4%,D:0.8%],F:0.8%,M:0.0%,n:124      |
+        |123    Complete BUSCOs (C)                       |
+        |122    Complete and single-copy BUSCOs (S)       |
+        |1      Complete and duplicated BUSCOs (D)        |
+        |1      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+		
+		
+## OXR-11
+$ spades.py --isolate -1 ../../Data/illumina/OXR-11_all_R1.trim.fq -2 ../../Data/illumina/OXR-11_all_R2.trim.fq --nanopore ../../Data/nanopore/qc/OXR-11_BC02_ONT_qc.fastq -o spades_out
+$ grep -Fo '>' spades_out/contigs.fasta
+# 37 contigs
+$ busco -i contigs.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+
+	***** Results: *****
+
+	C:99.2%[S:99.2%,D:0.0%],F:0.0%,M:0.8%,n:124	   
+	123	Complete BUSCOs (C)			   
+	123	Complete and single-copy BUSCOs (S)	   
+	0	Complete and duplicated BUSCOs (D)	   
+	0	Fragmented BUSCOs (F)			   
+	1	Missing BUSCOs (M)			   
+	124	Total BUSCO groups searched	
+
+## OXR-189
+$ spades.py --isolate -1 ../../Data/illumina/OXR-189_all_R1.trim.fq -2 ../../Data/illumina/OXR-189_all_R2.trim.fq --nanopore ../../Data/nanopore/qc/OXR-189_BC02_ONT_qc.fastq -o spades_out
+$ grep -Fo '>' spades_out/contigs.fasta
+# 9 contigs
+$ busco -i contigs.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:99.2%[S:99.2%,D:0.0%],F:0.8%,M:0.0%,n:124      |
+        |123    Complete BUSCOs (C)                       |
+        |123    Complete and single-copy BUSCOs (S)       |
+        |0      Complete and duplicated BUSCOs (D)        |
+        |1      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+
+
+## OXR-96
+$ spades.py --isolate -1 ../../Data/illumina/OXR-96_all_R1.trim.fq -2 ../../Data/illumina/OXR-96_all_R2.trim.fq --nanopore ../../Data/nanopore/qc/OXR-96_BC05_ONT_qc.fastq -o spades_out
+$ grep -Fo '>' spades_out/contigs.fasta
+# 95 contigs
+$ busco -i contigs.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:98.4%[S:98.4%,D:0.0%],F:1.6%,M:0.0%,n:124      |
+        |122    Complete BUSCOs (C)                       |
+        |122    Complete and single-copy BUSCOs (S)       |
+        |0      Complete and duplicated BUSCOs (D)        |
+        |2      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+
+
+## OXR-134
+$ spades.py --isolate -1 ../../Data/illumina/OXR-134_all_R1.trim.fq -2 ../../Data/illumina/OXR-134_all_R2.trim.fq --nanopore ../../Data/nanopore/qc/OXR-134_BC06_ONT_qc.fastq -o spades_out
+$ grep -Fo '>' spades_out/contigs.fasta
+# 48 contigs
+$ busco -i contigs.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+
+        --------------------------------------------------
+        |Results from dataset                             |
+        --------------------------------------------------
+        |C:99.2%[S:98.4%,D:0.8%],F:0.8%,M:0.0%,n:124      |
+        |123    Complete BUSCOs (C)                       |
+        |122    Complete and single-copy BUSCOs (S)       |
+        |1      Complete and duplicated BUSCOs (D)        |
+        |1      Fragmented BUSCOs (F)                     |
+        |0      Missing BUSCOs (M)                        |
+        |124    Total BUSCO groups searched               |
+        --------------------------------------------------
+
+
+## OXR-203
+$ spades.py --isolate -1 ../../Data/illumina/OXR-203_all_R1.trim.fq -2 ../../Data/illumina/OXR-203_all_R2.trim.fq --nanopore ../../Data/nanopore/qc/OXR-203_BC11_ONT_qc.fastq -o spades_out
+$ grep -Fo '>' spades_out/contigs.fasta
+# 37 contigs
+$ busco -i contigs.fasta -o busco -l ../../OXR-11/busco_downloads/lineages/bacteria_odb10/ --mode genome --long -c 12
+
+#################################################################
+# Run QUAST to get some stats
+# in the assembly folders for each run the following codes
+
+# MASURCA
+$ data/app/quast-5.0.2/quast/py CA.mr.99.17.15.0.02/primary.genome.scf.fasta
+# CANU+Polca
+$ /data/app/quast-5.0.2/quast.py purge_dups-corrected/OXR-76_canu_purged-all.fa
+# SPAdes
+$ /data/app/quast-5.0.2/quast.py contigs.fasta
+
+# alternatively, --glimmer for glimmerHMM gene prediction
+$ /data/app/quast-5.2.0/quast.py --glimmer masurca_assembly/CA.mr.99.17.15.0.02/primary.genome.scf.fasta polca-corrected/purge_dups-corrected/OXR-76_canu_purged-all.fa spades_out/scaffolds.fasta
+

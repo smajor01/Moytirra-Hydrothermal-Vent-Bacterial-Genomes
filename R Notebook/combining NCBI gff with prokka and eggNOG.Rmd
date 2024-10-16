@@ -1,0 +1,253 @@
+---
+title: "NCBI prokka and eggNOG GFF merging"
+output: html_document
+date: "2024-07-11"
+---
+
+In this notebook page I will take the GFF from teh GCFxxxxx (refSeq) from NCBI and merge them with the GFF of the other annotations such that I will have 1 file with all matching annotations.
+Some files were originally written from the "exploring non-syntenic regions.RMD"
+```{r }
+# manipulate the ncbi gff
+ncbi.gff <- readLines("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/ncbi_OXR-203/ncbi_dataset/data/GCF_034372165.1/genomic.gff") %>% as.data.frame()
+ncbi.gff <- ncbi.gff[-c(1:9),] %>% as.data.frame()
+names(ncbi.gff) <- "V1"
+ncbi.gff <- ncbi.gff %>% separate(V1, into = c("V1","V2","V3","V4","V5","V6","V7","V8","V9"), sep = "\t", extra = "merge", fill = "right")
+# ncbi.gff <- ncbi.gff
+
+# split the last column based on the ";"
+ncbi.9 <- ncbi.gff[,9]
+ncbi.9 <- strsplit(ncbi.9, ";")
+# Function to convert a list of key-value pairs to a named vector
+# Function to convert a list of key-value pairs to a named vector
+extract_key_value <- function(x) {
+  kv_pairs <- strsplit(x, "=")
+  kv_list <- sapply(kv_pairs, function(pair) {
+    if(length(pair) == 2) {
+      setNames(pair[2], pair[1])
+    } else {
+      NULL
+    }
+  })
+  return(as.list(kv_list))
+}
+key_value_list <- lapply(ncbi.9, extract_key_value)
+# Find all unique keys to ensure all columns are present in the final data frame
+all_keys <- unique(unlist(lapply(key_value_list, names)))
+# Function to convert each key-value list to a data frame row with all keys
+key_value_to_df <- function(kv) {
+  kv_row <- setNames(rep(NA, length(all_keys)), all_keys)
+  kv_row[names(kv)] <- unlist(kv)
+  return(as.data.frame(as.list(kv_row), stringsAsFactors = FALSE))
+}
+# Convert the list to a data frame with the same structure for each row
+key_value_df <- do.call(rbind, lapply(key_value_list, key_value_to_df))
+
+ncbi.comb <- cbind(ncbi.gff, key_value_df) %>% 
+  select(-V9) %>% mutate(NCBI.Gene.Acc = ID) %>% 
+  mutate(NCBI.Gene.Acc = sub(".*?-", "", NCBI.Gene.Acc)) %>%
+  mutate(isolate = "OXR-203")
+ncbi.comb <- ncbi.comb[!grepl("#",ncbi.comb$V1),]
+
+colnames(ncbi.comb)[colnames(ncbi.comb) == c("V1","V2","V3","V4","V5","V6","V7","V8")] <- c("NCBI.Contig.Acc","db","feature","start","stop","smthn","sense","frame")
+
+# 
+# # Get the names of the contigs from NCBI
+# genome.regions.203 <- ncbi.comb %>% filter(feature == c("region")) %>%
+#                                          mutate(Contig = c("Chr","pOXR203-01","pOXR203-02")) %>%
+#                                          mutate(Contig.2 = c("cluster_001_consensus_polypolish",
+#                                                              "cluster_004_consensus_polypolish",
+#                                                              "cluster_009_consensus_polypolish")) %>%
+#                                          select(NCBI.Contig.Acc, Contig, Contig.2, Is_circular)
+# #
+# genome.regions.203 <- ncbi.comb %>% filter(feature == c("region")) %>%
+#                                          mutate(Contig = c("Chr","pOXR203-01","pOXR203-02","pOXR203-03","pOXR203-04","pOXR203-05","pOXR203-06","pOXR203-07")) %>%
+#                                          mutate(Contig.2 = c("cluster_001_consensus_polypolish",
+#                                                              "cluster_004_consensus_polypolish",
+#                                                              "cluster_003_consensus_polypolish",
+#                                                              "cluster_007_consensus_polypolish",
+#                                                              "cluster_008_consensus_polypolish",
+#                                                              "cluster_009_consensus_polypolish",
+#                                                              "cluster_010_consensus_polypolish",
+#                                                              "cluster_013_consensus_polypolish")) %>%
+#                                          select(NCBI.Contig.Acc, Contig, Contig.2, Is_circular)
+# # # 
+genome.regions.203 <- ncbi.comb %>% filter(feature == c("region")) %>%
+                                         mutate(Contig = "Chr") %>%
+                                         mutate(Contig.2 = "cluster_001_consensus_polypolish") %>%
+                                         select(NCBI.Contig.Acc, Contig, Contig.2, Is_circular)
+
+
+ncbi.gff.2 <- merge(ncbi.comb, genome.regions.203[c("NCBI.Contig.Acc","Contig","Contig.2")], all.x = T) #%>% select(-frame,-genome,-Is_circular,-collected.by,-collection.date,-country,-gbkey,genome,-isolation.source,-mol_type,-strain,-locus_tag,-old_locus_tag,-Parent,-inference,-anticodon,-partial,-pseudo,-start_range,-end_range,-exception,-plasmid.name,-regulatory_class )
+
+# get the protein annotations
+ncbi.anno <- readLines("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/ncbi_OXR-203/ncbi_dataset/data/GCF_034372165.1/protein.faa") 
+ncbi.anno <- ncbi.anno[grep(">",ncbi.anno)] %>% as.data.frame() 
+names(ncbi.anno) <- "V1"
+ncbi.anno <- ncbi.anno %>% mutate(V1 = gsub(">","",V1)) %>% 
+  separate(V1, into = c("NCBI.Gene.Acc","NCBI.Anno"), sep = " ", extra = "merge", fill = "right")
+
+# Merge the protein annotations with the gff.2
+ncbi.prots <- merge(ncbi.gff.2, ncbi.anno, all = T)
+
+# read in the prokka and eggNOG combined annotations
+prokka.egg <- read.table("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/trycycler/prokka_eggnog_mergedGFF.txt", header = T)
+colnames(prokka.egg)[colnames(prokka.egg) == "Gene"] <- "prokka.gene"
+colnames(prokka.egg)[colnames(prokka.egg) == "Annotation"] <- "prokka.Anno"
+
+tot.203.comb <- merge(ncbi.prots, prokka.egg, all = T) %>% filter(!feature %in% c("region","gene")) %>% mutate(all.genes = coalesce(NCBI.Gene.Acc, prokka.gene, eggNOG_alt_name.x)) %>% mutate(all.genes.2 = coalesce(Name, prokka.gene, eggNOG_alt_name.x))
+
+write.table(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/OXR-203_prok_ncbi_annos.txt", tot.203.comb, sep = "\t", row.names = F)
+
+tot.203.comb.2 <- tot.203.comb[c("isolate","NCBI.Contig.Acc","Contig","Contig.2","eggNOG_alt_name.x","prokka.gene","NCBI.Gene.Acc","feature","db","start","stop","sense","ID","Dbxref","Name","gene_biotype","protein_id","Note","gene_synonym","bound_moiety","Ontology_term","go_function","go_component","go_process","gene","product","all.genes","all.genes.2","prokka.Anno","NCBI.Anno")]
+
+
+print(paste0("THERE ARE ",nrow(tot.203.comb[!grepl("WP_",tot.comb$all.genes.2),])," proteins not annotated by NCBI PGAP."))
+
+print(paste0("THERE ARE ", sum(is.na(tot.203.comb$all.genes.2))," unnamed genes in the list."))
+
+# take the annotations from eggNOG ( all comes from the kegg query pathways)
+all.203 <- all %>% select(-baseMean,-log2FoldChange,-lfcSE,-stat,-pvalue,-padj,-eggNOG_alt_name.y,-full_name,-location) %>%   filter(isolate == "OXR-203") 
+
+total.203 <- merge(tot.203.comb.2, all.203, by = c("isolate","Contig","eggNOG_alt_name.x","start","stop","sense"), all.x = T) 
+# %>% filter(!is.na(all.genes.2))
+
+write.table(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/OXR-203_all_annos.txt", total.203, sep = "\t", row.names = F)
+
+```
+
+In this next part I'll look even more closely at the genomic islands.
+working from a later section in the exploring non-syntenic region.rmd file
+```{r}
+# Here I'm going to include the eggNOG KEGG functional annotations and the NCBI
+# make the ranges to select for genes.
+fixed.2 <- read.csv("C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/203_no_syn_functions_cln.csv", header = T)
+fixed.2$X <- NULL
+# look at the ranges of the genomic islands
+range.203 <- fixed.2 %>%
+  group_by(Non.syntenic_GI) %>%
+  summarize(
+    range_start = min(start),
+    range_stop = max(stop)
+  )
+
+contig <- fixed.2[c("isolate","Contig","Non.syntenic_GI")]
+data <- contig[!duplicated(contig$Non.syntenic_GI),]
+ranges <- merge(data, range.203, by = "Non.syntenic_GI")
+
+# # make a table to upload to proksee
+# contig.proksee <- fixed.2[c("isolate","Contig.2","Non.syntenic_GI")]
+# data <- contig[!duplicated(contig$Non.syntenic_GI),]
+# ranges <- merge(data, range.203, by = "Non.syntenic_GI")
+
+# Join the data frames on the 'contig' column
+merged_df <- total.203 %>%
+  inner_join(ranges, by = c("isolate","Contig"))
+
+# Filter the rows
+filtered_df <- merged_df %>% mutate(across(c(start, stop, range_start, range_stop), as.numeric)) %>%
+  filter(start >= range_start & stop <= range_stop)
+
+### ~~~ Uncomment this line to write the file 
+write.csv(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI_total_annotations_functions.csv", filtered_df)
+# write.csv(file = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/203_GI_total_annotations_functions.csv", filtered_df)
+
+# Add an asterisk to the annotation of each gene that is duplicated due to multiple kegg annotations
+filter_dup <- filtered_df[duplicated(filtered_df$all.genes.2),]
+# filter_sing <- filtered_df[!duplicated(filtered_df$all.genes),]
+
+dups <- filtered_df[filtered_df$all.genes.2 %in% filter_dup$all.genes.2,] %>% mutate(prokka.Anno = paste0("*", prokka.Anno)) %>% mutate(NCBI.Anno = paste0("*", NCBI.Anno))
+sing <- filtered_df[! filtered_df$all.genes.2 %in% filter_dup$all.genes.2,]
+
+dup.edits.203 <- rbind(dups, sing)
+
+write.csv(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI_total_annotations_functions_dup.csv", dup.edits.203)
+
+# write.csv(file = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/203_GI_annotations_functions_dups.csv", dup.edits)
+
+prot.names <- as.data.frame(unique(dup.edits.203$all.genes.2)) %>% 
+  rename_at(vars(1), ~"Gene") %>% 
+  mutate(Gene = str_extract(Gene, "[^-]+")) %>% unique()
+
+write.table(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI_genes_ncbi.txt", prot.names, quote = F, col.names = F, row.names = F)
+
+
+print(paste0("THERE ARE ",nrow(dup.edits[!grepl("WP_",dup.edits.203$all.genes.2),])," proteins not annotated by NCBI PGAP."))
+
+print(paste0("THERE ARE ", sum(is.na(dup.edits.203$all.genes.2))," unnamed genes in the list."))
+
+```
+
+
+```{bash}
+# "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/ncbi_OXR-203/ncbi_dataset/data/GCF_034377285.1/"
+### Pull the protein sequences that match the all.genes field
+
+# cd /mnt/c/Users/SamuelMajor/OneDrive\ -\ Gloucester\ Marine\ Genomics\ Institute/Desktop/OXR\ genomes/Synteny\ Analysis/
+
+# cat ../OXR-203/trycycler/prokka_annotation/OXR-203.faa ../OXR-203/trycycler/eggNOG_annotations/out.emapper.genepred.fasta ../OXR-203/ncbi_OXR-203/ncbi_dataset/data/GCF_034377285.1/protein.faa | ../../scripts/FastaToTbl.txt > ../OXR-203/absurdtable
+
+```
+
+```{r}
+# I'll use this code instead of grep because it was giving me a hard time in the terminal
+list <- read.table("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI_genes_ncbi.txt")
+
+absurd <- readLines("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/absurdtable")
+absurd <- data.frame(line = absurd, stringsAsFactors = F)
+
+patterns <- list[[1]]
+
+library(stringr)
+# Use dplyr to filter absurd_df
+filtered_absurd <- absurd %>%
+  filter(str_detect(line, paste(patterns, collapse = "|")))
+
+write.table(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI_ncbi.tmp", filtered_absurd, row.names = F, col.names = F, quote = F)
+
+# in terminal 
+# ../../scripts/TblToFasta.txt OXR-203\ synteny/203_GI_ncbi.tmp > OXR-203\ synteny/203_GI_ncbi_genes.faa
+```
+
+Add the ghostKOALA annotations to the Genomic islands
+```{r}
+library(dplyr)
+library(tidyr)
+
+gi.203 <- read.csv(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI_total_annotations_functions_dup.csv", header = T)
+
+# write the ghostKOALA details into the file
+ghost.203 <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_ghostkoala_ko_detail_ncbi-prok-egg.txt", header = F, sep = "\t")
+
+names(ghost.203) <- c("all.genes.2","ko.ghost","ghst.def","ghst.scr","ko.ghost.2","ghst.scr.2")
+
+ghst.gi.genes <- gi.203 %>% merge(ghost.203, by = "all.genes.2", all = T)
+
+ghst.gi.genes.203 <- ghst.gi.genes %>% mutate(ko = ifelse(ko == "-", NA, ko)) %>% mutate(ko.ghost = ifelse(ko.ghost == "", NA, ko)) %>% mutate(ko.comb = coalesce(ko.ghost,ko)) %>% mutate(ko.comb.2 = coalesce(ko.ghost,ko,ko.ghost.2))
+
+write.table(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI_ghostK.txt", ghst.gi.genes.203, sep = "\t", row.names = F)
+
+# get the sizes or ranges of the islands
+print(ghst.gi.genes.203 %>% distinct(Non.syntenic_GI, .keep_all = TRUE) %>% select(Non.syntenic_GI,range_start,range_stop) %>% mutate(range = range_stop - range_start))
+
+# ghst.gi.genes %>%
+#   group_by(Non.syntenic_GI) %>%
+#   group_split() %>%
+#   walk2(.x = ., .y = unique(ghst.gi.genes$Non.syntenic_GI), ~ {
+#     # Extract only gene.names and ko columns
+#     subset_df <- .x %>%
+#       select(all.genes, ko.comb)
+#     
+#     # Write each subset to a separate CSV file
+#     write.table(subset_df, file = paste0("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI_", .y, "_ko.csv"), row.names = FALSE, quote = F, sep = "\t", col.names = F)
+#   })
+
+split_dfs <- split(ghst.gi.genes.203, ghst.gi.genes.203$Non.syntenic_GI)
+
+for (island in names(split_dfs)) {
+  subset_df <- split_dfs[[island]] %>%
+    select(all.genes, ko.comb)
+  
+  # Write each subset to a separate CSV file
+  write.table(subset_df, file = paste0("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-203 synteny/203_GI_", island, "_ko.txt"), row.names = FALSE, quote = F, sep = "\t", col.names = F)
+}
+```

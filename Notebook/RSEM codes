@@ -1,0 +1,120 @@
+# RSEM 
+
+mkdir trycycler/RSEM/
+mkdir trycycler/RSEM/ref
+
+#############
+cp OXR-9_final_genome_assembly.fasta trycycler/RSEM/ref/
+cp eggNOG_annotations/out.emapper.decorated.gff trycycler/RSEM/ref/
+
+cd trycycler/RSEM/
+
+/data/app/gff-utilities/gffread-0.11.6/gffread ref/out.emapper.decorated.gff -o out.emapper.decorated.gff3
+
+# fix gff3
+cut -f 9 ref/OXR-9.gff3 > ref/test.txt
+sed 's/^/;/' ref/test.txt > new-test.txt
+sed "s/ID/Parent/g" new-test.txt > parent.txt
+sed "s/Parent/ID/g" ref/OXR-9.gff3 > OXR-9_ID.gff3
+paste OXR-9_ID.gff3 parent.txt > OXR-9_almost.txt
+awk '{print $1 "\t" $2 "\t" $3 "\t" $4 "\t" $5 "\t" $6 "\t" $7 "\t" $8 "\t" $9 $10}' OXR-9_almost.txt > ref/OXR-9_complete.gff3
+
+sed "s/;ID/;Parent/g" almost.there.txt > OXR-9_almost.gff3
+
+/data/app/RSEM-1.3.3/rsem-prepare-reference  --gff3 ref/OXR-9_complete.gff3 --bowtie2 --bowtie2-path /data/app/bowtie2-2.5.1/bowtie2 ref/OXR-9.fasta ref/OXR-9_ref
+
+/data/app/RSEM-1.3.3/rsem-prepare-reference  --gff3 ref/out.emapper.decorated.gtf --bowtie2 --bowtie2-path /data/app/bowtie2-2.5.1/bowtie2 ref/OXR-9.fasta ref/OXR-9_ref
+############## This was giving unsolvable problems (by me) with the gff and gtf files
+
+# copy the predicted prokka transcripts to the ref file
+cp trycycler/prokka_annotation/OXR-9.ffn trycycler/RSEM/ref
+
+
+# copy the eggnog_annotation out.emapper.genepred.gff file to ref/ and turn to gff 
+/data/app/gff-utilities/gffread-0.11.6/gffread -T ref/out.emapper.genepred.gff -o ref/out.emapper.genepred_2.gtf 
+# change the "transcript" designation to "exon"
+sed "s/transcript/exon/g" ref/out.emapper.genepred_2.gtf > ref/out.emapper.genepred_2_exon.gtf
+# change the "exon_id" back to "transcript_id" 
+sed "s/exon_id/transcript_id/g" ref/out.emapper.genepred_2_exon.gtf > ref/out.emapper.genepred_2_exon_transcript.gtf 
+
+############## FAILED
+############## FAILED
+sed -n '/CDS/!p' ref/out.emapper.genepred.gtf > ref/transcript.gtf
+sed "s/transcript/exon/g" ref/transcript.gtf > ref/exon.gtf
+sed "s/exon_id/transcript_id/g" ref/exon.gtf > ref/exon_2.gtf
+cat ref/transcript.gtf ref/exon_2.gtf > ref/out.emapper.genepred_2.gtf
+
+# Make the reference
+/data/app/RSEM-1.3.3/rsem-prepare-reference --gtf ref/out.emapper.genepred_2.gtf --bowtie2 --bowtie2-path /data/app/bowtie2-2.5.1/ ref/OXR-9_final_assembly.fasta ref/OXR-9_ref
+
+
+readline() on closed filehandle INPUT at /data/app/RSEM-1.3.3/rsem-calculate-expression line 361.
+Use of uninitialized value $line in scalar chomp at /data/app/RSEM-1.3.3/rsem-calculate-expression line 361.
+Use of uninitialized value $line in split at /data/app/RSEM-1.3.3/rsem-calculate-expression line 363.
+Use of uninitialized value $type in numeric ne (!=) at /data/app/RSEM-1.3.3/rsem-calculate-expression line 364.
+Fail to create folder exp/test.temp.
+############## FAILED
+############## FAILED
+
+############## EGGNOG ANNOTATIONS AND GENOME
+sed -n '/CDS/!p' ref/out.emapper.genepred.gtf > ref/transcript.gtf
+sed "s/transcript/exon/g" ref/transcript.gtf > ref/exon.gtf
+sed "s/exon_id/transcript_id/g" ref/exon.gtf > ref/exon_2.gtf
+cat ref/transcript.gtf ref/exon_2.gtf > ref/out.emapper.genepred_2.gtf
+
+# Make the reference
+/data/app/RSEM-1.3.3/rsem-prepare-reference --gtf ref/out.emapper.genepred_2.gtf --bowtie2 --bowtie2-path /data/app/bowtie2-2.5.1/ ref/OXR-9_final_assembly.fasta ref/OXR-9_ref
+
+# Calculate the TPM FPKM and other things
+/data/app/RSEM-1.3.3/rsem-calculate-expression -p 8 --paired-end --bowtie2 --bowtie2-path /data/app/bowtie2-2.5.1/ --estimate-rspd --append-names --output-genome-bam /data/prj/ecosystem-diversity/OceanX/YEP1_2021/metatranscriptome/trimmed-reads/C1B10F2_R1_trim.fq.gz /data/prj/ecosystem-diversity/OceanX/YEP1_2021/metatranscriptome/trimmed-reads/C1B10F2_R2_trim.fq.gz eggNOG_genome_ref/OXR-9_ref eggNOG_genome_exp/test
+
+
+############## PROKKA PREDICTED TRANSCRIPTS
+/data/app/RSEM-1.3.3/rsem-prepare-reference --gtf ref/out.emapper.genepred_2.gtf --bowtie2 --bowtie2-path /data/app/bowtie2-2.5.1/ ref/OXR-9.ffn ref/OXR-9_ref
+
+mkdir exp/
+
+##### This with the C1B10F1 file did not work
+/data/app/RSEM-1.3.3/rsem-calculate-expression -p 8 --paired-end --bowtie2 --bowtie2-path /data/app/bowtie2-2.5.1/ --estimate-rspd --append-names /data/prj/ecosystem-diversity/OceanX/YEP1_2021/metatranscriptome/trimmed-reads/C1B10F1_R1_trim.fq.gz /data/prj/ecosystem-diversity/OceanX/YEP1_2021/metatranscriptome/trimmed-reads/C1B10F1_R2_trim.fq.gz ref/OXR-9 exp/test
+#####
+
+
+/data/app/RSEM-1.3.3/rsem-calculate-expression -p 8 --paired-end --bowtie2 --bowtie2-path /data/app/bowtie2-2.5.1/ --append-names --estimate-rspd /data/prj/ecosystem-diversity/OceanX/YEP1_2021/metatranscriptome/trimmed-reads/C1B10F2_R1_trim.fq.gz /data/prj/ecosystem-diversity/OceanX/YEP1_2021/metatranscriptome/trimmed-reads/C1B10F2_R2_trim.fq.gz ref/OXR-9_ref exp/test
+
+
+****************************************************************************
+#!/bin/bash
+
+# $1 = ref/the final genome assembly
+# $2 = OXR-X_ref
+#
+# Usage...
+# ~/RSEM_OXR.sh ref/OXR-9_final_assembly.fsa OXR-9_ref
+
+/data/app/gff-utilities/gffread-0.11.6/gffread -T ref/out.emapper.genepred.gff -o ref/out.emapper.genepred.gtf
+
+sed -n '/CDS/!p' ref/out.emapper.genepred.gtf > ref/transcript.gtf
+sed "s/transcript/exon/g" ref/transcript.gtf > ref/exon.gtf
+sed "s/exon_id/transcript_id/g" ref/exon.gtf > ref/exon_2.gtf
+cat ref/transcript.gtf ref/exon_2.gtf > ref/out.emapper.genepred_2.gtf
+
+/data/app/RSEM-1.3.3/rsem-prepare-reference --gtf ref/out.emapper.genepred_2.gtf --bowtie2 --bowtie2-path /data/app/bowtie2-2.5.1/ $1 ref/$2
+
+for file in /data/prj/ecosystem-diversity/OceanX/YEP1_2021/metatranscriptome/trimmed-reads/*.gz
+do
+
+    prefix="${file%R1*}"
+    suffix="${file#*R1}"
+
+        folder="${prefix##/data/prj/ecosystem-diversity/OceanX/YEP1_2021/metatranscriptome/trimmed-reads/}"
+        folder2="${folder%%_*}"
+        mkdir "${folder2}"
+    if [ -f "${prefix}R2${suffix}" ]
+    then
+        /data/app/RSEM-1.3.3/rsem-calculate-expression -p 8 --paired-end --bowtie2 --bowtie2-path /data/app/bowtie2-2.5.1/ --estimate-rspd --append-names --output-genome-bam "${prefix}R1${suffix}" "${prefix}R2${suffix}" ref/$2 "${folder2}"/"${2%_*}_${folder2}"
+    fi
+done
+****************************************************************************
+
+# Example execution of the code. Run it from the RSEM directory within 
+~/RSEM_OXR.sh ref/OXR-9_final_assembly.fasta OXR-9_ref

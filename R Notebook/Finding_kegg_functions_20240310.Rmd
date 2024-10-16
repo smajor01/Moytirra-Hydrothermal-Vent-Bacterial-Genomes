@@ -1,0 +1,822 @@
+---
+title: "OXR_kegg_explorations"
+output: html_document
+date: "2023-11-30"
+---
+
+This script is going to try to explore some of the genes in the genome, mainly by searching keywords in the kegg descriptions
+
+```{r}
+read.ALL.keggs <- function(genome, name.table){
+  packages <- c("dplyr")
+  sapply(c(packages), require, character.only = TRUE)
+oxr <-  read.csv(paste0("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/",
+                           genome,
+                           "/trycycler/eggNOG_annotations/",
+                           genome,
+                           "_ALL_all_data.txt"), sep = "\t", header = T)
+oxr <- oxr[,-c(17:118)]
+
+oxr$isolate <- genome
+oxr$contig <- sub("_\\d+$", "", oxr$eggNOG_alt_name.x)
+##### This was an attempt to remove some erroneous labeling
+##### The merging within the function was not cooperating with me
+# h <- oxr[duplicated(oxr$eggNOG_name),]
+i <- oxr[!(oxr$description %in% c("Cancer: overview","Cancer: specific types",
+                                    "Cardiovascular disease","Cell growth and death",
+                                    "Endocrine and metabolic disease",
+                                    "Infectious disease: parasitic","Infectious disease: viral",
+                                    "Neurodegenerative disease","Substance dependence",
+                                    "Nervous system","Development and regeneration",
+                                    "Excretory system","Neurodegenerative disease",
+                                    "Cell growth and death","Endocrine system",
+                                    "Digestive system","Immune system","Circulatory system",
+                                    "Aging","Immune disease")),]
+i <- i[!(i$class %in% c("Human Diseases")),]
+oxr <- i
+
+# ~~~ adding plasmid names
+##~~~ Rename the plasmids
+plasmid.names <- read.csv("C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/plasmid_names.csv", header = T)
+plasmid.names$plasmid <- paste(plasmid.names$Genome, plasmid.names$CLUSTER_NAME, sep = " ")
+
+oxr$contig <- sub("_consensus_polypolish", "", oxr$contig)
+oxr$plasmid <- paste(oxr$isolate, oxr$contig, sep = " ")
+
+oxr <- merge(oxr, plasmid.names, by = "plasmid", all.x = T)
+
+names(oxr)
+
+# new.2 <- new.names[c(2,14,4,5,6,7,9,11)]
+
+colnames(oxr)[colnames(oxr) == "PLASMID_NAME"] <- "Contig"
+
+oxr <- oxr %>% mutate(oxr.chr = stringr::str_replace(eggNOG_name, "_.*$", ""))
+
+oxr.cln <- oxr %>% distinct(isolate, Contig, oxr.chr) %>% .[! is.na(.$Contig),]
+
+oxr.merge <- merge(oxr[,! names(oxr) %in% c("Contig")], oxr.cln, by = c("isolate","oxr.chr"))
+
+oxr <- oxr.merge
+
+oxr <- oxr %>% select(c("isolate","Contig","eggNOG_name","start","stop","sense","eggNOG_alt_name.x","baseMean","log2FoldChange","lfcSE","stat","pvalue","padj","Description","Preferred_name","PFAMs","ko","eggNOG_alt_name.y","pathway","name","class","description"))
+
+oxr <- oxr %>% mutate(eggHead = str_replace(eggNOG_name, ".*_",""))
+oxr$full.name <- paste0(oxr$isolate,"_",oxr$Contig,"_",oxr$eggHead)
+# oxr <- oxr[,c(22,26,2,3,4,5,6,7,
+#              8,9,10,11,12,13,14,15,16,
+#              17,18,19,20,21)]
+
+
+# k <- oxr[-(duplicated(oxr$eggNOG_name)),]
+# l <- rbind(k,i)
+
+# print(unique(sort(oxr$class)))
+# print(unique(sort(oxr$description)))
+# print(unique(sort(oxr$name)))
+
+# oxr.sulfur <- oxr[oxr$name %in% "Sulfur metabolism",]
+# oxr.sulfur.relay <- oxr[oxr$name %in% "Sulfur relay system",]
+# oxr.second.metab <- oxr[oxr$description %in% c("Biosynthesis of other secondary metabolites","Metabolism of terpenoids and polyketides"),]
+# oxr.methane <- oxr[oxr$name %in% "Methane metabolism",]
+# oxr.tca <- oxr[oxr$name %in% "Citrate cycle (TCA cycle)",]
+# oxr.CRISPR <- oxr[grep("CRISPR",oxr$Description),]
+
+# # # sporulation ability
+# oxr.spore <- oxr[grep("sporulation",oxr$Description, ignore.case = T),]
+# oxr.spore.2 <- oxr[grep("spore",oxr$Description, ignore.case = T),]
+# oxr.spore.3 <- rbind(oxr.spore, oxr.spore.2) %>% .[! duplicated(.),]
+
+
+# # chemotaxis
+# oxr.chemotaxis <- oxr[grep("chemotaxis", oxr$Description, ignore.case = T),]
+
+assign(name.table, oxr, envir = globalenv())
+# assign(paste0(name.table,".sulfur"), oxr.sulfur, envir = globalenv())
+# assign(paste0(name.table,".sulfur.relay"), oxr.sulfur.relay, envir = globalenv())
+# assign(paste0(name.table,".sec.metab"), oxr.second.metab, envir = globalenv())
+# assign(paste0(name.table,".methane"), oxr.methane, envir = globalenv())
+# assign(paste0(name.table,".tca"), oxr.tca, envir = globalenv())
+# assign(paste0(name.table,".chemotaxis"), oxr.chemotaxis, envir = globalenv())
+# assign(paste0(name.table,".CRISPR"), oxr.CRISPR, envir = globalenv())
+# assign(paste0(name.table,".spore"), oxr.spore.3, envir = globalenv())
+
+}
+```
+
+Fix the presence of ID's without contigs testing
+```{r}
+read.ALL.keggs("OXR-9","oxr.9")
+
+test <- oxr.9#[c(1,2,3)]
+
+# Remove the _ from the eggNOG_name
+test <- test %>% mutate(test.chr = stringr::str_replace(eggNOG_name, "_.*$", ""))
+
+test.cln <- test %>% distinct(isolate, Contig, test.chr) %>% .[! is.na(.$Contig),]
+
+test.merge <- merge(test[,! names(test) %in% c("Contig")], test.cln, by = c("isolate","test.chr"))
+
+names(test.merge)
+
+# ~~~ Another test
+# ~~~ Make a new column with a different "Full name"
+library(dplyr)
+library(stringr)
+all <- all %>% mutate(eggHead = str_replace(eggNOG_name, ".*_",""))
+all$full.name <- paste0(all$isolate,"_",all$Contig,"_",all$eggHead)
+```
+Summarize the data counts
+```{r}
+read.ALL.keggs("OXR-9","oxr.9")
+oxr.9.count <- as.data.frame(table(oxr.9$name, oxr.9$Contig, oxr.9$isolate,oxr.9$eggNOG_name))
+oxr.9.count <- oxr.9.count[! oxr.9.count$Freq == 0,]
+oxr.9.count.gene <- as.data.frame(table(oxr.9$Preferred_name, oxr.9$Contig, oxr.9$isolate, oxr.9$eggNOG_name))
+oxr.9.count.gene <- oxr.9.count.gene[! oxr.9.count.gene$Freq == 0,]
+oxr.9.count.gene <- oxr.9.count.gene[!duplicated(oxr.9.count.gene$Var4),]
+
+read.ALL.keggs("OXR-11","oxr.11")
+oxr.11.count <- as.data.frame(table(oxr.11$name, oxr.11$Contig, oxr.11$isolate,oxr.11$eggNOG_name))
+oxr.11.count <- oxr.11.count[! oxr.11.count$Freq == 0,]
+oxr.11.count.gene <- as.data.frame(table(oxr.11$Preferred_name, oxr.11$Contig, oxr.11$isolate, oxr.11$eggNOG_name))
+oxr.11.count.gene <- oxr.11.count.gene[! oxr.11.count.gene$Freq == 0,]
+oxr.11.count.gene <- oxr.11.count.gene[!duplicated(oxr.11.count.gene$Var4),]
+
+read.ALL.keggs("OXR-76","oxr.76")
+oxr.76.count <- as.data.frame(table(oxr.76$name, oxr.76$Contig, oxr.76$isolate,oxr.76$eggNOG_name))
+oxr.76.count <- oxr.76.count[! oxr.76.count$Freq == 0,]
+oxr.76.count.gene <- as.data.frame(table(oxr.76$Preferred_name, oxr.76$Contig, oxr.76$isolate, oxr.76$eggNOG_name))
+oxr.76.count.gene <- oxr.76.count.gene[! oxr.76.count.gene$Freq == 0,]
+oxr.76.count.gene <- oxr.76.count.gene[!duplicated(oxr.76.count.gene$Var4),]
+
+read.ALL.keggs("OXR-85","oxr.85")
+oxr.85.count <- as.data.frame(table(oxr.85$name, oxr.85$Contig, oxr.85$isolate,oxr.85$eggNOG_name))
+oxr.85.count <- oxr.85.count[! oxr.85.count$Freq == 0,]
+oxr.85.count.gene <- as.data.frame(table(oxr.85$Preferred_name, oxr.85$Contig, oxr.85$isolate, oxr.85$eggNOG_name))
+oxr.85.count.gene <- oxr.85.count.gene[! oxr.85.count.gene$Freq == 0,]
+oxr.85.count.gene <- oxr.85.count.gene[!duplicated(oxr.85.count.gene$Var4),]
+
+read.ALL.keggs("OXR-96","oxr.96")
+oxr.96.count <- as.data.frame(table(oxr.96$name, oxr.96$Contig, oxr.96$isolate,oxr.96$eggNOG_name))
+oxr.96.count <- oxr.96.count[! oxr.96.count$Freq == 0,]
+oxr.96.count.gene <- as.data.frame(table(oxr.96$Preferred_name, oxr.96$Contig, oxr.96$isolate, oxr.96$eggNOG_name))
+oxr.96.count.gene <- oxr.96.count.gene[! oxr.96.count.gene$Freq == 0,]
+oxr.96.count.gene <- oxr.96.count.gene[!duplicated(oxr.96.count.gene$Var4),]
+
+read.ALL.keggs("OXR-134","oxr.134")
+oxr.134.count <- as.data.frame(table(oxr.134$name, oxr.134$Contig, oxr.134$isolate,oxr.134$eggNOG_name))
+oxr.134.count <- oxr.134.count[! oxr.134.count$Freq == 0,]
+oxr.134.count.gene <- as.data.frame(table(oxr.134$Preferred_name, oxr.134$Contig, oxr.134$isolate, oxr.134$eggNOG_name))
+oxr.134.count.gene <- oxr.134.count.gene[! oxr.134.count.gene$Freq == 0,]
+oxr.134.count.gene <- oxr.134.count.gene[!duplicated(oxr.134.count.gene$Var4),]
+
+read.ALL.keggs("OXR-137","oxr.137")
+oxr.137.count <- as.data.frame(table(oxr.137$name, oxr.137$Contig, oxr.137$isolate,oxr.137$eggNOG_name))
+oxr.137.count <- oxr.137.count[! oxr.137.count$Freq == 0,]
+oxr.137.count.gene <- as.data.frame(table(oxr.137$Preferred_name, oxr.137$Contig, oxr.137$isolate, oxr.137$eggNOG_name))
+oxr.137.count.gene <- oxr.137.count.gene[! oxr.137.count.gene$Freq == 0,]
+oxr.137.count.gene <- oxr.137.count.gene[!duplicated(oxr.137.count.gene$Var4),]
+
+read.ALL.keggs("OXR-159","oxr.159")
+oxr.159.count <- as.data.frame(table(oxr.159$name, oxr.159$Contig, oxr.159$isolate,oxr.159$eggNOG_name))
+oxr.159.count <- oxr.159.count[! oxr.159.count$Freq == 0,]
+oxr.159.count.gene <- as.data.frame(table(oxr.159$Preferred_name, oxr.159$Contig, oxr.159$isolate, oxr.159$eggNOG_name))
+oxr.159.count.gene <- oxr.159.count.gene[! oxr.159.count.gene$Freq == 0,]
+oxr.159.count.gene <- oxr.159.count.gene[!duplicated(oxr.159.count.gene$Var4),]
+
+read.ALL.keggs("OXR-189","oxr.189")
+oxr.189.count <- as.data.frame(table(oxr.189$name, oxr.189$Contig, oxr.189$isolate,oxr.189$eggNOG_name))
+oxr.189.count <- oxr.189.count[! oxr.189.count$Freq == 0,]
+oxr.189.count.gene <- as.data.frame(table(oxr.189$Preferred_name, oxr.189$Contig, oxr.189$isolate, oxr.189$eggNOG_name))
+oxr.189.count.gene <- oxr.189.count.gene[! oxr.189.count.gene$Freq == 0,]
+oxr.189.count.gene <- oxr.189.count.gene[!duplicated(oxr.189.count.gene$Var4),]
+
+read.ALL.keggs("OXR-199","oxr.199")
+oxr.199.count <- as.data.frame(table(oxr.199$name, oxr.199$Contig, oxr.199$isolate,oxr.199$eggNOG_name))
+oxr.199.count <- oxr.199.count[! oxr.199.count$Freq == 0,]
+oxr.199.count.gene <- as.data.frame(table(oxr.199$Preferred_name, oxr.199$Contig, oxr.199$isolate, oxr.199$eggNOG_name))
+oxr.199.count.gene <- oxr.199.count.gene[! oxr.199.count.gene$Freq == 0,]
+oxr.199.count.gene <- oxr.199.count.gene[!duplicated(oxr.199.count.gene$Var4),]
+
+read.ALL.keggs("OXR-203","oxr.203")
+oxr.203.count <- as.data.frame(table(oxr.203$name, oxr.203$Contig, oxr.203$isolate,oxr.203$eggNOG_name))
+oxr.203.count <- oxr.203.count[! oxr.203.count$Freq == 0,]
+oxr.203.count.gene <- as.data.frame(table(oxr.203$Preferred_name, oxr.203$Contig, oxr.203$isolate, oxr.203$eggNOG_name))
+oxr.203.count.gene <- oxr.203.count.gene[! oxr.203.count.gene$Freq == 0,]
+oxr.203.count.gene <- oxr.203.count.gene[!duplicated(oxr.203.count.gene$Var4),]
+
+read.ALL.keggs("OXR-209","oxr.209")
+oxr.209.count <- as.data.frame(table(oxr.209$name, oxr.209$Contig, oxr.209$isolate,oxr.209$eggNOG_name))
+oxr.209.count <- oxr.209.count[! oxr.209.count$Freq == 0,]
+oxr.209.count.gene <- as.data.frame(table(oxr.209$Preferred_name, oxr.209$Contig, oxr.209$isolate, oxr.209$eggNOG_name))
+oxr.209.count.gene <- oxr.209.count.gene[! oxr.209.count.gene$Freq == 0,]
+oxr.209.count.gene <- oxr.209.count.gene[!duplicated(oxr.209.count.gene$Var4),]
+
+```
+
+Prepare to look at the 
+``` {r}
+# Combine all the frequency counts of each Kegg named pathway for each Genome
+all <- rbind(oxr.9,oxr.11,oxr.76,oxr.85,oxr.96,oxr.134,oxr.137,oxr.159,oxr.189,oxr.199,oxr.203,oxr.209)
+
+all.2  <- all[,-c(7:12)]
+write.csv(all.2, file = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Table Sx Genome_gene_table.csv")
+
+# all$full_name <- paste(all$isolate,"_",all$eggNOG_alt_name.x)
+all$full_name <- paste(all$isolate,"_",all$eggNOG_name)
+# all$location <- paste(all$isolate,"_",all$contig)
+all$location <- paste(all$isolate,": ",all$Contig)
+
+all.primary <- all[grep("Chr",all$contig),]
+all.plasm <- all[- grep("Chr",all$contig),]
+
+# Combine all the frequency counts of each Kegg named pathway for each Genome
+all.counts <- rbind(oxr.9.count,oxr.11.count,oxr.76.count,oxr.85.count,oxr.96.count,oxr.134.count,oxr.137.count,oxr.159.count,oxr.189.count,oxr.199.count,oxr.203.count,oxr.209.count)
+
+#Combine all the frequency count of 
+all.counts.gene <- rbind(oxr.9.count.gene,oxr.11.count.gene,oxr.76.count.gene,oxr.85.count.gene,oxr.96.count.gene,oxr.134.count.gene,oxr.137.count.gene,oxr.159.count.gene,oxr.189.count.gene,oxr.199.count.gene,oxr.203.count.gene,oxr.209.count.gene)
+
+
+# build the data frame for higher function annotation
+j <- unique(all.counts$Var1)
+k <- all[all$name %in% j,]
+k <- k[c("name","class","description")] %>% .[! duplicated(.$name),]
+row.names(k) <- k$name
+k$name <- NULL
+colnames(k) <- c("Classification","Secondary Classification")
+k <- k[c(2,1)]
+# the dataframe with each contig length
+l <- read.csv("C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/contig_length_renamed.csv", header = F)
+m <- l
+row.names(m) <- m$V1
+m$V1 <- NULL
+colnames(m) <- "Size"
+# specific sizes for primary chromosome
+# primary.size <- l[grep("cluster_001", l$V1),]
+# primary.size$V1 <- gsub(" cluster_001","",primary.size$V1) 
+primary.size <- l
+row.names(primary.size) <- primary.size$V1
+primary.size$V1 <- NULL
+colnames(primary.size) <- "Size"
+primary.size$genome <- rownames(primary.size)
+primary.size$genome <- gsub(":.*","",primary.size$genome)
+primary.size <- primary.size[! duplicated(primary.size$genome),]
+rownames(primary.size) <- primary.size$genome
+primary.size$genome <- NULL
+
+### Check the genome and the primary contig for functions
+# # Make a wide data.table, and sum all the instances of the KEGG frequencies for each genome
+# library(tidyr)
+# # Look at the genome wide function
+# test <- all.counts.gene %>% pivot_wider(names_from = Var3, values_from = Freq)
+# test[is.na(test)] <- 0
+# test$Var2 <- NULL
+# test <- test %>% aggregate(.~Var1, FUN = sum)
+# rownames(test) <- test$Var1
+# test$Var1 <- NULL
+# test <- as.matrix(test) %>% .[! rownames(test) %in% c("Quorum sensing","ABC transporters","Two-component system"),]
+# test.clean <- test[rownames(test) %in% names(tail(sort(rowSums(test)),50)),]
+# 
+# library(pheatmap)
+# library(pipelineTools)
+# genome <- pheatmap(test.clean, display_numbers = T, cluster_cols = F, cluster_rows = T, color = colorRampPalette(c("blue","green","red"))(100))
+# 
+# save_pheatmap_png(plot = genome,
+#                   filename = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Genome_function_noABC_heatmap.png",
+#                   width = 1500)
+
+### Check the genome and the primary contig for functions
+# Make a wide data.table, and sum all the instances of the KEGG frequencies for each genome
+library(tidyr)
+# subset the primary contig
+all.prim <- all.counts[grep("Chr",all.counts$Var2),] # Var2 fpr function
+all.prim$Freq <- round(all.prim$Freq, 0) 
+test <- all.prim %>% pivot_wider(names_from = Var3, values_from = Freq) # Var3 for function
+test[is.na(test)] <- 0
+
+# WRite the table to a file
+test.2 <- test[! rowSums(test[4:15]) ==0,]
+colnames(test.2)[1:3] <- c("Preferred_name","Contig","eggNOG_names")
+write.csv(test.2, file = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Genome_primary_gene_table.csv")
+
+test$Var2 <- NULL
+test$Var4 <- NULL
+test <- test %>% aggregate(.~Var1, FUN = sum)
+# test <- test[! test$Var1 == "-",] # for Gene Specifics
+rownames(test) <- test$Var1
+test$Var1 <- NULL
+# test <- as.matrix(test) %>% .[! rownames(test) %in% c("Quorum sensing","ABC transporters","Two-component system"),]
+test.clean.pr <- test[rownames(test) %in% names(tail(sort(rowSums(test)),25)),]
+test.clean.2 <- test[row.names(test) %in% c("Flagellar assembly",
+                                          "Bacterial chemotaxis",
+                                          "Nitrogen metabolism",
+                                          "Methane metabolism",
+                                          "Sulfur metabolism",
+                                          "Glycolysis / Gluconeogenesis",
+                                          "Amino sugar and nucleotide sugar metabolism",
+                                          "Starch and sucrose metabolism",
+                                          "Galactose metabolism",
+                                          "Fructose and mannose metabolism",
+                                          "ABC transporters",
+                                          "Quorum sensing",
+                                          "Two-component system"),]
+
+# ~~~ Combine the two
+test.clean.3 <- test.clean.pr[! rownames(test.clean.pr) %in% rownames(test.clean.2),]
+# test.clean.3 <- test.clean.3[c(nrow(test.clean.3)-7:nrow(test.clean.3)),]
+test.clean.3 <- test.clean.3[! rownames(test.clean.3) %in% names(head(sort(rowSums(test.clean.3)),7)),]
+  
+test.merge <- rbind(test.clean.3, test.clean.2)
+
+ann_colors_1 = list(`Secondary Classification` = c("Amino acid metabolism" = "pink",
+                                                   # "Biosynthesis of other secondary metabolites" = "#00CDCD",
+                                                   "Carbohydrate metabolism" = "#7FFFD4",
+                                                   "Cell motility" = "#FF7F24",
+                                                   "Cellular community - prokaryotes" = "#0000FF",
+                                                   "Energy metabolism" = "#C0FF3E",
+                                                   # "Glycan biosynthesis and metabolism" = "#8B3A62",
+                                                   # "Lipid metabolism" = "#FA8072",
+                                                   "Membrane transport" = "#BF3EFF",
+                                                   "Metabolism of cofactors and vitamins" = "#2E8B57",
+                                                   # "Metabolism of terpenoids and polyketides" = "royalblue4",
+                                                   "Nucleotide metabolism" = "springgreen",
+                                                   "Signal transduction" = "#EE1289",
+                                                   "Translation" = "turquoise"),
+                                                   # "Xenobiotics biodegradation and metabolism" = "orange"),
+                                                   # "Metabolism of other amino acids",
+                                                   # "Folding sorting and degradation",
+                                                   # "Environmental adaptation",
+                                                   # "Transport and catabolism",
+                                                   # "Replication and repair",
+                                                   # "Transcription",
+                                                   # "Information processing in viruses",
+                                                   # "Signaling molecules and interaction" = "black"),
+                                                   
+                    Classification = c("Cellular Processes"="#d81b60ff",
+                                     "Environmental Information Processing"="#1e88e5ff",
+                                     "Genetic Information Processing"="#ffc107ff",
+                                     "Metabolism"="#00d133ff"))
+
+# ann_colors_1 = list(Classification = c("Cellular Processes"="#d81b60ff",
+#                                      "Environmental Information Processing"="#1e88e5ff",
+#                                      "Genetic Information Processing"="#ffc107ff",
+#                                      "Metabolism"="#00d133ff"))
+library(pheatmap)
+library(pipelineTools)
+primary <- pheatmap(test.merge, 
+                    annotation_row = k, 
+                    annotation_col = primary.size, 
+                    display_numbers = test.merge, 
+                    annotation_colors  = ann_colors_1,
+                    cluster_cols = T, 
+                    cluster_rows = T,
+                    cellwidth = 18,
+                    cellheight = 15,
+                    fontsize = 12,
+                    angle_col = 90)
+
+                    # color = colorRampPalette(c("blue","green","red"))(100))
+save_pheatmap_png(plot = primary,
+                  filename = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Genome_primary_function_heatmap_select_25.png",
+                  width = 1800, height = 1250)
+
+# 
+# save_pheatmap_png(plot = primary,
+#                   filename = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Genome_primary_function_40_heatmap.png",
+#                   width = 1500, height = 1500) # height = 3500 for all... height = 1500 for 50
+
+
+### Check the plasmid contigs for functions
+# Make a wide data.table, and sum all the instances of the KEGG frequencies for each genome
+library(tidyr)
+# subset the plasmid contig
+all.plasm <- all.counts[- grep("Chr",all.counts$Var2),]
+all.plasm$plasmid <- paste(all.plasm$Var3, all.plasm$Var2, sep = ": ")
+all.plasm$plasmid <- gsub("_consensus_polypolish", "",all.plasm$plasmid)
+all.plasm <- all.plasm[!(is.na(all.plasm$Var2) | all.plasm$Var2==""),]
+test <- all.plasm %>% pivot_wider(names_from = plasmid, values_from = Freq)
+test[is.na(test)] <- 0
+
+# WRite the table to a file
+test.2 <- test[! rowSums(test[5:34]) ==0,]
+colnames(test.2)[1:4] <- c("Preferred_name","Contig","Isolate","eggNOG_name")
+write.csv(test.2, file = "C:/Users/SamuelMajor//Box/Science/Microbe Repository/OceanX Deep Water Culturing/Genome_plasmid_gene_table.csv")
+
+test$Var2 <- NULL
+test$Var3 <- NULL
+test$Var4 <- NULL
+test <- test %>% aggregate(.~Var1, FUN = sum)
+rownames(test) <- test$Var1
+test$Var1 <- NULL
+# test <- as.matrix(test) %>% .[! rownames(test) %in% c("Quorum sensing","ABC transporters","Two-component system"),]
+test.clean.pl <- test[rownames(test) %in% names(tail(sort(rowSums(test)),25)),]
+# test.clean.2 <- test[row.names(test) %in% c("Flagellar assembly",
+#                                           "Bacterial chemotaxis",
+#                                           "Nitrogen metabolism",
+#                                           "Methane metabolism",
+#                                           "Sulfur metabolism",
+#                                           "Glycolysis / Gluconeogenesis",
+#                                           "Amino sugar and nucleotide sugar metabolism",
+#                                           "Starch and sucrose metabolism",
+#                                           "Galactose metabolism",
+#                                           "Fructose and mannose metabolism",
+#                                           "ABC transporters",
+#                                           "Quorum sensing",
+#                                           "Two-component system"),]
+# 
+# # ~~~ Combine the two
+# test.clean.3 <- test.clean.pl[! rownames(test.clean.pl) %in% rownames(test.clean.2),]
+# test.clean.3 <- test.clean.3[c(nrow(test.clean.3)-7:nrow(test.clean.3)),]
+#   
+# test.merge <- rbind(test.clean.3, test.clean.2)
+
+ann_colors_2 = list(`Secondary Classification` = c("Amino acid metabolism" = "pink",
+                                                   "Biosynthesis of other secondary metabolites" = "#00CDCD",
+                                                   "Carbohydrate metabolism" = "#7FFFD4",
+                                                   "Cell motility" = "#FF7F24",
+                                                   "Cellular community - prokaryotes" = "#0000FF",
+                                                   "Energy metabolism" = "#C0FF3E",
+                                                   "Glycan biosynthesis and metabolism" = "#8B3A62",
+                                                   "Lipid metabolism" = "#FA8072",
+                                                   "Membrane transport" = "#BF3EFF",
+                                                   "Metabolism of cofactors and vitamins" = "#2E8B57",
+                                                   "Metabolism of terpenoids and polyketides" = "royalblue4",
+                                                   "Nucleotide metabolism" = "springgreen",
+                                                   "Signal transduction" = "#EE1289",
+                                                   "Xenobiotics biodegradation and metabolism" = "orange"),
+                                                   # "Metabolism of other amino acids",
+                                                   # "Folding sorting and degradation",
+                                                   # "Translation"
+                                                   # "Environmental adaptation",
+                                                   # "Transport and catabolism",
+                                                   # "Replication and repair",
+                                                   # "Transcription",
+                                                   # "Information processing in viruses",
+                                                   # "Signaling molecules and interaction" = "black"),
+                    Classification = c("Cellular Processes"="#d81b60ff",
+                                     "Environmental Information Processing"="#1e88e5ff",
+                                     "Metabolism"="#00d133ff"))
+
+# name.order <- c("OXR-9 cluster_002","OXR-9 cluster_003","OXR-9 cluster_004","OXR-9 cluster_005","OXR-9 cluster_006",
+#                 "OXR-85 cluster_002","OXR-85 cluster_003",
+#                 "OXR-137 cluster_004","OXR-137 cluster_009",
+#                 "OXR-159 cluster_003","OXR-159 cluster_004","OXR-159 cluster_007","OXR-159 cluster_008","OXR-159 cluster_009","OXR-159 cluster_010","OXR-159 cluster_013",
+#                 "OXR-199 cluster_002","OXR-199 cluster_003","OXR-199 cluster_004","OXR-199 cluster_005","OXR-199 cluster_006","OXR-199 cluster_007",
+#                 "OXR-209 cluster_003","OXR-209 cluster_004","OXR-209 cluster_005","OXR-209 cluster_006","OXR-209 cluster_007","OXR-209 cluster_010")
+
+name.order <- c("OXR-9: pOXR009-01","OXR-9: pOXR009-02","OXR-9: pOXR009-03","OXR-9: pOXR009-04","OXR-9: pOXR009-05","OXR-85: pOXR085-01","OXR-85: pOXR085-02","OXR-137: pOXR137-01","OXR-137: pOXR137-02","OXR-159: pOXR159-01","OXR-159: pOXR159-02","OXR-159: pOXR159-03","OXR-159: pOXR159-04","OXR-159: pOXR159-05","OXR-159: pOXR159-06","OXR-159: pOXR159-07","OXR-199: pOXR199-01","OXR-199: pOXR199-02","OXR-199: pOXR199-03","OXR-199: pOXR199-04","OXR-199: pOXR199-05","OXR-199: pOXR199-06","OXR-209: pOXR209-01","OXR-209: pOXR209-02","OXR-209: pOXR209-03","OXR-209: pOXR209-04","OXR-209: pOXR209-05","OXR-209: pOXR209-06")
+
+# plasmid$Plasmid <- factor(plasmid$Plasmid, levels = c("OXR-9: pOXR009-01","OXR-9: pOXR009-02","OXR-9: pOXR009-04",
+#                                                       "OXR-9: pOXR009-05","OXR-85: pOXR085-01","OXR-85: pOXR085-02",
+#                                                       "OXR-137: pOXR137-01","OXR-159: pOXR159-02","OXR-159: pOXR159-03",
+#                                                       "OXR-199: pOXR199-01","OXR-199: pOXR199-04","OXR-199: pOXR199-05",
+#                                                       "OXR-209: pOXR209-01","OXR-209: pOXR209-02","OXR-209: pOXR209-03",
+#                                                       "OXR-209: pOXR209-04"))
+
+test.clean <- test.merge[, match(name.order, colnames(test.clean.pl))]
+
+library(pheatmap)
+plasmid <- pheatmap(test.clean, 
+                    display_numbers = test.clean, 
+                    annotation_row = k, 
+                    annotation_col = m, 
+                    annotation_colors = ann_colors_2,
+                    cluster_cols = F, 
+                    cluster_rows = T, 
+                    cellwidth = 15,
+                    cellheight = 10,
+                    gaps_col = c(5,7,9,16,22),
+                    angle_col = 90)
+                    # color = colorRampPalette(c("blue","green","red"))(100))
+
+library(pipelineTools)
+save_pheatmap_png(plot = plasmid,
+                  filename = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Genome_plasmid_function_25_heatmap_select.png",
+                  width = 2000, height = 1000)
+
+
+```
+
+Are there unique gene names and their functions in plasmids
+```{r}
+# look to see if there are preferred name genes in the plasmids that are not in the primary genome
+oxr.9.primary <- oxr.9[oxr.9$contig == "Chr",]
+oxr.9.plasmid <- oxr.9[! oxr.9$contig == "Chr",]
+
+oxr.9.plas.unique <- oxr.9.plasmid[! oxr.9.plasmid$Preferred_name %in% oxr.9.primary$Preferred_name,]
+
+sort(table(oxr.9.plas.unique$Preferred_name))
+
+oxr.9.plas.unqtable <- as.data.frame(table(oxr.9.plas.unique$name, oxr.9.plas.unique$contig, oxr.9.plas.unique$isolate, oxr.9.plas.unique$eggNOG_name ))
+
+# look to see if there are preferred name genes in the plasmids that are not in the primary genome
+oxr.85.primary <- oxr.85[oxr.85$contig == "Chr",]
+oxr.85.plasmid <- oxr.85[! oxr.85$contig == "Chr",]
+
+oxr.85.plas.unique <- oxr.85.plasmid[! oxr.85.plasmid$Preferred_name %in% oxr.85.primary$Preferred_name,]
+
+oxr.85.plas.unqtable <- as.data.frame(table(oxr.85.plas.unique$name, oxr.85.plas.unique$contig, oxr.85.plas.unique$isolate,oxr.85.plas.unique$eggNOG_name ))
+
+# look to see if there are preferred name genes in the plasmids that are not in the primary genome
+oxr.137.primary <- oxr.137[oxr.137$contig == "Chr",]
+oxr.137.plasmid <- oxr.137[! oxr.137$contig == "Chr",]
+
+oxr.137.plas.unique <- oxr.137.plasmid[! oxr.137.plasmid$Preferred_name %in% oxr.137.primary$Preferred_name,]
+
+oxr.137.plas.unqtable <- as.data.frame(table(oxr.137.plas.unique$name, oxr.137.plas.unique$contig, oxr.137.plas.unique$isolate,oxr.137.plas.unique$eggNOG_name ))
+
+# look to see if there are preferred name genes in the plasmids that are not in the primary genome
+oxr.159.primary <- oxr.159[oxr.159$contig == "Chr",]
+oxr.159.plasmid <- oxr.159[! oxr.159$contig == "Chr",]
+
+oxr.159.plas.unique <- oxr.159.plasmid[! oxr.159.plasmid$Preferred_name %in% oxr.159.primary$Preferred_name,]
+
+oxr.159.plas.unqtable <- as.data.frame(table(oxr.159.plas.unique$name, oxr.159.plas.unique$contig, oxr.159.plas.unique$isolate,oxr.159.plas.unique$eggNOG_name ))
+
+# look to see if there are preferred name genes in the plasmids that are not in the primary genome
+oxr.199.primary <- oxr.199[oxr.199$contig == "Chr",]
+oxr.199.plasmid <- oxr.199[! oxr.199$contig == "Chr",]
+
+oxr.199.plas.unique <- oxr.199.plasmid[! oxr.199.plasmid$Preferred_name %in% oxr.199.primary$Preferred_name,]
+
+oxr.199.plas.unqtable <- as.data.frame(table(oxr.199.plas.unique$name, oxr.199.plas.unique$contig, oxr.199.plas.unique$isolate,oxr.199.plas.unique$eggNOG_name ))
+
+# look to see if there are preferred name genes in the plasmids that are not in the primary genome
+oxr.209.primary <- oxr.209[oxr.209$contig == "Chr",]
+oxr.209.plasmid <- oxr.209[! oxr.209$contig == "Chr",]
+
+oxr.209.plas.unique <- oxr.209.plasmid[! oxr.209.plasmid$Preferred_name %in% oxr.209.primary$Preferred_name,]
+
+oxr.209.plas.unqtable <- as.data.frame(table(oxr.209.plas.unique$name, oxr.209.plas.unique$contig, oxr.209.plas.unique$isolate,oxr.209.plas.unique$eggNOG_name ))
+
+# Combine all of the tables
+all.unqtables <- rbind(oxr.9.plas.unqtable,oxr.85.plas.unqtable,oxr.137.plas.unqtable,oxr.159.plas.unqtable,oxr.199.plas.unqtable,oxr.209.plas.unqtable)
+
+# make new column with the plasmid designation
+all.unqtables$plasmid <- paste(all.unqtables$Var3, all.unqtables$Var2, sep = " ")
+# remoove the erroneus information
+all.unqtables$plasmid <- gsub("_consensus_polypolish", "",all.unqtables$plasmid)
+all.unqtables <- all.unqtables[!(is.na(all.unqtables$Var2) | all.unqtables$Var2==""),]
+test <- all.unqtables %>% pivot_wider(names_from = plasmid, values_from = Freq)
+test[is.na(test)] <- 0
+
+# WRite the table to a file
+test.2 <- test[! rowSums(test[5:31]) ==0,]
+colnames(test.2)[1:4] <- c("KEGG_name","Contig","Isolate","eggNOG_name")
+write.csv(test.2, file = "C:/Users/SamuelMajor//Box/Science/Microbe Repository/OceanX Deep Water Culturing/Genome_plasmid_unique_function_table.csv")
+
+test$Var2 <- NULL
+test$Var3 <- NULL
+test$Var4 <- NULL # 
+test <- test %>% aggregate(.~Var1, FUN = sum)
+rownames(test) <- test$Var1
+test$Var1 <- NULL
+# test <- as.matrix(test) %>% .[! rownames(test) %in% c("Quorum sensing","ABC transporters","Two-component system"),]
+# test.clean <- test[rownames(test) %in% names(head(sort(rowSums(test)),50)),] # chage to head or tail for most/least unique genes and functions
+
+library(pheatmap)
+plasmid <- pheatmap(test, annotation_row = k, annotation_col = m,display_numbers = T,  cluster_cols = F, cluster_rows = T, color = colorRampPalette(c("blue","green","red"))(100))
+
+library(pipelineTools)
+save_pheatmap_png(plot = plasmid,
+                  filename = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Genome_plasmid_unique_function_heatmap_all.png",
+                  width = 2500, height = 4000)
+
+```
+Look at the individual genes
+```{r}
+# look to see if there are preferred name genes in the plasmids that are not in the primary genome
+oxr.9.primary <- oxr.9[oxr.9$Contig == "Chr",]
+oxr.9.plasmid <- oxr.9[! oxr.9$Contig == "Chr",]
+
+oxr.9.plas.unique <- oxr.9.plasmid[! oxr.9.plasmid$Preferred_name %in% oxr.9.primary$Preferred_name,]
+
+oxr.9.plas.unique <- oxr.9.plas.unique[!duplicated(oxr.9.plas.unique$eggNOG_name),]
+
+sort(table(oxr.9.plas.unique$Preferred_name))
+
+oxr.9.plas.unqtable <- as.data.frame(table(oxr.9.plas.unique$Preferred_name, oxr.9.plas.unique$Contig, oxr.9.plas.unique$isolate, oxr.9.plas.unique$eggNOG_name ))
+
+oxr.9.plas.unqtable.2 <- oxr.9.plas.unqtable[! oxr.9.plas.unqtable$Freq == 0,]
+
+# look to see if there are preferred name genes in the plasmids that are not in the primary genome
+oxr.85.primary <- oxr.85[oxr.85$Contig == "Chr",]
+oxr.85.plasmid <- oxr.85[! oxr.85$Contig == "Chr",]
+
+oxr.85.plas.unique <- oxr.85.plasmid[! oxr.85.plasmid$Preferred_name %in% oxr.85.primary$Preferred_name,]
+
+oxr.85.plas.unique <- oxr.85.plas.unique[!duplicated(oxr.85.plas.unique$eggNOG_name),]
+
+oxr.85.plas.unqtable <- as.data.frame(table(oxr.85.plas.unique$Preferred_name, oxr.85.plas.unique$Contig, oxr.85.plas.unique$isolate,oxr.85.plas.unique$eggNOG_name ))
+
+# look to see if there are preferred name genes in the plasmids that are not in the primary genome
+oxr.137.primary <- oxr.137[oxr.137$Contig == "Chr",]
+oxr.137.plasmid <- oxr.137[! oxr.137$Contig == "Chr",]
+
+oxr.137.plas.unique <- oxr.137.plasmid[! oxr.137.plasmid$Preferred_name %in% oxr.137.primary$Preferred_name,]
+
+oxr.137.plas.unique <- oxr.137.plas.unique[!duplicated(oxr.137.plas.unique$eggNOG_name),]
+
+oxr.137.plas.unqtable <- as.data.frame(table(oxr.137.plas.unique$Preferred_name, oxr.137.plas.unique$Contig, oxr.137.plas.unique$isolate,oxr.137.plas.unique$eggNOG_name ))
+
+# look to see if there are preferred name genes in the plasmids that are not in the primary genome
+oxr.159.primary <- oxr.159[oxr.159$Contig == "Chr",]
+oxr.159.plasmid <- oxr.159[! oxr.159$Contig == "Chr",]
+
+oxr.159.plas.unique <- oxr.159.plasmid[! oxr.159.plasmid$Preferred_name %in% oxr.159.primary$Preferred_name,]
+
+oxr.159.plas.unique <- oxr.159.plas.unique[!duplicated(oxr.159.plas.unique$eggNOG_name),]
+
+oxr.159.plas.unqtable <- as.data.frame(table(oxr.159.plas.unique$Preferred_name, oxr.159.plas.unique$Contig, oxr.159.plas.unique$isolate,oxr.159.plas.unique$eggNOG_name ))
+
+# look to see if there are preferred name genes in the plasmids that are not in the primary genome
+oxr.199.primary <- oxr.199[oxr.199$Contig == "Chr",]
+oxr.199.plasmid <- oxr.199[! oxr.199$Contig == "Chr",]
+
+oxr.199.plas.unique <- oxr.199.plasmid[! oxr.199.plasmid$Preferred_name %in% oxr.199.primary$Preferred_name,]
+
+oxr.199.plas.unique <- oxr.199.plas.unique[!duplicated(oxr.199.plas.unique$eggNOG_name),]
+
+oxr.199.plas.unqtable <- as.data.frame(table(oxr.199.plas.unique$Preferred_name, oxr.199.plas.unique$Contig, oxr.199.plas.unique$isolate,oxr.199.plas.unique$eggNOG_name ))
+
+# look to see if there are preferred name genes in the plasmids that are not in the primary genome
+oxr.209.primary <- oxr.209[oxr.209$Contig == "Chr",]
+oxr.209.plasmid <- oxr.209[! oxr.209$Contig == "Chr",]
+
+oxr.209.plas.unique <- oxr.209.plasmid[! oxr.209.plasmid$Preferred_name %in% oxr.209.primary$Preferred_name,]
+
+oxr.209.plas.unique <- oxr.209.plas.unique[!duplicated(oxr.209.plas.unique$eggNOG_name),]
+
+oxr.209.plas.unqtable <- as.data.frame(table(oxr.209.plas.unique$Preferred_name, oxr.209.plas.unique$Contig, oxr.209.plas.unique$isolate,oxr.209.plas.unique$eggNOG_name ))
+
+
+# Combine all of the tables
+all.unqtables <- rbind(oxr.9.plas.unqtable,oxr.85.plas.unqtable,oxr.137.plas.unqtable,oxr.159.plas.unqtable,oxr.199.plas.unqtable,oxr.209.plas.unqtable)
+
+# Combine the Isolate and the plasmid information
+all.unqtables$plasmid <- paste(all.unqtables$Var3, all.unqtables$Var2, sep = ": ")
+# Remove unnessecary information
+all.unqtables$plasmid <- gsub("_consensus_polypolish", "",all.unqtables$plasmid)
+all.unqtables <- all.unqtables[!(is.na(all.unqtables$Var2) | all.unqtables$Var2==""),]
+test <- all.unqtables %>% pivot_wider(names_from = plasmid, values_from = Freq)
+test[is.na(test)] <- 0
+
+# WRite the table to a file
+test.2 <- test[! rowSums(test[5:31]) ==0,]
+colnames(test.2)[1:4] <- c("Preferred_name","Contig","Isolate","eggNOG_name")
+write.csv(test.2, file = "C:/Users/SamuelMajor//Box/Science/Microbe Repository/OceanX Deep Water Culturing/Genome_plasmid_unique_genes_table.csv")
+
+# continue to fix for plotting
+test$Var2 <- NULL
+test$Var3 <- NULL
+test$Var4 <- NULL # 
+test <- test %>% aggregate(.~Var1, FUN = sum)
+rownames(test) <- test$Var1
+test$Var1 <- NULL
+# test <- as.matrix(test) %>% .[! rownames(test) %in% c("Quorum sensing","ABC transporters","Two-component system"),]
+test.clean <- test[rownames(test) %in% names(head(sort(rowSums(test)),25)),] # chage to head or tail for most/least unique genes and functions
+
+library(pheatmap)
+plasmid <- pheatmap(test, 
+                    annotation_col = m, 
+                    display_numbers = test, 
+                    cluster_cols = F, 
+                    cluster_rows = T,
+                    cellwidth = 10,
+                    cellheight = 10,
+                    # gaps_col = c(5,7,8,15,2),
+                    gaps_col = c(5,7,8,15,21),
+                    angle_col = 90)
+
+
+library(pipelineTools)
+save_pheatmap_png(plot = plasmid,
+                  filename = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Genome_plasmid_unique_genes_heatmap_all_new_20240321.png",
+                  width = 1000, height = 11000)
+
+```
+
+Make tables of specific functions
+```{r}
+# add column to R to better parse our contigs and 
+all <- rbind(oxr.9,oxr.11,oxr.76,oxr.85,oxr.96,oxr.134,oxr.137,oxr.159,oxr.189,oxr.199,oxr.203,oxr.209)
+all$full_name <- paste(all$isolate,"_",all$eggNOG_alt_name.x)
+all$location <- paste(all$isolate,"_",all$contig)
+all.primary <- all[grep("cluster_001",all$contig),]
+all.plasm <- all[- grep("cluster_001",all$contig),]
+
+# # look at the occurence of multiple genes in the genome
+all.genome.genes <- all[! duplicated(all$full_name),]
+all.plasm.genes <- all.plasm[! duplicated(all.plasm$full_name),]
+all.prim.genes <- all.primary[! duplicated(all.primary$full_name),]
+
+
+# primary contig
+all.genome.prim.genes <- all.genome.genes[grep("cluster_001",all.genome.genes$contig),]
+all.genome.prim.gene.table <- as.data.frame(table(all.genome.prim.genes$Preferred_name))#, all.genome.prim.genes$isolate))
+all.genome.prim.gene.isolate.table <- as.data.frame(table(all.genome.prim.genes$Preferred_name, all.genome.prim.genes$isolate))
+all.genome.prim.gene.table <- all.genome.prim.gene.table[! all.genome.prim.gene.table$Freq == 0,]
+# how many genes are duplicated in which genomes?
+k <- all.genome.prim.gene.isolate.table[all.genome.prim.gene.isolate.table$Freq >= 2,]
+table(k$Var2)
+unique(k$Freq)
+
+# look for Quorum snensning genes
+all.quorum <- all[all$name %in% "Quorum sensing",]
+all.quorum.genes <- all.quorum[! duplicated(all.quorum$full_name),]
+# primary contig
+all.quorum.prim.genes <- all.quorum.genes[grep("cluster_001",all.quorum.genes$contig),]
+all.quorum.prim.gene.table <- as.data.frame(table(all.quorum.prim.genes$Preferred_name))#, all.quorum.prim.genes$isolate))
+all.quorum.prim.gene.isolate.table <- as.data.frame(table(all.quorum.prim.genes$Preferred_name, all.quorum.prim.genes$isolate))
+all.quorum.prim.gene.table <- all.quorum.prim.gene.table[! all.quorum.prim.gene.table$Freq == 0,]
+
+all.quorum.prim.gene.table.2 <- all.quorum.prim.gene.isolate.table %>% pivot_wider(names_from = Var2, values_from = Freq)
+all.quorum.prim.gene.table.2[is.na(all.quorum.prim.gene.table.2)] <- 0
+
+
+# look for Chemotaxis genes
+all.chemo <- all[all$name %in% "Bacterial chemotaxis",]
+all.chemo.genes <- all.chemo[! duplicated(all.chemo$full_name),]
+# primary contig
+all.chemo.prim.genes <- all.chemo.genes[grep("cluster_001",all.chemo.genes$contig),]
+all.chemo.prim.gene.table <- as.data.frame(table(all.chemo.prim.genes$Preferred_name))#, all.chemo.prim.genes$isolate))
+all.chemo.prim.gene.isolate.table <- as.data.frame(table(all.chemo.prim.genes$Preferred_name, all.chemo.prim.genes$isolate))
+all.chemo.prim.gene.table <- all.chemo.prim.gene.table[! all.chemo.prim.gene.table$Freq == 0,]
+
+all.chemo.prim.gene.table.2 <- all.chemo.prim.gene.isolate.table %>% pivot_wider(names_from = Var2, values_from = Freq)
+all.chemo.prim.gene.table.2[is.na(all.chemo.prim.gene.table.2)] <- 0
+
+# look for sulftaxis genes
+all.sulf <- all[all$name %in% "Sulfur metabolism",]
+all.sulf.genes <- all.sulf[! duplicated(all.sulf$full_name),]
+# primary contig
+all.sulf.prim.genes <- all.sulf.genes[grep("cluster_001",all.sulf.genes$contig),]
+all.sulf.prim.gene.table <- as.data.frame(table(all.sulf.prim.genes$Preferred_name))#, all.sulf.prim.genes$isolate))
+all.sulf.prim.gene.isolate.table <- as.data.frame(table(all.sulf.prim.genes$Preferred_name, all.sulf.prim.genes$isolate))
+all.sulf.prim.gene.table <- all.sulf.prim.gene.table[! all.sulf.prim.gene.table$Freq == 0,]
+
+all.sulf.prim.gene.table.2 <- all.sulf.prim.gene.isolate.table %>% pivot_wider(names_from = Var2, values_from = Freq)
+all.sulf.prim.gene.table.2[is.na(all.sulf.prim.gene.table.2)] <- 0
+
+
+# look for Methane metabolism genes
+all.meth <- all[all$name %in% "Methane metabolism",]
+all.meth.genes <- all.meth[! duplicated(all.meth$full_name),]
+# primary contig
+all.meth.prim.genes <- all.meth.genes[grep("cluster_001",all.meth.genes$contig),]
+all.meth.prim.gene.table <- as.data.frame(table(all.meth.prim.genes$Preferred_name))#, all.meth.prim.genes$isolate))
+all.meth.prim.gene.isolate.table <- as.data.frame(table(all.meth.prim.genes$Preferred_name, all.meth.prim.genes$isolate))
+all.meth.prim.gene.table <- all.meth.prim.gene.table[! all.meth.prim.gene.table$Freq == 0,]
+
+all.meth.prim.gene.table.2 <- all.meth.prim.gene.isolate.table %>% pivot_wider(names_from = Var2, values_from = Freq)
+all.meth.prim.gene.table.2[is.na(all.meth.prim.gene.table.2)] <- 0
+
+# look for mercury resistance genes on th genome
+all.primary.mer <- all.primary[grep("mer",all.primary$Preferred_name),]
+all.primary.mer.genes <- all.primary.mer[! duplicated(all.primary.mer$full_name),]
+# primaryids
+all.primary.mer.gene.table <- as.data.frame(table(all.primary.mer.genes$Preferred_name))#, all.primary.mer.genes$isolate))
+all.primary.mer.gene.contig.table <- as.data.frame(table(all.primary.mer.genes$Preferred_name, all.primary.mer.genes$location))
+all.primary.mer.gene.table <- all.primary.mer.gene.table[! all.primary.mer.gene.table$Freq == 0,]
+
+all.primary.mer.gene.table.2 <- all.primary.mer.gene.contig.table %>% pivot_wider(names_from = Var2, values_from = Freq)
+all.primary.mer.gene.table.2[is.na(all.primary.mer.gene.table.2)] <- 0
+
+
+# look for the abc reporters genes on th primids
+all.prim.abc <- all.primary[all.primary$name %in% "ABC transporters",]
+all.prim.abc.genes <- all.prim.abc[! duplicated(all.prim.abc$full_name),]
+# primids
+all.prim.abc.gene.table <- as.data.frame(table(all.prim.abc.genes$Preferred_name))#, all.prim.abc.genes$isolate))
+all.prim.abc.gene.contig.table <- as.data.frame(table(all.prim.abc.genes$Preferred_name, all.prim.abc.genes$location))
+all.prim.abc.gene.table <- all.prim.abc.gene.table[! all.prim.abc.gene.table$Freq == 0,]
+
+all.prim.abc.gene.table.2 <- all.prim.abc.gene.contig.table %>% pivot_wider(names_from = Var2, values_from = Freq)
+all.prim.abc.gene.table.2[is.na(all.prim.abc.gene.table.2)] <- 0
+########
+### Plasmids
+# look for mercury resistance genes on th plasmids
+all.plasm.mer <- all.plasm[grep("mer",all.plasm$Preferred_name),]
+all.plasm.mer.genes <- all.plasm.mer[! duplicated(all.plasm.mer$full_name),]
+# Plasmids
+all.plasm.mer.gene.table <- as.data.frame(table(all.plasm.mer.genes$Preferred_name))#, all.plasm.mer.genes$isolate))
+all.plasm.mer.gene.contig.table <- as.data.frame(table(all.plasm.mer.genes$Preferred_name, all.plasm.mer.genes$full_name))
+all.plasm.mer.gene.table <- all.plasm.mer.gene.table[! all.plasm.mer.gene.table$Freq == 0,]
+
+all.plasm.mer.gene.table.2 <- all.plasm.mer.gene.contig.table %>% pivot_wider(names_from = Var2, values_from = Freq)
+all.plasm.mer.gene.table.2[is.na(all.plasm.mer.gene.table.2)] <- 0
+
+
+# look for the abc reporters genes on th plasmids
+all.plasm.abc <- all.plasm[all.plasm$name %in% "ABC transporters",]
+all.plasm.abc.genes <- all.plasm.abc[! duplicated(all.plasm.abc$full_name),]
+# Plasmids
+all.plasm.abc.gene.table <- as.data.frame(table(all.plasm.abc.genes$Preferred_name))#, all.plasm.abc.genes$isolate))
+all.plasm.abc.gene.contig.table <- as.data.frame(table(all.plasm.abc.genes$Preferred_name, all.plasm.abc.genes$location))
+all.plasm.abc.gene.table <- all.plasm.abc.gene.table[! all.plasm.abc.gene.table$Freq == 0,]
+
+all.plasm.abc.gene.table.2 <- all.plasm.abc.gene.contig.table %>% pivot_wider(names_from = Var2, values_from = Freq)
+all.plasm.abc.gene.table.2[is.na(all.plasm.abc.gene.table.2)] <- 0
+```
+
+

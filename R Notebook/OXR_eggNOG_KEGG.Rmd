@@ -1,0 +1,314 @@
+---
+title: "Untitled"
+output: html_document
+date: "2023-10-31"
+---
+
+
+```{r}
+# OXR-9
+library(readxl)
+egg <- read_excel("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-9/trycycler/eggNOG_annotations/out.emapper.annotations.xlsx", skip = 2)
+
+names(egg)[1] <- "eggNOG_alt_name"
+
+codex <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-9/trycycler/eggNOG_annotations/OXR-9_eggNOG_codex.txt", sep = " ", header = F)
+
+names(codex) <- c("eggNOG_name", "eggNOG_alt_name")
+
+# Add the names of the codex (i.e: 5_2911) along with the ko'd names (cluster_00X_consensus_polypolish_XXX)
+new <- left_join(codex, egg, by = "eggNOG_alt_name")
+
+#
+ko <- new[,c(1,2,13)]
+ko[is.na(ko)] <- "-"
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+ko <- splitstackshape::cSplit(ko, "KEGG_ko", se=",")
+ko <- melt(setDT(ko), id.vars = c(1,2), variable.name = "KEGG_ko")
+ko$KEGG_ko <- NULL
+names(ko)[3] <- "KEGG_ko"
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-9/trycycler/eggNOG_annotations/OXR-9_KEGG_egg.txt", "wb")
+write.table(ko, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+####
+```{r}
+# OXR-11
+library(readxl)
+egg <- read_excel("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-11/trycycler/eggNOG_annotations/out.emapper.annotations.xlsx", skip = 2)
+
+names(egg)[1] <- "eggNOG_alt_name"
+
+codex <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-11/trycycler/eggNOG_annotations/OXR-11_eggNOG_codex.txt", sep = " ", header = F)
+
+names(codex) <- c("eggNOG_name", "eggNOG_alt_name")
+
+# Add the names of the codex (i.e: 5_2911) along with the ko'd names (cluster_00X_consensus_polypolish_XXX)
+new <- left_join(codex, egg, by = "eggNOG_alt_name")
+
+#
+ko <- new[,c(1,2,13)]
+ko[is.na(ko)] <- "-"
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+ko <- splitstackshape::cSplit(ko, "KEGG_ko", se=",")
+ko <- melt(setDT(ko), id.vars = c(1,2), variable.name = "KEGG_ko")
+ko$KEGG_ko <- NULL
+names(ko)[3] <- "KEGG_ko"
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-11/trycycler/eggNOG_annotations/OXR-11_KEGG_egg.txt", "wb")
+write.table(ko, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+####
+```{r}
+# OXR-76
+library(readxl)
+egg <- read_excel("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-76/trycycler/eggNOG_annotations/out.emapper.annotations.xlsx", skip = 2)
+
+names(egg)[1] <- "eggNOG_alt_name"
+
+codex <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-76/trycycler/eggNOG_annotations/OXR-76_eggNOG_codex.txt", sep = " ", header = F)
+
+names(codex) <- c("eggNOG_name", "eggNOG_alt_name")
+
+# Add the names of the codex (i.e: 5_2911) along with the ko'd names (cluster_00X_consensus_polypolish_XXX)
+new <- left_join(codex, egg, by = "eggNOG_alt_name")
+
+#
+ko <- new[,c(1,2,13)]
+ko[is.na(ko)] <- "-"
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+ko <- splitstackshape::cSplit(ko, "KEGG_ko", se=",")
+ko <- melt(setDT(ko), id.vars = c(1,2), variable.name = "KEGG_ko")
+ko$KEGG_ko <- NULL
+names(ko)[3] <- "KEGG_ko"
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-76/trycycler/eggNOG_annotations/OXR-76_KEGG_egg.txt", "wb")
+write.table(ko, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+####
+```{r}
+# OXR-96
+library(readxl)
+egg <- read_excel("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-96/trycycler/eggNOG_annotations/out.emapper.annotations.xlsx", skip = 2)
+
+names(egg)[1] <- "eggNOG_alt_name"
+
+codex <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-96/trycycler/eggNOG_annotations/OXR-96_eggNOG_codex.txt", sep = " ", header = F)
+
+names(codex) <- c("eggNOG_name", "eggNOG_alt_name")
+
+# Add the names of the codex (i.e: 5_2911) along with the ko'd names (cluster_00X_consensus_polypolish_XXX)
+new <- left_join(codex, egg, by = "eggNOG_alt_name")
+
+#
+ko <- new[,c(1,2,13)]
+ko[is.na(ko)] <- "-"
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+ko <- splitstackshape::cSplit(ko, "KEGG_ko", se=",")
+ko <- melt(setDT(ko), id.vars = c(1,2), variable.name = "KEGG_ko")
+ko$KEGG_ko <- NULL
+names(ko)[3] <- "KEGG_ko"
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-96/trycycler/eggNOG_annotations/OXR-96_KEGG_egg.txt", "wb")
+write.table(ko, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+####
+```{r}
+# OXR-134
+library(readxl)
+egg <- read_excel("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-134/trycycler/eggNOG_annotations/out.emapper.annotations.xlsx", skip = 2)
+
+names(egg)[1] <- "eggNOG_alt_name"
+
+codex <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-134/trycycler/eggNOG_annotations/OXR-134_eggNOG_codex.txt", sep = " ", header = F)
+
+names(codex) <- c("eggNOG_name", "eggNOG_alt_name")
+
+# Add the names of the codex (i.e: 5_2911) along with the ko'd names (cluster_00X_consensus_polypolish_XXX)
+new <- left_join(codex, egg, by = "eggNOG_alt_name")
+
+#
+ko <- new[,c(1,2,13)]
+ko[is.na(ko)] <- "-"
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+ko <- splitstackshape::cSplit(ko, "KEGG_ko", se=",")
+ko <- melt(setDT(ko), id.vars = c(1,2), variable.name = "KEGG_ko")
+ko$KEGG_ko <- NULL
+names(ko)[3] <- "KEGG_ko"
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-134/trycycler/eggNOG_annotations/OXR-134_KEGG_egg.txt", "wb")
+write.table(ko, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+####
+```{r}
+# OXR-137
+library(readxl)
+egg <- read_excel("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/eggNOG_annotations/out.emapper.annotations.xlsx", skip = 2)
+
+names(egg)[1] <- "eggNOG_alt_name"
+
+codex <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/eggNOG_annotations/OXR-137_eggNOG_codex.txt", sep = " ", header = F)
+
+names(codex) <- c("eggNOG_name", "eggNOG_alt_name")
+
+# Add the names of the codex (i.e: 5_2911) along with the ko'd names (cluster_00X_consensus_polypolish_XXX)
+new <- left_join(codex, egg, by = "eggNOG_alt_name")
+
+#
+ko <- new[,c(1,2,13)]
+ko[is.na(ko)] <- "-"
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+ko <- splitstackshape::cSplit(ko, "KEGG_ko", se=",")
+ko <- melt(setDT(ko), id.vars = c(1,2), variable.name = "KEGG_ko")
+ko$KEGG_ko <- NULL
+names(ko)[3] <- "KEGG_ko"
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/eggNOG_annotations/OXR-137_KEGG_egg.txt", "wb")
+write.table(ko, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+####
+```{r}
+# OXR-159
+library(readxl)
+egg <- read_excel("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-159/trycycler/eggNOG_annotations/out.emapper.annotations.xlsx", skip = 2)
+
+names(egg)[1] <- "eggNOG_alt_name"
+
+codex <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-159/trycycler/eggNOG_annotations/OXR-159_eggNOG_codex.txt", sep = " ", header = F)
+
+names(codex) <- c("eggNOG_name", "eggNOG_alt_name")
+
+# Add the names of the codex (i.e: 5_2911) along with the ko'd names (cluster_00X_consensus_polypolish_XXX)
+new <- left_join(codex, egg, by = "eggNOG_alt_name")
+
+#
+ko <- new[,c(1,2,13)]
+ko[is.na(ko)] <- "-"
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+ko <- splitstackshape::cSplit(ko, "KEGG_ko", se=",")
+ko <- melt(setDT(ko), id.vars = c(1,2), variable.name = "KEGG_ko")
+ko$KEGG_ko <- NULL
+names(ko)[3] <- "KEGG_ko"
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-159/trycycler/eggNOG_annotations/OXR-159_KEGG_egg.txt", "wb")
+write.table(ko, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+####
+```{r}
+# OXR-189
+library(readxl)
+egg <- read_excel("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-189/trycycler/eggNOG_annotations/out.emapper.annotations.xlsx", skip = 2)
+
+names(egg)[1] <- "eggNOG_alt_name"
+
+codex <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-189/trycycler/eggNOG_annotations/OXR-189_eggNOG_codex.txt", sep = " ", header = F)
+
+names(codex) <- c("eggNOG_name", "eggNOG_alt_name")
+
+# Add the names of the codex (i.e: 5_2911) along with the ko'd names (cluster_00X_consensus_polypolish_XXX)
+new <- left_join(codex, egg, by = "eggNOG_alt_name")
+
+#
+ko <- new[,c(1,2,13)]
+ko[is.na(ko)] <- "-"
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+ko <- splitstackshape::cSplit(ko, "KEGG_ko", se=",")
+ko <- melt(setDT(ko), id.vars = c(1,2), variable.name = "KEGG_ko")
+ko$KEGG_ko <- NULL
+names(ko)[3] <- "KEGG_ko"
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-189/trycycler/eggNOG_annotations/OXR-189_KEGG_egg.txt", "wb")
+write.table(ko, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+####
+```{r}
+# OXR-199
+library(readxl)
+egg <- read_excel("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-199/trycycler/eggNOG_annotations/out.emapper.annotations.xlsx", skip = 2)
+
+names(egg)[1] <- "eggNOG_alt_name"
+
+codex <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-199/trycycler/eggNOG_annotations/OXR-199_eggNOG_codex.txt", sep = " ", header = F)
+
+names(codex) <- c("eggNOG_name", "eggNOG_alt_name")
+
+# Add the names of the codex (i.e: 5_2911) along with the ko'd names (cluster_00X_consensus_polypolish_XXX)
+new <- left_join(codex, egg, by = "eggNOG_alt_name")
+
+#
+ko <- new[,c(1,2,13)]
+ko[is.na(ko)] <- "-"
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+ko <- splitstackshape::cSplit(ko, "KEGG_ko", se=",")
+ko <- melt(setDT(ko), id.vars = c(1,2), variable.name = "KEGG_ko")
+ko$KEGG_ko <- NULL
+names(ko)[3] <- "KEGG_ko"
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-199/trycycler/eggNOG_annotations/OXR-199_KEGG_egg.txt", "wb")
+write.table(ko, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+####
+```{r}
+# OXR-203
+library(readxl)
+egg <- read_excel("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/trycycler/eggNOG_annotations/out.emapper.annotations.xlsx", skip = 2)
+
+names(egg)[1] <- "eggNOG_alt_name"
+
+codex <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/trycycler/eggNOG_annotations/OXR-203_eggNOG_codex.txt", sep = " ", header = F)
+
+names(codex) <- c("eggNOG_name", "eggNOG_alt_name")
+
+# Add the names of the codex (i.e: 5_2911) along with the ko'd names (cluster_00X_consensus_polypolish_XXX)
+new <- left_join(codex, egg, by = "eggNOG_alt_name")
+
+#
+ko <- new[,c(1,2,13)]
+ko[is.na(ko)] <- "-"
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+ko <- splitstackshape::cSplit(ko, "KEGG_ko", se=",")
+ko <- melt(setDT(ko), id.vars = c(1,2), variable.name = "KEGG_ko")
+ko$KEGG_ko <- NULL
+names(ko)[3] <- "KEGG_ko"
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-203/trycycler/eggNOG_annotations/OXR-203_KEGG_egg.txt", "wb")
+write.table(ko, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```
+####
+```{r}
+# OXR-209
+library(readxl)
+egg <- read_excel("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-209/trycycler/eggNOG_annotations/out.emapper.annotations.xlsx", skip = 2)
+
+names(egg)[1] <- "eggNOG_alt_name"
+
+codex <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-209/trycycler/eggNOG_annotations/OXR-209_eggNOG_codex.txt", sep = " ", header = F)
+
+names(codex) <- c("eggNOG_name", "eggNOG_alt_name")
+
+# Add the names of the codex (i.e: 5_2911) along with the ko'd names (cluster_00X_consensus_polypolish_XXX)
+new <- left_join(codex, egg, by = "eggNOG_alt_name")
+
+#
+ko <- new[,c(1,2,13)]
+ko[is.na(ko)] <- "-"
+ko$KEGG_ko <- gsub("ko:","",ko$KEGG_ko)
+ko <- splitstackshape::cSplit(ko, "KEGG_ko", se=",")
+ko <- melt(setDT(ko), id.vars = c(1,2), variable.name = "KEGG_ko")
+ko$KEGG_ko <- NULL
+names(ko)[3] <- "KEGG_ko"
+
+output.file <- file("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-209/trycycler/eggNOG_annotations/OXR-209_KEGG_egg.txt", "wb")
+write.table(ko, file = output.file, row.names = F, col.names = T, sep = "\t")
+close(output.file)
+```

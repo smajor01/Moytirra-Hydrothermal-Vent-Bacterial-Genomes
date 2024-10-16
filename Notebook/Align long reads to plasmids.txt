@@ -1,0 +1,19 @@
+### 
+## Need to map long reads to the plasmids
+#
+# First I will need to concatenate all of the proposed plasmid contigs. 
+# Be in a directory that contains all the plasmid contigs
+# Concatenate all of the fasta files to a single file for alignment to the genome
+$ cat *fa > OXR-209_plasmid.fa
+
+# Then align them to the long reads with mini-map2
+# gotta use BWA 
+# copy the plasmid file into the working directory
+bwa index OXR-9_plasmids.fa
+bwa mem -x ont2d OXR-9_plasmids.fa ../../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq.gz > aln.sam
+
+ 
+samtools view -S -b aln.sam > aln.bam
+samtools sort aln.bam -o aln.sorted.bam
+samtools index aln.sorted.bam
+bedtools bamtobed -i aln.sorted.bam > aln.sorted.bed

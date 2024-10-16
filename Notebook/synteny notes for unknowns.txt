@@ -1,0 +1,127 @@
+# Synteny notes from KC
+https://github.com/tanghaibao/jcvi/wiki/MCscan-(Python-version)
+
+# There's also a synteny.zip file on the desktop to check out.
+# And check out the cactus genome alignment powerpoint.
+
+# Download the closest genome relative as determined by the TYGS Genome phylogeny, not the 16S
+
+# Move the prokka annotations gff and ffn file to a new folder
+
+# Make a bed file
+python3 -m jcvi.formats.gff bed --type=CDS echinicola.genomic.gff -o echinicola.bed
+python3 -m jcvi.formats.gff bed --type=CDS portivictoriae.genomic.gff -o portivictoriae.bed
+python3 -m jcvi.formats.gff bed --type=CDS OXR-203.gff -o OXR-203.bed
+
+# reformat Fasta files
+python3 -m jcvi.formats.fasta format echinicola.cds_from_genomic.fna echinicola.cds
+python3 -m jcvi.formats.fasta format portivictoriae.cds_from_genomic.fna portivictoriae.cds
+python3 -m jcvi.formats.fasta format OXR-203.ffn OXR-203.cds
+
+### fix the Faviae and portivictoriae files
+sed -i 's/.*cds_/>cds-/g' echinicola.cds
+sed -i 's/.*cds_/>cds-/g' portivictoriae.cds
+
+### then fix erroneous stuff:
+cut -f1,2 -d'_' echinicola.cds > echinicola_editHeader.cds
+mv echinicola_editHeader.cds echinicola.cds
+
+cut -f1,2 -d'_' portivictoriae.cds > portivictoriae_editHeader.cds
+mv portivictoriae_editHeader.cds portivictoriae.cds
+
+### Calculate synteny
+python3 -m jcvi.compara.catalog ortholog echinicola OXR-203 --no_strip_names
+python3 -m jcvi.compara.catalog ortholog portivictoriae OXR-203 --no_strip_names
+
+### Look at synteny depth
+python3 -m jcvi.compara.synteny depth --histogram echinicola.OXR-203.anchors
+python3 -m jcvi.compara.synteny depth --histogram portivictoriae.OXR-203.anchors
+
+### Get the chromosome of each organism and make a "seqid" file
+awk '{print $1}' portivictoriae.bed |sort | uniq | tr '\n' ',' | sed 's/,$//' > seqids
+awk '{print $1}' OXR-203.bed |sort | uniq | tr '\n' ',' | sed 's/,$//' > temp
+awk '{print $1}' echinicola.bed |sort | uniq | tr '\n' ',' | sed 's/,$//' > temp2
+cat seqids <(echo) temp > seqids2 
+cat seqids2 <(echo) temp2> seqids
+rm seqids2
+rm temp
+rm temp2
+
+### Make the "...anchors.simple" file
+python3 -m jcvi.compara.synteny screen --minspan=30 --simple echinicola.OXR-203.anchors echinicola.OXR-203.anchors.new
+python3 -m jcvi.compara.synteny screen --minspan=30 --simple portivictoriae.OXR-203.anchors portivictoriae.OXR-203.anchors.new
+
+### Make a "layout" file
+# y, xstart, xend, rotation, color, label, va,  bed
+ .8,     .2,    .9,       0,      r, C. portivictoriae, top, portivictoriae.bed
+ .6,     .2,    .9,       0,      g, OXR-203 , top, OXR-203.bed
+ .4,     .2,    .9,       0,      b, C. echinicola, top, echinicola.bed
+# edges
+e, 0, 1, portivictoriae.OXR-203.anchors.simple
+e, 1, 2, echinicola.OXR-203.anchors.simple
+
+# make the graphic
+python -m jcvi.graphics.karyotype seqids layout --nocircle --figsize=12x11
+
+
+### ~~~
+### ~~~ I want to look at the empty, non syntenous, regions of the genomes
+# Do micro synteny...
+python3 -m jcvi.compara.synteny mcscan OXR-159.bed indolifex.OXR-159.lifted.anchors --iter=1 -o indolifex.OXR-159.i1.blocks
+
+# take sequence names that don't have a syntenous genes
+awk '$2 == "."' indolifex.OXR-159.i1.blocks > indolifex.dot.test
+
+# take the annotations of the proteins from the .ffn file
+grep ">" OXR-159.ffn > OXR-159.annos.txt
+sed -i 's/>//g' OXR-159.annos.txt
+
+# take the annotations that match the non-syntenic regions.
+awk '{print $1}' indolifex.dot.test | grep -Ff - OXR-159.annos.txt > indolifex.OXR-159.no-synteny.annos.txt
+# add a new first column with some identifying information
+awk -v new_column="OXR-159_indolifex" '{print new_column, $0}' indolifex.OXR-159.no-synteny.txt > tmp && mv tmp indolifex.OXR-159.no-synteny.txt
+
+#~~~ this got made into a command "no_synteny_query.bash"
+~/no_synteny_query.bash OXR-137 salexigens
+~/no_synteny_query.bash OXR-137 litoreum
+
+cat salexigens.OXR-137.no-synteny.annos.txt litoreum.OXR-137.no-synteny.annos.txt > OXR-137_no_synteny.txt
+
+# this makes it so that there is a tab replacing the spaces before the comparison name, the gene name, and the annotation. 
+# Makes importing into excel easier
+sed 's/ /    /2' OXR-137_no_synteny.txt | sed 's/ /    /1' > tmp && mv tmp OXR-137_no_synteny.txt
+
+###~~~ No I want to look at specific regions of the genome to look at synteny
+python3 -m jcvi.compara.synteny mcscan OXR-159.bed indolifex.OXR-159.lifted.anchors --iter=1 -o indolifex.OXR-159.i1.blocks
+
+sort indolifex.OXR-159.i1.blocks > tmp && mv tmp indolifex.OXR-159.i1.blocks
+
+head -50 indolifex.OXR-159.i1.blocks > indolifex.500.blocks
+# or...
+sed -n '1580,1600p' indolifex.OXR-159.i1.blocks > indolifex.1580_1600.blocks
+
+# Make the blocks layout
+# x,   y, rotation,   ha,     va,   color, ratio,            label
+0.5, 0.6,        0, left, center,       m,     1,       OXR-159 Chr1
+0.5, 0.4,        0, left, center, #fc8d62,     1, indolifex scaffold_1
+# edges
+e, 0, 1
+
+cat OXR-159.bed indolifex.bed > 159_indolifex.bed
+
+python -m jcvi.graphics.synteny indolifex.1580-1600.blocks 159_indolifex.bed indolifex.blocks.layout
+
+###~~~ I took the "OXR-137_no_synteny.txt" file, edited in R and excel "exploring non-syntenic regions.R"
+###~~~ Then I took the proteins from the associated amino-acid fasta file and blasted them against nr
+
+# I want the proteins to blast.
+# Get the names of the proteins from the "137_no_syn_functions_cln" file to make the gi_genes.tmp file
+../../scripts/FastaToTbl.txt ../OXR-137/trycycler/eggNOG_annotations/out.emapper.genepred.fasta | grep -w -f OXR-137\ synteny/gi_genes.tmp | ../../scripts/TblToFasta.txt > OXR-137\ synteny/137_shared_genes.faa
+# remember to include the NA's and their proteins
+
+blastp -query 203_shared_genes.faa -db /data/resources/databases/blastdb/nr -out 203_shared_blastp.txt -outfmt "6 qseqid sseqid pident stitle qcovs evalue length mismatch gapopen qstart qend sstart send bitscore" -num_alignments 5 -num_threads 16
+
+# Look for all the genes in the Range of GI
+# make the file "OXR-137 synteny/prokka_egg_GI_genes.txt" form the R script exploring non-syntenic regions.RMD
+
+cat ../OXR-137/trycycler/prokka_annotation/OXR-137.faa ../OXR-137/trycycler/eggNOG_annotations/out.emapper.genepred.fasta | ../../scripts/FastaToTbl.txt | grep -Fw -f <(cut -d ' ' -f 8 OXR-137\ synteny/prokka_egg_GI_genes.txt) | ../../scripts/TblToFasta.txt > OXR-137\ synteny/GI_genes_inRange.fa

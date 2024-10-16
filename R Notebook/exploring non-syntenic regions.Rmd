@@ -1,0 +1,337 @@
+---
+title: "getting the non-syntenic regions"
+output: html_document
+date: "2024-06-11"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Read in the non-syntenic regions
+
+```{r}
+library(dplyr)
+library(tidyverse)
+setwd("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/")
+
+no.syn.137 <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-137_no_synteny.txt", sep = "\t", header = F)
+names(no.syn.137) <- c("Compared","Gene","Annotation") # Add headers
+no.syn.137$Split <- no.syn.137$Gene # prepare to split
+no.syn.137 <- no.syn.137 %>% separate(Split, into=c("Contig","Number"), sep = "_")
+
+dup.137 <- no.syn.137[duplicated(no.syn.137$Gene),]
+dup.137$Found <- "Idiomarina sp. OXR-137"
+write.table(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-137_shared_no_synteny.txt",dup.137) 
+#~~~ non-syntenic regions, i.e; only found in OXR-137
+
+unique.137 <- no.syn.137[! no.syn.137$Gene %in% dup.137$Gene,]
+write.table(file = "OXR-137_unique_no_synteny.txt",unique.137) 
+#~~~ these files are the genes that DO NOT HAVE A MATCH to the named organisms
+#~~~ ergo, the mismatch is unique. It should be found in the OTHER organism
+
+# unique(unique.137$Compared)[[2]]
+# 
+# un.137.dubius <- unique.137[unique.137$Compared %in% unique(unique.137$Compared)[[1]],]
+# un.137.dubius$Found <- "Sulfitobacter indolifex SAORIC-263"
+# 
+# un.137.indolifex <- unique.137[unique.137$Compared %in% unique(unique.137$Compared)[[2]],]
+# un.137.indolifex$Found <- "Sulfitobacter dubius CI.11.F.A3"
+
+# no.137 <- rbind(dup.137, un.137.dubius, un.137.indolifex)
+
+###~~~ Edit the "OXR-137_shared_no_synteny.txt" to identify the genomic islands and give them a number
+###~~~ The files name is "137_no_syn_islands.csv"
+islands.137 <- read.csv("C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/137_no_syn_islands.csv", header = T)
+islands.137 <- islands.137 %>% filter(Compared !="")
+islands.137 <- islands.137 %>% select(-Compared,-Contig, -Number,-Found)
+
+```
+
+## Next I want to see what these genes do, according to KEGG. 
+## I need to match the gene id's from the above file (originating from PROKKA)
+## and match that to the gene names from the eggnog annotations 
+## the eggnog annotations contain the information for their KEGG annotations
+## find the KEGG information in the "finding_kegg_functions.Rmd" file
+
+```{r}
+# Read in the GFF from the eggnog Annotations
+egg.137 <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/eggNOG_annotations/out.emapper.decorated.gff", sep = "\t", skip = 8, header = F)
+egg.137 <- egg.137 %>% separate(V9, into="ID", sep = ";")
+egg.137$ID <- gsub(x = egg.137$ID, ".*_","")
+egg.137$isolate <- "OXR-137"
+egg.137$eggNOG_alt_name.x <- paste0(egg.137$V1,"_",egg.137$ID)
+egg.137 <- egg.137 %>% select(-V2,-V3,-V6,-V7,-V8,-ID)
+names(egg.137) <- c("Contig","start","stop","isolate","eggNOG_alt_name.x")
+
+# Read in the GFF from the prokka annotations
+prok.137 <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/prokka_annotation/OXR-137.gff", sep = "\t", skip = 4, header = F)
+prok.137 <- prok.137 %>% separate(V9, into="Gene", sep = ";")
+prok.137 <- prok.137[grep("cluster",prok.137$V1),] %>% .[! grepl(">",.$V1),]
+prok.137$Gene <- gsub(x = prok.137$Gene, "ID=","")
+
+
+# sel <- no.137[,c("Gene","Annotation","Found")]
+
+test <- prok.137[prok.137$Gene %in% islands.137$Gene,]
+test <- merge(test, islands.137, by = "Gene")
+test <- test %>% select(-V2,-V3,-V6,-V7,-V8)
+names(test) <- c("Gene","Contig","start","stop","Annotation","Non.syntenic_GI")
+test$isolate <- "OXR-137"
+
+prok.egg <- merge(egg.137, test, by=c("isolate","Contig","start","stop"), all.y = T) #%>% select(isolate,eggNOG_alt_name.x,Found)
+prok.egg$Contig <- gsub("cluster_001_consensus_polypolish","Chr", prok.egg$Contig)
+# prok.egg$Contig <- gsub("cluster_004_consensus_polypolish","pOXR137-01", prok.egg$Contig)
+# prok.egg$Contig <- gsub("cluster_003_consensus_polypolish","pOXR137-02", prok.egg$Contig)
+# prok.egg$Contig <- gsub("cluster_007_consensus_polypolish","pOXR137-03", prok.egg$Contig)
+# prok.egg$Contig <- gsub("cluster_008_consensus_polypolish","pOXR137-04", prok.egg$Contig)
+# prok.egg$Contig <- gsub("cluster_009_consensus_polypolish","pOXR137-02", prok.egg$Contig)
+# prok.egg$Contig <- gsub("cluster_010_consensus_polypolish","pOXR137-06", prok.egg$Contig)
+# prok.egg$Contig <- gsub("cluster_013_consensus_polypolish","pOXR137-07", prok.egg$Contig)
+
+all.edits <- all %>% select(-baseMean,-log2FoldChange,-lfcSE,-stat,-pvalue,-padj,-eggNOG_alt_name.y,-full_name,-location)
+
+no.syn.anno.137 <- merge(all.edits[all.edits$isolate == "OXR-137",], prok.egg, by = c("isolate","Contig","eggNOG_alt_name.x","start","stop"), all.y = T)
+
+write.csv(file = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/137_no_syn_functions.csv", no.syn.anno.137)
+###~~~This needs to be edited
+
+```
+
+### I'm gonna work with this file to make sure the names of the non-syntenous genomic islands are numbered in the same row.
+```{r}
+###~~~ Read in the file above that's been edited to split cross over genomic island numbering
+fixed <- read.csv("C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/137_no_syn_functions.csv", header = T)
+
+df <- data.frame(Non.syntenic_GI = unique(fixed$Non.syntenic_GI),
+                 new.num = c(1:max(unique(fixed$Non.syntenic_GI))))
+
+fix.2 <- merge(fixed, df, by = "Non.syntenic_GI")
+fix.2$Non.syntenic_GI <- NULL
+fix.2 <- fix.2 %>% rename(Non.syntenic_GI = new.num)
+
+write.csv(file = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/137_no_syn_functions_cln.csv", fix.2)
+
+
+
+```
+
+
+Revist merging the prokka and eggnog gffs together.
+Read in the GFF from the eggnog Annotations
+```{r}
+library(dplyr)
+## Revist merging the prokka and eggnog gffs together.
+# Read in the GFF from the eggnog Annotations
+egg.137 <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/eggNOG_annotations/out.emapper.decorated.gff", sep = "\t", skip = 4, header = F) 
+#137 skip 8
+#137 skip 18
+#137 skip 4
+#137 skip 4
+egg.137 <- egg.137 %>% separate(V9, into="ID", sep = ";")
+egg.137$ID <- gsub(x = egg.137$ID, ".*_","")
+egg.137$isolate <- "OXR-137"
+egg.137$eggNOG_alt_name.x <- paste0(egg.137$V1,"_",egg.137$ID)
+egg.137 <- egg.137 %>% select(-V2,-V6,-V8,-ID)
+names(egg.137) <- c("Contig","feature","start","stop","sense","isolate","eggNOG_alt_name.x")
+
+# Read in the GFF from the prokka annotations
+prok.137 <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/prokka_annotation/OXR-137.gff", sep = "\t", skip = 2, header = F)
+#137 skip 4
+#137 skip 9
+#137 skip 2
+#137 skip 2
+prok.137 <- prok.137 %>% separate(V9, into="Gene", sep = ";")
+prok.137 <- prok.137[grep("cluster",prok.137$V1),] %>% .[! grepl(">",.$V1),]
+prok.137$Gene <- gsub(x = prok.137$Gene, "ID=","")
+prok.137$isolate <- "OXR-137"
+
+prok.137.new <- prok.137 %>% select(c(-V2, -V6, -V8))
+names(prok.137.new) <- c("Contig","feature","start","stop","sense","Gene","isolate")
+
+prok.egg.137 <- merge(egg.137, prok.137.new, by = c("Contig","feature","start","stop","sense","isolate"), all = T) %>% mutate(all.genes = coalesce(Gene, eggNOG_alt_name.x))
+
+# read in the "...annos.txt" file that was made with the script no_synteny_query.bash or synteny_notes_for_unknowns.txt
+annos <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/prokka_annotation/OXR-137.annos.txt", header = F, stringsAsFactors = F, sep = "^") # the sep here is a trash separator because there are commas in the annotations
+annos <- annos %>% separate(V1, into = c("Gene","Annotation"), sep = " ", extra = "merge")
+
+anno.prok <- merge(prok.egg.137, annos, by = "Gene", all.x = T)
+
+# add the plasmid names
+anno.prok$Contig.2 <- anno.prok$Contig
+# Thalassobaculum
+# old.137.val <- c("cluster_004_consensus_polypolish","cluster_009_consensus_polypolish","cluster_001_consensus_polypolish")
+# new.137.val <- c("pOXR137-01","pOXR137-02","Chr")
+# Sulfitobacter
+# old.137.val <- c("cluster_008_consensus_polypolish", "cluster_007_consensus_polypolish", "cluster_003_consensus_polypolish", "cluster_004_consensus_polypolish", "cluster_001_consensus_polypolish", "cluster_013_consensus_polypolish","cluster_010_consensus_polypolish", "cluster_009_consensus_polypolish")
+# new.137.val <- c("pOXR137-04", "pOXR137-03", "pOXR137-02", "pOXR137-01", "Chr", "pOXR137-07", "pOXR137-06", "pOXR137-05")
+# Idiomarina and Chistiangramia
+old.137.val <- c("cluster_001_consensus_polypolish")
+new.137.val <- c("Chr")
+
+anno.prok <- anno.prok %>%
+  mutate(Contig = recode(Contig, !!!setNames(new.137.val, old.137.val)))
+anno.prok <- anno.prok[c("isolate","Contig","Contig.2","eggNOG_alt_name.x","Gene","feature","start","stop","sense","all.genes","Annotation")]
+
+write.table(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/trycycler/prokka_eggnog_mergedGFF.txt",anno.prok, row.names = F)
+```
+
+This next section will identify and subset a new table of all the mobile genetic elements from mobileOG
+Then it will use the eggNOG GFF and prokka GFF to fetch all the genes within the non-syntenic genomic islands.
+I'll combine all those protein sequences and fetch them with a bash codes
+```{r}
+library(dplyr)
+library(tidyverse)
+
+fixed.2 <- read.csv("C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/137_no_syn_functions_cln.csv", header = T)
+fixed.2$X <- NULL
+# look at the ranges of the genomic islands
+range.137 <- fixed.2 %>%
+  group_by(Non.syntenic_GI) %>%
+  summarize(
+    range_start = min(start),
+    range_stop = max(stop)
+  )
+
+contig <- fixed.2[c("isolate","Contig","Contig.2","Non.syntenic_GI")]
+
+data <- contig[!duplicated(contig$Non.syntenic_GI),]
+
+ranges <- merge(data, range.137, by = "Non.syntenic_GI")
+
+## After using proksee and running mobileOG-db (beatrix-1.6), 
+# I'm going to find the mobile genetic elements in a file
+
+# use files from the R script "exploring non-syntenic regions.Rmd"
+mobile <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/OXR-137/proksee files/cgview.fa.mobileOG.Alignment.Out.csv",header = T)
+
+mobile$Contig.2 <- mobile$Specific.Contig
+
+# I want the mobile genetic elements that fall within the range of the genomic islands
+# Join the data frames on the 'contig' column
+merged_df <- mobile %>%
+  inner_join(ranges, by = "Contig.2")
+
+# Filter the rows
+filtered_df <- merged_df %>%
+  filter(ORF_Start >= range_start & ORF_End <= range_stop) %>%
+  select( Contig, Contig.2, e.value,  Best.Hit.Accession.ID,Source.Database, Evidence.Type, Pident, ORF_Start, ORF_End, Non.syntenic_GI, Gene.Name, Major.mobileOG.Category,Minor.mobileOG.Category, range_start, range_stop)  # Optionally select relevant columns
+
+annos.to.merge <- anno.prok[c("Contig","Contig.2","start","stop","Gene","Annotation")]
+names(annos.to.merge) <- c("Contig","Contig.2","ORF_Start","ORF_End","Gene","Annotation")
+
+anno.df <- merge(filtered_df, annos.to.merge, by = c("Contig","Contig.2","ORF_Start","ORF_End"), all.x = T)
+
+write.csv(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-137 synteny/mobileOG_GIs_w_annos.csv", anno.df)
+
+## Merge the ranges with these new genes
+# prok.egg.137$Contig.2 <- prok.egg.137$Contig
+
+prok.egg.range <- anno.prok %>% inner_join(ranges, by = c("isolate","Contig","Contig.2"))
+
+# Filter the rows
+prok.egg.GI <- prok.egg.range %>%
+  filter(start >= range_start & stop <= range_stop) 
+
+write.csv(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-137 synteny/prokka_egg_GI_genes.csv",prok.egg.GI, row.names = F)
+
+write.table(file = "C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-137 synteny/prokka_egg_GI_genes.txt",prok.egg.GI, row.names = F, quote = F)
+
+# gi.genes.137 <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-137 synteny/prokka_egg_GI_genes.txt", header = T, sep = " ")
+
+### Pull the protein sequences that match the all.genes field
+# cat ../OXR-137/trycycler/prokka_annotation/OXR-137.faa ../OXR-137/trycycler/eggNOG_annotations/out.emapper.genepred.fasta | ../../scripts/FastaToTbl.txt | grep -Fw -f <(cut -d ' ' -f 9 OXR-137\ synteny/prokka_egg_GI_genes.txt) | ../../scripts/TblToFasta.txt > OXR-137\ synteny/GI_genes_inRange.fa
+#../../scripts/FastaToTbl.txt OXR-137\ synteny/GI_genes_inRange.fa | awk '{print $1}' > OXR-137\ synteny/grep_names.txt
+
+# just checking to see if anything is missing. Missing genes appear to be tRNA.
+# list <- read.table("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-137 synteny/grep_names.txt")
+
+# non <- prok.egg.GI[! prok.egg.GI$all.genes %in% list$V1,]
+
+```
+
+```{r}
+library(dplyr)
+library(tidyr)
+gi.genes.137 <- read.csv("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-137 synteny/prokka_egg_GI_genes.csv", header = T)
+
+j <- table(gi.genes.137$Annotation, gi.genes.137$Non.syntenic_GI) %>% as.data.frame.matrix()
+colSums(j)
+
+# Here I'm going to include the eggNOG KEGG functional annotations
+# make the ranges to select for genes.
+fixed.2 <- read.csv("C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/137_no_syn_functions_cln.csv", header = T)
+fixed.2$X <- NULL
+# look at the ranges of the genomic islands
+range.137 <- fixed.2 %>%
+  group_by(Non.syntenic_GI) %>%
+  summarize(
+    range_start = min(start),
+    range_stop = max(stop)
+  )
+
+contig <- fixed.2[c("isolate","Contig","Contig.2","Non.syntenic_GI")]
+
+data <- contig[!duplicated(contig$Non.syntenic_GI),]
+
+ranges <- merge(data, range.137, by = "Non.syntenic_GI")
+
+# remove erroneous columns, and merge it with the other GI annotations
+all.gi.137 <- all %>% select(-baseMean,-log2FoldChange,-lfcSE,-stat,-pvalue,-padj,-eggNOG_alt_name.y,-full_name,-location) %>%   filter(isolate == "OXR-137") 
+
+# Join the data frames on the 'contig' column
+merged_df <- all.gi.137 %>%
+  inner_join(ranges, by = c("isolate","Contig"))
+
+# Filter the rows
+filtered_df <- merged_df %>%
+  filter(start >= range_start & stop <= range_stop) %>%
+  merge(gi.genes.137, by = c("isolate","Contig","Contig.2", "Non.syntenic_GI","eggNOG_alt_name.x","start","stop","sense","range_start","range_stop"), all = T) %>% filter(!is.na(all.genes))
+
+### ~~~ Uncomment this line to write the file 
+# write.csv(file = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/137_GI_annotations_functions.csv", filtered_df)
+
+# Add an asterisk to the annotation of each gene that is duplicated due to multiple kegg annotations
+filter_dup <- filtered_df[duplicated(filtered_df$all.genes),]
+# filter_sing <- filtered_df[!duplicated(filtered_df$all.genes),]
+
+dups <- filtered_df[filtered_df$all.genes %in% filter_dup$all.genes,] %>% mutate(Annotation = paste0("*", Annotation))
+sing <- filtered_df[! filtered_df$all.genes %in% filter_dup$all.genes,]
+
+dup.edits <- rbind(dups, sing)
+
+write.csv(file = "C:/Users/SamuelMajor/Box/Science/Microbe Repository/OceanX Deep Water Culturing/Notes and Genome Assemblies/137_GI_annotations_functions_dups.csv", dup.edits)
+
+
+# write the ghostKOALA details into the file
+ghost.137 <- read.table("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-137 synteny/ghostkoal_ko_detail.txt", header = F, sep = "\t")
+
+names(ghost.137) <- c("all.genes","ko.ghost","ghst.def","ghst.scr","ko.ghost.2","ghst.scr.2")
+
+ghst.gi.genes <- dup.edits %>% merge(ghost.137, by = "all.genes")
+
+ghst.gi.genes <- ghst.gi.genes[c("isolate","Contig","Contig.2","all.genes","eggNOG_alt_name.x","Gene","feature","start","stop","sense","Non.syntenic_GI","Description","Preferred_name","PFAMs","ko","pathway","ko.ghost","ghst.scr","ghst.def","ko.ghost.2","ghst.scr.2","name","class","description","Annotation")] %>% mutate(ko = ifelse(ko == "-", NA, ko)) %>% mutate(ko.ghost = ifelse(ko.ghost == "", NA, ko)) %>% mutate(ko.comb = coalesce(ko.ghost,ko)) %>% mutate(ko.comb.2 = coalesce(ko.ghost,ko,ko.ghost.2))
+
+# ghst.gi.genes %>%
+#   group_by(Non.syntenic_GI) %>%
+#   group_split() %>%
+#   walk2(.x = ., .y = unique(ghst.gi.genes$Non.syntenic_GI), ~ {
+#     # Extract only gene.names and ko columns
+#     subset_df <- .x %>%
+#       select(all.genes, ko.comb)
+#     
+#     # Write each subset to a separate CSV file
+#     write.table(subset_df, file = paste0("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-137 synteny/137_GI_", .y, "_ko.csv"), row.names = FALSE, quote = F, sep = "\t", col.names = F)
+#   })
+
+split_dfs <- split(ghst.gi.genes, ghst.gi.genes$Non.syntenic_GI)
+
+for (island in names(split_dfs)) {
+  subset_df <- split_dfs[[island]] %>%
+    select(all.genes, ko.comb)
+  
+  # Write each subset to a separate CSV file
+  write.table(subset_df, file = paste0("C:/Users/SamuelMajor/OneDrive - Gloucester Marine Genomics Institute/Desktop/OXR genomes/Synteny Analysis/OXR-137 synteny/137_GI_", island, "_ko.txt"), row.names = FALSE, quote = F, sep = "\t", col.names = F)
+}
+```
+

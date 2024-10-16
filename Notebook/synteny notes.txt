@@ -1,0 +1,130 @@
+# Synteny notes from KC
+https://github.com/tanghaibao/jcvi/wiki/MCscan-(Python-version)
+
+# There's also a synteny.zip file on the desktop to check out.
+# And check out the cactus genome alignment powerpoint.
+
+# Download the closest genome relative as determined by the TYGS Genome phylogeny, not the 16S
+
+# Move the prokka annotations gff and ffn file to a new folder
+
+# Make a bed file
+python3 -m jcvi.formats.gff bed --type=CDS faviae_genomic.gff -o faviae.bed
+python3 -m jcvi.formats.gff bed --type=CDS indolifex_genomic.gff -o indolifex.bed
+python3 -m jcvi.formats.gff bed --type=CDS OXR-9.gff -o OXR-9.bed
+
+# reformat Fasta files
+python3 -m jcvi.formats.fasta format faviae_cds_from_genomic.fna faviae.cds
+python3 -m jcvi.formats.fasta format indolifex_cds_from_genomic.fna indolifex.cds
+python3 -m jcvi.formats.fasta format OXR-9.ffn OXR-9.cds
+
+# Remove some weird lettering before the headers
+sed 's/^>lcl|/>/' faviae.cds > faviae.cds
+
+
+### fix the Faviae and indolifex files
+sed -i 's/.*cds_/>cds-/g' faviae.cds
+sed -i 's/.*cds_/>cds-/g' indolifex.cds
+#this will remove everything before and including the cds and then add it back in as "cds-" to match your bed file
+#-i will change the faviae.cds file - could also remove the -i and direct it to a second file if you want to check your command by doing > newfile.cds
+
+### then:
+cut -f1,2 -d'_' faviae.cds > faviae_editHeader.cds
+cut -f1,2 -d'_' indolifex.cds > indolifex_editHeader.cds
+#this will remove everything after the second occurrence of an "_". I am doing this because in your cds file there is an _ and a # but that is not in the bed file IDs
+
+### Calculate synteny
+python3 -m jcvi.compara.catalog ortholog faviae OXR-9 --no_strip_names
+
+### Look at synteny depth
+python3 -m jcvi.compara.synteny depth --histogram faviae.OXR-9.anchors
+
+### Get the chromosome of each organism and make a "seqid" file
+awk -F"\t" '!_[$1]++' faviae.bed ## This works too... awk '{print $1}' faviae.bed |sort | uniq
+awk -F"\t" '!_[$1]++' OXR-9.bed
+### Example "seqid" file
+cluster_001_consensus_polypolish,cluster_002_consensus_polypolish,cluster_003_consensus_polypolish,cluster_004_consensus_polypolish,cluster_005_consensus_polypolish,cluster_006_consensus_polypolish,cluster_011_consensus_polypolish,cluster_012_consensus_polypolish
+NZ_PGFQ01000001.1,NZ_PGFQ01000002.1,NZ_PGFQ01000003.1,NZ_PGFQ01000004.1,NZ_PGFQ01000005.1
+
+### Make a "layout" file
+# y, xstart, xend, rotation, color, label, va,  bed
+ .6,     .1,    .8,       0,      , OXR-9 S. faviae, top, OXR-9.bed
+ .4,     .1,    .8,       0,      , S. faviae, top, faviae.bed
+# edges
+e, 0, 1, faviae.OXR-9.anchors.simple
+
+### Make the "...anchors.simple" file
+python3 -m jcvi.compara.synteny screen --minspan=30 --simple faviae.OXR-9.anchors faviae.OXR-9.anchors.new
+
+### Repeat the above with the indolifex
+python3 -m jcvi.compara.catalog ortholog indolifex OXR-9 --no_strip_names
+python3 -m jcvi.compara.synteny depth --histogram indolifex.OXR-9.anchors
+python3 -m jcvi.compara.synteny screen --minspan=30 --simple indolifex.OXR-9.anchors indolifex.OXR-9.anchors.new
+python -m jcvi.graphics.karyotype seqids layout
+
+###########
+### repeat for OXR-159
+# Copy files indolifex and faviae cds, bed, seqids, and layout files to the Synteny Analysis folder for OXR-159
+python3 -m jcvi.formats.gff bed --type=CDS OXR-159.gff -o OXR-159.bed
+python3 -m jcvi.formats.fasta format OXR-159.ffn OXR-159.cds
+python3 -m jcvi.compara.catalog ortholog faviae OXR-159 --no_strip_names
+python3 -m jcvi.compara.synteny depth --histogram faviae.OXR-159.anchors
+python3 -m jcvi.compara.synteny screen --minspan=30 --simple faviae.OXR-159.anchors faviae.OXR-159.anchors.new
+
+python3 -m jcvi.compara.catalog ortholog indolifex OXR-159 --no_strip_names
+python3 -m jcvi.compara.synteny depth --histogram indolifex.OXR-159.anchors
+python3 -m jcvi.compara.synteny screen --minspan=30 --simple indolifex.OXR-159.anchors indolifex.OXR-159.anchors.new
+
+python -m jcvi.graphics.karyotype seqids layout
+
+###########
+### repeat for OXR-199
+python3 -m jcvi.formats.gff bed --type=CDS litoralis_genomic.gff -o litoralis.bed
+python3 -m jcvi.formats.fasta format litoralis_cds_from_genomic.fna litoralis.cds
+sed -i 's/.*cds_/>cds-/g' litoralis.cds
+cut -f1,2 -d'_' litoralis.cds > litoralis_edit.cds
+mv litoralis_edit.cds litoralis.cds
+
+python3 -m jcvi.formats.gff bed --type=CDS pontiacus_genomic.gff -o pontiacus.bed
+python3 -m jcvi.formats.fasta format pontiacus_cds_from_genomic.fna pontiacus.cds
+sed -i 's/.*cds_/>cds-/g' pontiacus.cds
+cut -f1,2 -d'_' pontiacus.cds > pontiacus_edit.cds
+mv pontiacus_edit.cds pontiacus.cds
+
+python3 -m jcvi.formats.gff bed --type=CDS OXR-199.gff -o OXR-199.bed
+python3 -m jcvi.formats.fasta format OXR-199.ffn OXR-199.cds
+
+### Calculate synteny
+python3 -m jcvi.compara.catalog ortholog litoralis OXR-199 --no_strip_names
+python3 -m jcvi.compara.synteny depth --histogram litoralis.OXR-199.anchors
+python3 -m jcvi.compara.synteny screen --minspan=30 --simple litoralis.OXR-199.anchors litoralis.OXR-199.anchors.new
+
+python3 -m jcvi.compara.catalog ortholog pontiacus OXR-199 --no_strip_names
+python3 -m jcvi.compara.synteny depth --histogram pontiacus.OXR-199.anchors
+python3 -m jcvi.compara.synteny screen --minspan=30 --simple pontiacus.OXR-199.anchors pontiacus.OXR-199.anchors.new
+
+### Get the chromosome of each organism and make a "seqid" file
+awk '{print $1}' litoralis.bed |sort | uniq
+awk '{print $1}' OXR-199.bed |sort | uniq
+awk '{print $1}' pontiacus.bed |sort | uniq
+### Manually make the "layout" file
+
+python -m jcvi.graphics.karyotype seqids layout
+
+###########
+### Compare the 3 genomes OXR-9 OXR-159 OXR-199
+python3 -m jcvi.compara.catalog ortholog OXR-9 OXR-159 --no_strip_names
+python3 -m jcvi.compara.synteny depth --histogram OXR-9.OXR-159.anchors
+python3 -m jcvi.compara.synteny screen --minspan=30 --simple OXR-9.OXR-159.anchors OXR-9.OXR-159.anchors.new
+
+python3 -m jcvi.compara.catalog ortholog OXR-9 OXR-199 --no_strip_names
+python3 -m jcvi.compara.synteny depth --histogram OXR-9.OXR-199.anchors
+python3 -m jcvi.compara.synteny screen --minspan=30 --simple OXR-9.OXR-199.anchors OXR-9.OXR-199.anchors.new
+
+python3 -m jcvi.compara.catalog ortholog OXR-159 OXR-199 --no_strip_names
+python3 -m jcvi.compara.synteny depth --histogram OXR-159.OXR-199.anchors
+python3 -m jcvi.compara.synteny screen --minspan=30 --simple OXR-159.OXR-199.anchors OXR-159.OXR-199.anchors.new
+
+# Make seqid and layout table
+
+python -m jcvi.graphics.karyotype seqids layout

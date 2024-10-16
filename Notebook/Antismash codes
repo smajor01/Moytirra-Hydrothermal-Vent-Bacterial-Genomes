@@ -1,0 +1,19 @@
+# Run on the online portal
+# upload final genome as fasta file
+# Check (defaults) "KnownClusterBlast", "TFBS Analysis", "ActiveSiteFinder", "SubClusterBlast", "RREFinder". 
+# Check "Pfam-based GO term annotation"
+
+# antismash data
+
+python3 /app/data/antismash-7.0.0/run_antismash.py OXR-9_final_assembly.fsa --output-dir trycycler/antismash --output-basename OXR-9
+
+#################
+# This was ultimately done on the web browser
+
+#################
+# Execute the genome through deepBGC on the server. This generates an ....antismash.json file (with other stuff).
+# re-do the antismash and include the deepBGC json file with the "Upload exta annotations" option.
+
+# run the antismash_converter.py script to make a table with the new antismash data.
+
+# combine all the data and plot it with the R script "AntiSMASH deepBGC merging.Rmd"

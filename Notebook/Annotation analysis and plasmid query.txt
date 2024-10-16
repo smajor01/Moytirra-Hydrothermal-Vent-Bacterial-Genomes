@@ -1,0 +1,405 @@
+# This document describes the Annotation, BARRNAP identification, plasmidSPAdes, and other alignments for the OXR cultures
+
+#################################################################
+# Annotation
+
+#OXR-11
+$ /data/app/prokka/bin/prokka --outdir prokka_annotation masurca_assembly/CA.mr.99.17.15.0.02/primary.genome.scf.fasta --prefix OXR-11
+# output file names 
+errorsummary.val
+OXR-11.ffn            
+OXR-11.fsa  
+OXR-11.log  
+OXR-11.tsv
+OXR-11.err  
+OXR-11.fixedproducts  
+OXR-11.gbf  
+OXR-11.sqn  
+OXR-11.txt
+OXR-11.faa  
+OXR-11.fna            
+OXR-11.gff  
+OXR-11.tbl  
+OXR-11.val
+
+#OXR-134
+$ /data/app/prokka/bin/prokka --outdir prokka_annotation masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta --prefix OXR-134
+errorsummary.val  
+OXR-134.faa  
+OXR-134.fixedproducts  
+OXR-134.fsa  
+OXR-134.gff  
+OXR-134.sqn  
+OXR-134.tsv  
+OXR-134.val
+OXR-134.err       
+OXR-134.ffn  
+OXR-134.fna            
+OXR-134.gbf  
+OXR-134.log  
+OXR-134.tbl  
+OXR-134.txt
+
+# These codes were repeated for each isolate; execute the code in the culture's directory: "Analysis/OXR-x"
+# I generated an alias in the .bashrc file for prokka to execute it more quickly without including the whole path: 
+alias prokka='/data/app/prokka/bin/prokka'
+
+#################################################################
+# barrnap for 16S ID
+# make alias in .bashrc file for barrnap
+alias barrnap='/data/app/barrnap/bin/barrnap'
+
+# Make a new directory in each isolates folder called "barrnap" and navigate to it. 
+# I made another .bashrc shortcut to simultaneously make and move to a new directory:
+mkcd ()
+{
+mkdir -p -- "$1" && cd -P -- "$1"
+}
+# so I do: 
+$ mkcd barrnap
+# Then execute:
+$ barrnap ../masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta -o OXR-209_rRNA.fa > OXR-209_barrnap.gff
+# Do this for each isolate
+# -o OXR-x_rRNA.fa writes a fasta with the predicted rRNA sequences
+# > OXR-x_barrnap.gff write the results to a features file with basic information
+
+# Copy each .fa file to a new directory in "Analysis" called "barrnap_taxonomy"
+$ cp ../OXR-?/barrnap/*.fa ./
+$ cp ../OXR-??/barrnap/*.fa ./
+$ cp ../OXR-???/barrnap/*.fa ./
+
+# Append the sequence file name to the header of each sequence.
+$ for f in *.fa; do sed -i "s/^>/>${f%.fa}_/g" "$f"; done
+
+# Concatenate each of files to a single fasta file
+$ cat *.fa > OXR_barrnap_rRNA.fa
+
+# blast the rRNAs against the blast database
+$ blastn -db nt -query OXR_barrnap_rRNA.fa -outfmt "6 qseqid staxids sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore" -max_target_seqs 5 -out OXR_barrnap_blast.txt
+# Re-try with BLAST formatted silva
+$ blastn -db /data/app/databases/silva-138.1/SILVA_138.1_SSURef_NR99_tax_silva_trunc.fasta -query OXR_barrnap_rRNA.fa -outfmt "6 qseqid staxids sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore" -max_target_seqs 5 -out OXR_barrnap_silva_blast.txt
+
+#################################################################
+# spadePlasmidFinder
+
+# Start by trimming the adapters from the fastq files
+# Made another alias in .bashrc so there isn't a need for full length paths and calling on java to run it
+alias trimmomatic='java -jar /data/app/Trimmomatic-0.38/trimmomatic-0.38.jar'
+
+# start with running the code below in "Data/illumina"
+$ trimmomatic PE -threads 8 -phred33 OXR-11_all_R1.fastq.gz OXR-11_all_R2.fastq.gz OXR-11_all_R1.trim.fq OXR-11_all_R1.orphan OXR-11_all_R2.trim.fq OXR_11_all_R2.orphan ILLUMINACLIP:/data/app/Trimmomatic-0.38/adapters/TruSeq3-PE-2+cDNA.fa:3:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:50
+# Input Read Pairs: 1812837 Both Surviving: 1642052 (90.58%) Forward Only Surviving: 125568 (6.93%) Reverse Only Surviving: 14290 (0.79%) Dropped: 30927 (1.71%)
+$ trimmomatic PE -threads 8 -phred33 OXR-134_all_R1.fastq.gz OXR-134_all_R2.fastq.gz OXR-134_all_R1.trim.fq OXR-134_all_R1.orphan OXR-134_all_R2.trim.fq OXR_134_all_R2.orphan ILLUMINACLIP:/data/app/Trimmomatic-0.38/adapters/TruSeq3-PE-2+cDNA.fa:3:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:50
+# Input Read Pairs: 5126372 Both Surviving: 4719496 (92.06%) Forward Only Surviving: 366101 (7.14%) Reverse Only Surviving: 26593 (0.52%) Dropped: 14182 (0.28%)
+$ trimmomatic PE -threads 8 -phred33 OXR-137_all_R1.fastq.gz OXR-137_all_R2.fastq.gz OXR-137_all_R1.trim.fq OXR-137_all_R1.orphan OXR-137_all_R2.trim.fq OXR_137_all_R2.orphan ILLUMINACLIP:/data/app/Trimmomatic-0.38/adapters/TruSeq3-PE-2+cDNA.fa:3:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:50
+# Input Read Pairs: 6366763 Both Surviving: 5454855 (85.68%) Forward Only Surviving: 845093 (13.27%) Reverse Only Surviving: 34537 (0.54%) Dropped: 32278 (0.51%)
+$ trimmomatic PE -threads 8 -phred33 OXR-159_all_R1.fastq.gz OXR-159_all_R2.fastq.gz OXR-159_all_R1.trim.fq OXR-159_all_R1.orphan OXR-159_all_R2.trim.fq OXR_159_all_R2.orphan ILLUMINACLIP:/data/app/Trimmomatic-0.38/adapters/TruSeq3-PE-2+cDNA.fa:3:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:50
+# Input Read Pairs: 1836529 Both Surviving: 1716550 (93.47%) Forward Only Surviving: 91211 (4.97%) Reverse Only Surviving: 10480 (0.57%) Dropped: 18288 (1.00%)
+$ trimmomatic PE -threads 8 -phred33 OXR-189_all_R1.fastq.gz OXR-189_all_R2.fastq.gz OXR-189_all_R1.trim.fq OXR-189_all_R1.orphan OXR-189_all_R2.trim.fq OXR_189_all_R2.orphan ILLUMINACLIP:/data/app/Trimmomatic-0.38/adapters/TruSeq3-PE-2+cDNA.fa:3:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:50
+# Input Read Pairs: 3041006 Both Surviving: 2685676 (88.32%) Forward Only Surviving: 336840 (11.08%) Reverse Only Surviving: 12161 (0.40%) Dropped: 6329 (0.21%)
+$ trimmomatic PE -threads 8 -phred33 OXR-199_all_R1.fastq.gz OXR-199_all_R2.fastq.gz OXR-199_all_R1.trim.fq OXR-199_all_R1.orphan OXR-199_all_R2.trim.fq OXR_199_all_R2.orphan ILLUMINACLIP:/data/app/Trimmomatic-0.38/adapters/TruSeq3-PE-2+cDNA.fa:3:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:50
+# Input Read Pairs: 4233782 Both Surviving: 3764655 (88.92%) Forward Only Surviving: 431081 (10.18%) Reverse Only Surviving: 18821 (0.44%) Dropped: 19225 (0.45%)
+$ trimmomatic PE -threads 8 -phred33 OXR-203_all_R1.fastq.gz OXR-203_all_R2.fastq.gz OXR-203_all_R1.trim.fq OXR-203_all_R1.orphan OXR-203_all_R2.trim.fq OXR_203_all_R2.orphan ILLUMINACLIP:/data/app/Trimmomatic-0.38/adapters/TruSeq3-PE-2+cDNA.fa:3:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:50 \
+# Input Read Pairs: 3148475 Both Surviving: 2890112 (91.79%) Forward Only Surviving: 222035 (7.05%) Reverse Only Surviving: 14509 (0.46%) Dropped: 21819 (0.69%)
+$ trimmomatic PE -threads 8 -phred33 OXR-209_all_R1.fastq.gz OXR-209_all_R2.fastq.gz OXR-209_all_R1.trim.fq OXR-209_all_R1.orphan OXR-209_all_R2.trim.fq OXR_209_all_R2.orphan ILLUMINACLIP:/data/app/Trimmomatic-0.38/adapters/TruSeq3-PE-2+cDNA.fa:3:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:50 \
+# Input Read Pairs: 5737125 Both Surviving: 5017206 (87.45%) Forward Only Surviving: 644785 (11.24%) Reverse Only Surviving: 38167 (0.67%) Dropped: 36967 (0.64%)
+$ trimmomatic PE -threads 8 -phred33 OXR-76_all_R1.fastq.gz OXR-76_all_R2.fastq.gz OXR-76_all_R1.trim.fq OXR-76_all_R1.orphan OXR-76_all_R2.trim.fq OXR_76_all_R2.orphan ILLUMINACLIP:/data/app/Trimmomatic-0.38/adapters/TruSeq3-PE-2+cDNA.fa:3:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:50 \
+# Input Read Pairs: 4231138 Both Surviving: 3721502 (87.96%) Forward Only Surviving: 465432 (11.00%) Reverse Only Surviving: 23611 (0.56%) Dropped: 20593 (0.49%)
+$ trimmomatic PE -threads 8 -phred33 OXR-77_all_R1.fastq.gz OXR-77_all_R2.fastq.gz OXR-77_all_R1.trim.fq OXR-77_all_R1.orphan OXR-77_all_R2.trim.fq OXR_77_all_R2.orphan ILLUMINACLIP:/data/app/Trimmomatic-0.38/adapters/TruSeq3-PE-2+cDNA.fa:3:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:50 \
+# Input Read Pairs: 6531492 Both Surviving: 5892056 (90.21%) Forward Only Surviving: 557772 (8.54%) Reverse Only Surviving: 42458 (0.65%) Dropped: 39206 (0.60%)
+$ trimmomatic PE -threads 8 -phred33 OXR-85_all_R1.fastq.gz OXR-85_all_R2.fastq.gz OXR-85_all_R1.trim.fq OXR-85_all_R1.orphan OXR-85_all_R2.trim.fq OXR_85_all_R2.orphan ILLUMINACLIP:/data/app/Trimmomatic-0.38/adapters/TruSeq3-PE-2+cDNA.fa:3:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:50 \
+# Input Read Pairs: 2890268 Both Surviving: 2580966 (89.30%) Forward Only Surviving: 275924 (9.55%) Reverse Only Surviving: 14337 (0.50%) Dropped: 19041 (0.66%)
+$ trimmomatic PE -threads 8 -phred33 OXR-96_all_R1.fastq.gz OXR-96_all_R2.fastq.gz OXR-96_all_R1.trim.fq OXR-96_all_R1.orphan OXR-96_all_R2.trim.fq OXR_96_all_R2.orphan ILLUMINACLIP:/data/app/Trimmomatic-0.38/adapters/TruSeq3-PE-2+cDNA.fa:3:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:50 \
+# Input Read Pairs: 8581779 Both Surviving: 6886053 (80.24%) Forward Only Surviving: 1555959 (18.13%) Reverse Only Surviving: 48292 (0.56%) Dropped: 91475 (1.07%)
+$ trimmomatic PE -threads 8 -phred33 OXR-9_all_R1.fastq.gz OXR-9_all_R2.fastq.gz OXR-9_all_R1.trim.fq OXR-9_all_R1.orphan OXR-9_all_R2.trim.fq OXR_9_all_R2.orphan ILLUMINACLIP:/data/app/Trimmomatic-0.38/adapters/TruSeq3-PE-2+cDNA.fa:3:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:50
+# Input Read Pairs: 4634781 Both Surviving: 4358118 (94.03%) Forward Only Surviving: 232728 (5.02%) Reverse Only Surviving: 23440 (0.51%) Dropped: 20495 (0.44%)
+
+# Run plasmidspades
+# make an alias in .bashrc
+alias plasmidspades='python3 /data/app/SPAdes-3.14.1/bin/plasmidspades.py'
+# navigate to the OXR-X directories under "Analysis"
+$ plasmidspades -t 16 -o plasmid_spades -1 ../../Data/illumina/OXR-11_all_R1.trim.fq -2 ../../Data/illumina/OXR-11_all_R2.trim.fq
+
+
+# OXR-9 plasmidspades command yielded the following warning
+# === Error correction and assembling warnings:
+# * 0:02:10.652   364M / 9G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 105)   More than 20% of long edges have coverage significantly different from median (total 802828 of 3946479 bases).
+# * 0:02:10.652   364M / 9G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 106)   In most cases it means that either read coverage is uneven or significant contamination is present - both of these two cases make plasmidSPAdes' results unreliable
+# * 0:02:10.653   364M / 9G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 107)   However, that situation may still be OK if you expect to see large plasmids in your dataset, so plasmidSPAdes will continue to work
+# ======= Warnings saved to /data/prj/ecosystem-diversity/OceanX/YEP3_culture-WGS/Analysis/OXR-9/plasmid_spades/warnings.log
+
+# OXR-96 plasmidspades command yielded the following warning
+# === Error correction and assembling warnings:
+# * 0:04:31.998     2G / 9G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 105)   More than 20% of long edges have coverage significantly different from median (total 711961 of 3310550 bases).
+# * 0:04:31.999     2G / 9G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 106)   In most cases it means that either read coverage is uneven or significant contamination is present - both of these two cases make plasmidSPAdes' results unreliable
+# * 0:04:31.999     2G / 9G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 107)   However, that situation may still be OK if you expect to see large plasmids in your dataset, so plasmidSPAdes will continue to work
+# ======= Warnings saved to /data/prj/ecosystem-diversity/OceanX/YEP3_culture-WGS/Analysis/OXR-96/plasmid_spades/warnings.log
+
+# OXR-134 plasmidspades command yielded the following warning
+# === Error correction and assembling warnings:
+# * 0:02:07.118   122M / 9G    WARN    General                 (kmer_coverage_model.cpp   : 327)   Valley value was estimated improperly, reset to 2
+# * 0:02:33.403   477M / 9G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 411)   No putative plasmid contigs found!
+# * 0:03:46.038   478M / 9G    WARN    General                 (pair_info_count.cpp       : 341)   Unable to estimate insert size for paired library #0
+# * 0:03:46.039   478M / 9G    WARN    General                 (pair_info_count.cpp       : 347)   None of paired reads aligned properly. Please, check orientation of your read pairs.
+# * 0:03:46.041   478M / 9G    WARN    General                 (repeat_resolving.cpp      :  63)   Insert size was not estimated for any of the paired libraries, repeat resolution module will not run.
+# ======= Warnings saved to /data/prj/ecosystem-diversity/OceanX/YEP3_culture-WGS/Analysis/OXR-134/plasmid_spades/warnings.log
+
+# OXR-159 plasmidspades command yielded the following warning
+# === Error correction and assembling warnings:
+# * 0:00:35.104   156M / 9G    WARN    General                 (kmer_coverage_model.cpp   : 218)   Too many erroneous kmers, the estimates might be unreliable
+# * 0:00:43.992   156M / 9G    WARN    General                 (kmer_coverage_model.cpp   : 327)   Valley value was estimated improperly, reset to 3
+# * 0:00:58.604   248M / 9G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 105)   More than 20% of long edges have coverage significantly different from median (total 921347 of 4221709 bases).
+# * 0:00:58.605   248M / 9G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 106)   In most cases it means that either read coverage is uneven or significant contamination is present - both of these two cases make plasmidSPAdes' results unreliable
+# * 0:00:58.605   248M / 9G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 107)   However, that situation may still be OK if you expect to see large plasmids in your dataset, so plasmidSPAdes will continue to work
+# ======= Warnings saved to /data/prj/ecosystem-diversity/OceanX/YEP3_culture-WGS/Analysis/OXR-159/plasmid_spades/warnings.log
+
+# OXR-189 plasmidspades command yielded the following warning
+# === Error correction and assembling warnings:
+# * 0:01:12.765   162M / 8G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 411)   No putative plasmid contigs found!
+# * 0:01:41.678   162M / 8G    WARN    General                 (pair_info_count.cpp       : 341)   Unable to estimate insert size for paired library #0
+# * 0:01:41.679   162M / 8G    WARN    General                 (pair_info_count.cpp       : 347)   None of paired reads aligned properly. Please, check orientation of your read pairs.
+# * 0:01:41.681   162M / 8G    WARN    General                 (repeat_resolving.cpp      :  63)   Insert size was not estimated for any of the paired libraries, repeat resolution module will not run.
+# ======= Warnings saved to /data/prj/ecosystem-diversity/OceanX/YEP3_culture-WGS/Analysis/OXR-189/plasmid_spades/warnings.log
+
+# OXR-203 plasmidspades command yielded the following warning
+# === Error correction and assembling warnings:
+# * 0:01:03.475   175M / 8G    WARN    General                 (kmer_coverage_model.cpp   : 327)   Valley value was estimated improperly, reset to 3
+# * 0:01:36.167   230M / 8G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 105)   More than 20% of long edges have coverage significantly different from median (total 888061 of 3371753 bases).
+# * 0:01:36.167   230M / 8G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 106)   In most cases it means that either read coverage is uneven or significant contamination is present - both of these two cases make plasmidSPAdes' results unreliable
+# * 0:01:36.168   230M / 8G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 107)   However, that situation may still be OK if you expect to see large plasmids in your dataset, so plasmidSPAdes will continue to work
+# ======= Warnings saved to /data/prj/ecosystem-diversity/OceanX/YEP3_culture-WGS/Analysis/OXR-203/plasmid_spades/warnings.log
+
+# OXR-209 plasmidspades command yielded the following warning
+# === Error correction and assembling warnings:
+# * 0:04:10.557     2G / 9G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 105)   More than 20% of long edges have coverage significantly different from median (total 1156927 of 4146583 bases).
+# * 0:04:10.558     2G / 9G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 106)   In most cases it means that either read coverage is uneven or significant contamination is present - both of these two cases make plasmidSPAdes' results unreliable
+# * 0:04:10.558     2G / 9G    WARN   ChromosomeRemover        (chromosome_remover.cpp    : 107)   However, that situation may still be OK if you expect to see large plasmids in your dataset, so plasmidSPAdes will continue to work
+# ======= Warnings saved to /data/prj/ecosystem-diversity/OceanX/YEP3_culture-WGS/Analysis/OXR-209/plasmid_spades/warnings.log
+
+#################################################################
+# Viral Verify to check validity of putative plasmids
+# download hmm database https://figshare.com/s/f897d463b31a35ad7bf0
+# add it to my home directory and unzip
+$ gunzip nbc_hmms.hmm.gz
+
+# add this to the .bashrc file to avoid exporting the paths everytime this code is run
+export PATH=$PATH:/data/app/Prodigal/:/data/app/hmmer-3.3/bin/
+
+# navigate to the OXR-X directories under "Analysis"
+$ python3 /data/app/viralVerify/bin/viralverify -f plasmid_spades/contigs.fasta -o plasmid_Verify --hmm ~/nbc_hmms.hmm -p -t 16
+
+#################################################################
+# Annotate the plasmids that were not rejected by ViralVerify
+# The fasta headers cannot be longer than 37 characters. Copy the contigs.fasta file as contigs_fix.fasta and delete some stuff in the names, manually
+$ prokka --outdir plasmid_prokka plasmid_Verify/Prediction_results_fasta/contigs_plasmid_fix.fasta --prefix OXR-209_plasmid-prokka
+# For virus files
+$ prokka --outdir virus_prokka plasmid_Verify/Prediction_results_fasta/contigs_virus_fix.fasta --prefix OXR-159_virus-prokka
+
+#################################################################
+# Map the long reads to the masurca genome
+
+$ /data/app/minimap2/minimap2 -ax map-ont masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta ../../Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq > minimap2_alignment/OXR-9_align.sam
+
+# copy the sam into a bam
+$ samtools view -S -b OXR-9_align.sam > OXR-9_align.bam
+# remove the sam
+$ rm rm OXR-9_align.sam
+
+# sort it
+$ samtools sort OXR-9_align.bam -o OXR-9_align.sorted.bam
+
+# index the bam 
+samtools index OXR-9_align.sorted.bam 
+
+# Copy the masurca file to the current directory  and then create and fasta index
+$ cp ../masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta OXR-9_masurca_genome.fasta
+$ samtools faidx OXR-9_masurca_genome.fasta
+
+# View the files in IGV
+
+##### THIS IS DOO-DOO #####
+# Convert the bam to a human readable bed file
+$ /data/app/bedtools2/bin/bamToBed -i OXR-9_align.sorted.bam > OXR-9_align.sorted.bed
+
+# I want to see if there are multiple locations of alignments for different reads
+# pull out one of the scaffolds
+$ grep "scf7180000000019" OXR-9_align.sorted.bed > scf718000000001cd .9.bed
+# look at the unique read names in column 4 of the new file, sort them, count the number of each unique occurence, sort by numeric and make a new file
+$ awk '{print $4}' scf7180000000019.bed | sort | uniq -c | sort -n > scf19_uniq.bed
+# Look for sequences that have appeared greater than 1 time. 
+$ awk -F' ' '$1 >1' scf19_uniq.bed > test.bed
+##### THIS IS DOO-DOO #####
+
+
+#################################################################
+# Align the plasmids and/or viral contigs to the contigs on the main genome to verify if the extra contigs are extra-chromosomal DNA elements
+
+## OXR-9
+# Append the sequence file name to the header of each sequence in the plasmid_Verify folder
+$ for f in *.fasta; do sed -i "s/^>/>${f%.fa}_/g" "$f"; done
+# Concatenate all of the fasta files to a single file for alignment to the genome
+$ cat *fasta > OXR-9_all_x-chrom.fasta
+
+# Try to align the plasmid data to the masurca genome
+$ mkcd minimap2_alignment
+$ mkcd plasmid_align
+$ /data/app/minimap2/minimap2 -a ../OXR-9_masurca_genome.fasta ../../plasmid_Verify/Prediction_results_fasta/OXR-9_all_x-chrom.fasta > OXR-9_all_x-chrom.align.sam
+$ samtools view -S -b OXR-9_all_x-chrom.align.sam > OXR-9_all_x-chrom.align.bam
+$ samtools sort OXR-9_all_x-chrom.align.bam -o OXR-9_all_x-chrom.align.sorted.bam
+$ samtools index OXR-9_all_x-chrom.align.sorted.bam
+$ /data/app/bedtools2/bin/bamToBed -i OXR-9_all_x-chrom.align.sorted.bam > OXR-9_all_x-chrom.align.sorted.bed
+
+#### Individual ####
+$ /data/app/minimap2/minimap2 -a ../OXR-9_masurca_genome.fasta ../../plasmid_Verify/Prediction_results_fasta/contigs_plasmid_fix.fasta > OXR-9_plasmid.align.sam
+$ samtools view -S -b OXR-9_plasmid.align.sam > OXR-9_plasmid.align.bam
+$ samtools sort OXR-9_plasmid.align.bam -o OXR-9_plasmid.align.sorted.bam
+$ samtools index OXR-9_plasmid.align.sorted.bam
+
+# try with the uncertain plasmids
+$ ./data/app/minimap2/minimap2 -a ../OXR-9_masurca_genome.fasta ../../plasmid_Verify/Prediction_results_fasta/contigs_plasmid_uncertain.fasta > OXR-9_plasmid_uncertain.align.sam
+$ samtools view -S -b OXR-9_plasmid_uncertain.align.sam > OXR-9_plasmid_uncertain.align.bam
+$ samtools sort OXR-9_plasmid_uncertain.align.bam -o OXR-9_plasmid_uncertain.align.sorted.bam
+$ samtools index OXR-9_plasmid_uncertain.align.sorted.bam
+####			####
+
+# Aligning the fixed plasmids and the uncertain plasmids with minimap2 all showed hits to the "other" contigs, as opposed to the main chromosom/contig.
+
+# Takeout the contig that I believe is the bacterial chromosome with a some scripts I found elsewhere
+$ ~/FastaToTbl ../OXR-9_masurca_genome.fasta | grep -wE 'scf7180000000016' | ~/TblToFasta > ../../OXR-9_genome_contig.fasta
+
+## OXR-76
+$ cp masurca_assembly/CA.mr.99.17.15.0.02/primary.genome.scf.fasta OXR-76_masurca_genome.fasta
+$ samtools faidx OXR-76_masurca_genome.fasta
+
+# Append the sequence file name to the header of each sequence in the plasmid_Verify folder
+$ for f in *.fasta; do sed -i "s/^>/>${f%.fa}_/g" "$f"; done
+# Concatenate all of the fasta files to a single file for alignment to the genome
+$ cat *fasta > OXR-76_all_x-chrom.fasta
+
+# Try to align the plasmid data to the masurca genome
+$ mkcd minimap2_alignment
+$ /data/app/minimap2/minimap2 -a ../OXR-76_masurca_genome.fasta ../plasmid_Verify/Prediction_results_fasta/OXR-76_all_x-chrom.fasta > OXR-76_all_x-chrom.align.sam
+$ samtools view -S -b OXR-76_all_x-chrom.align.sam > OXR-76_all_x-chrom.align.bam
+$ samtools sort OXR-76_all_x-chrom.align.bam -o OXR-76_all_x-chrom.align.sorted.bam
+$ samtools index OXR-76_all_x-chrom.align.sorted.bam
+$ /data/app/bedtools2/bin/bamToBed -i OXR-76_all_x-chrom.align.sorted.bam > OXR-76_all_x-chrom.align.sorted.bed
+
+#####
+# Try to align the plasmid data to the masurca genome
+$ mkcd minimap2_alignment
+$ /data/app/minimap2/minimap2 -a ../OXR-76_masurca_genome.fasta ../plasmid_Verify/Prediction_results_fasta/contigs_plasmid_fix.fasta > OXR-76_plasmid.align.sam
+$ samtools view -S -b OXR-76_plasmid.align.sam > OXR-76_plasmid.align.bam
+$ samtools sort OXR-76_plasmid.align.bam -o OXR-76_plasmid.align.sorted.bam
+$ samtools index OXR-76_plasmid.align.sorted.bam
+
+# try with the uncertain plasmids
+$ /data/app/minimap2/minimap2 -a ../OXR-76_masurca_genome.fasta ../plasmid_Verify/Prediction_results_fasta/contigs_plasmid_uncertain.fasta > OXR-76_plasmid_uncertain.align.sam
+$ samtools view -S -b OXR-76_plasmid_uncertain.align.sam > OXR-76_plasmid_uncertain.align.bam
+$ samtools sort OXR-76_plasmid_uncertain.align.bam -o OXR-76_plasmid_uncertain.align.sorted.bam
+$ samtools index OXR-76_plasmid_uncertain.align.sorted.bam
+####
+
+# The alignment showed that the 1 sequence that was "verified" to be a plasmid aligned to the main chromosome (Node_9)
+
+## OXR-85
+$ cp masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta OXR-85_masurca_genome.fasta
+$ samtools faidx OXR-85_masurca_genome.fasta
+
+# Append the sequence file name to the header of each sequence in the plasmid_Verify folder
+$ for f in *.fasta; do sed -i "s/^>/>${f%.fa}_/g" "$f"; done
+# Concatenate all of the fasta files to a single file for alignment to the genome
+$ cat *fasta > OXR-85_all_x-chrom.fasta
+
+# Try to align the plasmid data to the masurca genome
+$ mkcd minimap2_alignment
+$ /data/app/minimap2/minimap2 -a ../OXR-85_masurca_genome.fasta ../plasmid_Verify/Prediction_results_fasta/OXR-85_all_x-chrom.fasta > OXR-85_all_x-chrom.align.sam
+$ samtools view -S -b OXR-85_all_x-chrom.align.sam > OXR-85_all_x-chrom.align.bam
+$ samtools sort OXR-85_all_x-chrom.align.bam -o OXR-85_all_x-chrom.align.sorted.bam
+$ samtools index OXR-85_all_x-chrom.align.sorted.bam
+$ /data/app/bedtools2/bin/bamToBed -i OXR-85_all_x-chrom.align.sorted.bam > OXR-85_all_x-chrom.align.sorted.bed
+
+
+## OXR-137
+$ cp masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta OXR-137_masurca_genome.fasta
+$ samtools faidx OXR-137_masurca_genome.fasta
+
+# Append the sequence file name to the header of each sequence in the plasmid_Verify folder
+$ for f in *.fasta; do sed -i "s/^>/>${f%.fa}_/g" "$f"; done
+# Concatenate all of the fasta files to a single file for alignment to the genome
+$ cat *fasta > OXR-137_all_x-chrom.fasta
+
+# Try to align the plasmid data to the masurca genome
+$ mkcd minimap2_alignment
+$ /data/app/minimap2/minimap2 -a ../OXR-137_masurca_genome.fasta ../plasmid_Verify/Prediction_results_fasta/OXR-137_all_x-chrom.fasta > OXR-137_all_x-chrom.align.sam
+$ samtools view -S -b OXR-137_all_x-chrom.align.sam > OXR-137_all_x-chrom.align.bam
+$ samtools sort OXR-137_all_x-chrom.align.bam -o OXR-137_all_x-chrom.align.sorted.bam
+$ samtools index OXR-137_all_x-chrom.align.sorted.bam
+$ /data/app/bedtools2/bin/bamToBed -i OXR-137_all_x-chrom.align.sorted.bam > OXR-137_all_x-chrom.align.sorted.bed
+
+## OXR-159
+$ cp masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta OXR-159_masurca_genome.fasta
+$ samtools faidx OXR-137_masurca_genome.fasta
+
+# Append the sequence file name to the header of each sequence in the plasmid_Verify folder
+$ for f in *.fasta; do sed -i "s/^>/>${f%.fa}_/g" "$f"; done
+# Concatenate all of the fasta files to a single file for alignment to the genome
+$ cat *fasta > OXR-159_all_x-chrom.fasta
+
+# Try to align the plasmid data to the masurca genome
+$ mkcd minimap2_alignment
+$ /data/app/minimap2/minimap2 -a ../OXR-159_masurca_genome.fasta ../plasmid_Verify/Prediction_results_fasta/OXR-159_all_x-chrom.fasta > OXR-159_all_x-chrom.align.sam
+$ samtools view -S -b OXR-159_all_x-chrom.align.sam > OXR-159_all_x-chrom.align.bam
+$ samtools sort OXR-159_all_x-chrom.align.bam -o OXR-159_all_x-chrom.align.sorted.bam
+$ samtools index OXR-159_all_x-chrom.align.sorted.bam
+$ /data/app/bedtools2/bin/bamToBed -i OXR-159_all_x-chrom.align.sorted.bam > OXR-159_all_x-chrom.align.sorted.bed
+
+## OXR-199
+$ cp masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta OXR-199_masurca_genome.fasta
+$ samtools faidx OXR-199_masurca_genome.fasta
+
+# Append the sequence file name to the header of each sequence in the plasmid_Verify folder
+$ for f in *.fasta; do sed -i "s/^>/>${f%.fa}_/g" "$f"; done
+# Concatenate all of the fasta files to a single file for alignment to the genome
+$ cat *fasta > OXR-199_all_x-chrom.fasta
+
+# Try to align the plasmid data to the masurca genome
+$ mkcd minimap2_alignment
+$ /data/app/minimap2/minimap2 -a ../OXR-199_masurca_genome.fasta ../plasmid_Verify/Prediction_results_fasta/OXR-199_all_x-chrom.fasta > OXR-199_all_x-chrom.align.sam
+$ samtools view -S -b OXR-199_all_x-chrom.align.sam > OXR-199_all_x-chrom.align.bam
+$ samtools sort OXR-199_all_x-chrom.align.bam -o OXR-199_all_x-chrom.align.sorted.bam
+$ samtools index OXR-199_all_x-chrom.align.sorted.bam
+$ /data/app/bedtools2/bin/bamToBed -i OXR-199_all_x-chrom.align.sorted.bam > OXR-199_all_x-chrom.align.sorted.bed
+
+## OXR-209
+$ cp masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta OXR-209_masurca_genome.fasta
+$ samtools faidx OXR-209_masurca_genome.fasta
+
+# Append the sequence file name to the header of each sequence in the plasmid_Verify folder
+$ for f in *.fasta; do sed -i "s/^>/>${f%.fa}_/g" "$f"; done
+# Concatenate all of the fasta files to a single file for alignment to the genome
+$ cat *fasta > OXR-209_all_x-chrom.fasta
+
+# Try to align the plasmid data to the masurca genome
+$ mkcd minimap2_alignment
+$ /data/app/minimap2/minimap2 -a ../OXR-209_masurca_genome.fasta ../plasmid_Verify/Prediction_results_fasta/OXR-209_all_x-chrom.fasta > OXR-209_all_x-chrom.align.sam
+$ samtools view -S -b OXR-209_all_x-chrom.align.sam > OXR-209_all_x-chrom.align.bam
+$ samtools sort OXR-209_all_x-chrom.align.bam -o OXR-209_all_x-chrom.align.sorted.bam
+$ samtools index OXR-209_all_x-chrom.align.sorted.bam
+$ /data/app/bedtools2/bin/bamToBed -i OXR-209_all_x-chrom.align.sorted.bam > OXR-209_all_x-chrom.align.sorted.bed
+
+
+#################################################################
+# Attempt to circularlize the genomes with circlator
+
+## OXR-9
+# use circlator to try and find the circularized contigs
+$ /data/app/circlator-1.5.5-docker5/scripts/circlator all --bwa_opts "-x ont2d" --threads 8 masurca_assembly/CA.mr.83.17.15.0.02/primary.genome.scf.fasta /data/prj/ecosystem-diversity/OceanX/YEP3_culture-WGS/Data/nanopore/qc/OXR-9_BC01_ONT_qc.fastq circlator_output
+# lack luster results.
+# Description of results found in the file "04.merge.circularise_details.log"
+
+## OXR-76
+# use circlator to try and find the circularized contigs
+$ /data/app/circlator-1.5.5-docker5/scripts/circlator all --bwa_opts "-x ont2d" --threads 8 masurca_assembly/CA.mr.99.17.15.0.02/primary.genome.scf.fasta /data/prj/ecosystem-diversity/OceanX/YEP3_culture-WGS/Data/nanopore/qc/OXR-76_BC03_ONT_qc.fastq circlator_output
+# Description of results found in the file "04.merge.circularise_details.log"
+^^^^^^^ not working??????
+
