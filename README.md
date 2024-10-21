@@ -1,12 +1,14 @@
 # Moytirra-Hydrothermal-Vent-Bacterial-Genomes
 
-Genome assemblies, raw Illumina short-read sequences in fastq, raw ONT long-read sequences in fastq, and raw 16S rRNA gene sequences in fastq format for this project can be found at NCBI BioProject accession number PRJNA1046213. Data generated for and during this project is available at https://osf.io/8czpm/
+Genome assemblies, raw Illumina short-read sequences in fastq, raw ONT long-read sequences in fastq, and raw 16S rRNA gene sequences in fastq format for this project can be found at NCBI BioProject accession number PRJNA1046213, SRA data is unreleased as of Oct 21, 2024. Data generated for and during this project is available at https://osf.io/8czpm/
 
-## Sample collection
-Sample collection is described in Polinski et al. 2023 (DOI 10.3389/fmars.2023.1219784)
+Transcriptomic and 16S metabarcoding data used in the paper originate from Polinski et al. 2023 "Drifting in the deep: Metatranscriptomics and metabarcoding reveal sustained metabolic activity and community composition in hydrothermal vent plume microbial communities" (https://doi.org/10.3389/fmars.2023.1219784). The data can be retrieved from NCBI BioProject accession number PRJNA950338.
 
 # Abstract
 Hydrothermal vent plumes (HVPs), formed by high-temperature vent emissions, are rich in compounds which support chemosynthesis and serve as reservoirs of microbial diversity and genetic innovation. Through turbulence, mixing, and interaction with subsea currents, vent communities are thought to disperse across ocean basins.  In this study, we focused on the Moytirra HVP, a relatively unexplored site, to investigate its microbial inhabitants. We cultured bacteria from the plume using 11 different media types and performed complete genome sequencing on 12 isolates. Our analyses revealed four putatively novel species from the Thalassobaculum, Sulfitobacter, Idiomarina, and Christiangramia genera. Comparative genomics identified unique genomic islands containing biosynthetic gene clusters, including a novel Non-Ribosomal Peptide Synthetase/Polyketide Synthase cluster, toxin-antitoxin systems, and evidence of horizontal gene transfer facilitated by prophages. These findings underscore the potential of HVPs as a source of novel microbial species and biotechnologically relevant genes, contributing to our understanding of the biodiversity and genetic complexity of these extreme environments.
+
+## Sample collection
+Sample collection is described in Polinski et al. 2023 (DOI 10.3389/fmars.2023.1219784)
 
 ## Microbe Culturing
 Filters were submerged in 25% glycerol in sterile filtered seawater for cryopreservation. The filters  were thawed on ice and vortexed 
