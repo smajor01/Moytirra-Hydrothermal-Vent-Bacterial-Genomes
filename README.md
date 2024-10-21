@@ -1,4 +1,4 @@
-# Moytirra-Hydrothermal-Vent-Bacterial-Genomes
+# Moytirra Hydrothermal Vent Bacterial Genomes
 
 Genome assemblies, raw Illumina short-read sequences in fastq, raw ONT long-read sequences in fastq, and raw 16S rRNA gene sequences in fastq format for this project can be found at NCBI BioProject accession number PRJNA1046213, SRA data is unreleased as of Oct 21, 2024. Data generated for and during this project is available at https://osf.io/8czpm/
 
